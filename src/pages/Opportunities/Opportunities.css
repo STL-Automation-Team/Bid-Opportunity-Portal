@@ -1,0 +1,315 @@
+/* Opportunities.css */
+
+.opportunities-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+}
+
+.cards-container {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.table-container {
+    overflow-x: auto;
+    width: 100%;
+}
+
+.opportunities-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.opportunities-table th,
+.opportunities-table td {
+    padding: 12px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.opportunities-table th {
+    background-color: #4caf50; /* Nice background color for the header row */
+    color: white; /* White text color for contrast */
+}
+
+.opportunities-table td {
+    color: #000; /* Set the text color to black */
+}
+
+.opportunities-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.opportunities-table tr:hover {
+    background-color: #e9ecef;
+}
+
+.opportunities-table a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.opportunities-table a:hover {
+    text-decoration: underline;
+}
+
+
+.opportunities-container {
+    position: relative;
+    /* Ensure container is relative for absolute positioning */
+}
+.fixed-button {
+    position: fixed;
+    bottom: 20px;
+    right: -100px; /* Hide the button by default */
+    z-index: 1000; /* Ensure it's above other content if necessary */
+    transition: right 0.5s; /* Add a transition effect for smooth sliding */
+}
+
+.fixed-button .hidden-button {
+    display: none; /* Hide the button by default */
+}
+
+.fixed-button:hover {
+    right: 20px; /* Show the button on hover */
+}
+
+.fixed-button:hover .hidden-button {
+    display: block; /* Show the button on hover */
+}
+
+.fixed-button .arrow {
+    position: absolute;
+    top: 50%;
+    right: -20px;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: #333;
+    cursor: pointer;
+}
+
+.fixed-button:hover .arrow {
+    right: -30px; /* Move the arrow to the left on hover */
+}
+
+.filter-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-container select,
+.filter-container input {
+    padding: 8px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex-grow: 1;
+}
+
+@media (max-width: 768px) {
+    .filter-container {
+        flex-direction: column;
+    }
+    
+    .filter-container select,
+    .filter-container input {
+        width: 100%;
+        margin: 5px 0;
+    }
+}
+
+.expandable-area {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.expandable-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f0f0f0;
+}
+
+.expandable-header h3 {
+    margin: 0;
+    color: black;
+}
+
+.expandable-header button {
+    padding: 5px 10px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.expandable-content {
+    padding: 15px;
+}
+
+.additional-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.additional-table th,
+.additional-table td {
+    padding: 12px;
+    border: 1px solid #ccc;
+    text-align: left;
+    color: black;
+}
+
+.additional-table th {
+    background-color: #4caf50;
+    color: white;
+}
+
+.no-results-message,
+.no-filter-message {
+    text-align: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    color: #6c757d;
+    font-size: 16px;
+}
+
+.no-filter-message {
+    background-color: #e9ecef;
+}
+
+
+.fy-selector {
+    margin-bottom: 20px;
+}
+
+.fy-selector select {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.account-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.account-table th,
+.account-table td {
+    padding: 12px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.account-table th {
+    background-color: #4caf50;
+    color: white;
+}
+
+.account-table .total-row {
+    font-weight: bold;
+    background-color: #f2f2f2;
+}
+
+.expandable-content {
+    padding: 20px;
+    color: black;
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+}
+
+.account-table th {
+    background-color: #4caf50;
+    color: white;
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: center;
+}
+
+.account-table thead tr:nth-child(2) th,
+.account-table thead tr:nth-child(3) th {
+    background-color: #084b0b;  /* A lighter green for the AGP and Value rows */
+}
+
+.account-table thead tr:nth-child(2) th:first-child,
+.account-table thead tr:nth-child(2) th:last-child {
+    background-color: #4caf50;  /* Keep the merged cells the same color as the header */
+}
+
+.account-table thead tr:nth-child(2) th,
+.account-table thead tr:nth-child(3) th {
+    padding: 8px;  /* Slightly reduce padding for these rows */
+}
+
+
+.account-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.account-table th, .account-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.account-table th {
+    background-color: #4caf50;
+    color: white;
+}
+
+.account-table thead tr:nth-child(2) th,
+.account-table thead tr:nth-child(3) th {
+    background-color: #4caf50;
+}
+
+.account-table thead select {
+    width: 100%;
+    padding: 2px;
+    border: none;
+    background-color: green;
+    color: white;
+    font-weight: bold;
+    text-align-last: center;
+}
+
+.account-table thead select option {
+    background-color: white;
+    color: black;
+}
+
+.account-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.account-table .total-row {
+    font-weight: bold;
+    background-color: #e8f5e9;
+}
+
+.total-row {
+    font-weight: bold;
+    background-color: #f0f0f0;
+}
+
+.agp-total {
+    color: #4a4a4a;
+}
+
+.vis-act-total {
+    color: #0066cc;
+}

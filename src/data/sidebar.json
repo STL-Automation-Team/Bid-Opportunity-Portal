@@ -1,0 +1,54 @@
+[
+    {
+        "title": "Home",
+        "icon": "bi-grid-1x2-fill",
+        "path": "/"
+    },
+    {
+        "title": "Assets",
+        "icon": "bi-stack",
+        "childrens": [
+            {
+                "title": "Network Assets",
+                "icon": "bi-menu-button-wide-fill",
+                "path": "/assetslist"
+            },
+            {
+                "title": "Virtual Servers",
+                "icon": "bi-server",
+                "path": "/register"
+            }
+        ]
+    },
+    {
+        "title": "Licenses",
+        "icon": "bi-file-earmark-text-fill",
+        "path": "/licenseslist"
+    },
+    {
+        "title": "Operations",
+        "icon": "bi-ticket-detailed-fill",
+        "path": "/operationslist"
+    },
+    {
+        "title": "Users",
+        "icon": "bi-people-fill",
+        "path": "userslist"
+    },
+    {
+        "title": "Settings",
+        "icon": "bi-gear-fill",
+        "childrens": [
+            {
+                "title": "Asset Modal",
+                "icon": "bi-back",
+                "path": "/profile"
+            },
+            {
+                "title": "Custom Fields",
+                "icon": "bi-pencil-square"
+            }
+        ]
+    }
+
+]

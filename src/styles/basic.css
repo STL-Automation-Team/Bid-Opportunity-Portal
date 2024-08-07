@@ -1,0 +1,25 @@
+.sidebar {
+  /* Existing styles for the sidebar */
+  z-index: 100; /* Ensure the sidebar appears above the page content */
+}
+
+.page-container {
+  margin-left: 260px; /* Adjust the margin to match the width of the open sidebar */
+  transition: all 0.5s ease;
+  position: relative; /* Create a stacking context for proper z-indexing */
+}
+
+.sidebar.close ~ .page-container {
+  margin-left: 78px; /* Adjust the margin for the closed sidebar */
+}
+
+@media (max-width: 400px) {
+  /* Responsive styles for the sidebar */
+  .page-container {
+    margin-left: 78px; /* Adjust the margin for the responsive layout */
+  }
+
+  .sidebar.close ~ .page-container {
+    margin-left: 0; /* Remove the margin for the closed sidebar in responsive mode */
+  }
+}

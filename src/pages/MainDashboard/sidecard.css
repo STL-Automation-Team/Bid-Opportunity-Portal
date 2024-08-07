@@ -1,0 +1,29 @@
+.count-card {
+    position: relative;
+    margin-bottom: 10px;
+    /* border: 1px solid #ccc; */
+  }
+  
+  .expand-toggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+  
+  .expand-button {
+    background-color: transparent;
+    border: none;
+    padding: 5px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .expand-button:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .card-header{
+    background-color: none;
+    border-bottom: none;
+  }

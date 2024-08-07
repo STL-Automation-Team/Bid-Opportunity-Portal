@@ -1,0 +1,92 @@
+/* Ensure modal specific styles */
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .modal-title {
+    font-weight: bold;
+    color: #343a40;
+  }
+  
+  .form-label {
+    font-weight: bold;
+    color: #495057;
+  }
+  
+  .form-control {
+    border-radius: 0.25rem;
+  }
+  
+  button {
+    font-weight: bold;
+  }
+  
+  /* Main layout styles */
+  .main1 {
+    display: flex;
+    height: 100vh; /* Use full viewport height */
+  }
+  
+  .left1 {
+    flex: 1; /* Take up 50% of the available space */
+    padding: 20px;
+    background-color: #f0f0f0; /* Example background color */
+    overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+  }
+  
+  .right1 {
+    flex: 1; /* Take up 50% of the available space */
+    padding: 20px;
+    background-color: #ffffff; /* Example background color */
+    overflow-y: auto; /* Enable vertical scrolling if content exceeds height */
+    position: relative; /* Ensure relative positioning */
+  }
+  
+  /* Ensure the button remains in the bottom-right corner */
+  .add-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #FFDE95;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    z-index: 10; /* Ensure it's above other content */
+  }
+  
+  .add-button img {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .add-button:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Styling for popup options */
+  .popup {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    z-index: 5;
+    margin-top: 10px;
+    padding: 20px;
+    width: -90px;
+    right: 110px;
+  }
+  
+  .popup-option {
+    cursor: pointer;
+    padding: 5px 10px;
+    z-index: 5;
+  }
+  
+  /* Styling for submitted cards */
+  .submitted-card {
+    margin-bottom: 10px;
+  }
+  
