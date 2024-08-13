@@ -1,0 +1,33 @@
+.count-card {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.expand-button {
+  background-color: transparent;
+  border: none;
+  padding: 5px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  color: white; /* Make the plus/minus button white */
+  margin-right: 10px;
+}
+
+.expand-button:hover {
+  background-color: #f0f0f0;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  background-color: none;
+  border-bottom: none;
+}
+
+.card-title {
+  flex-grow: 1;
+  font-weight: bold; /* Add if it was bold previously */
+  font-size: 1.1em; /* Adjust this to match the previous size */
+  text-align: center; /* Center the text */
+}
