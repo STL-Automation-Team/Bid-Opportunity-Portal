@@ -1,0 +1,52 @@
+.user-management {
+    padding: 20px;
+  }
+  
+  .action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .content {
+    margin-top: 20px;
+  }
+
+  /* AppBar styles */
+
+/* AppBar styles */
+.user-management .MuiAppBar-root {
+    background-color: #f0f4f8 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  /* Tab styles */
+  .user-management .MuiTabs-root .MuiTab-root {
+    color: #4a5568 !important;
+    font-weight: 500 !important;
+    text-transform: none !important;
+    min-height: 64px !important;
+    background-color: transparent !important;
+  }
+  
+  /* Selected tab styles */
+  .user-management .MuiTabs-root .MuiTab-root.Mui-selected {
+    color: #3182ce !important;
+  }
+  
+  /* Tab indicator styles */
+  .user-management .MuiTabs-root .MuiTabs-indicator {
+    background-color: #3182ce !important;
+    height: 3px !important;
+  }
+  
+  /* Tab icon styles */
+  .user-management .MuiTabs-root .MuiTab-root .MuiSvgIcon-root {
+    margin-bottom: 4px !important;
+  }
+  
+  /* Hover effect for tabs */
+  .user-management .MuiTabs-root .MuiTab-root:hover {
+    background-color: rgba(49, 130, 206, 0.04) !important;
+  }

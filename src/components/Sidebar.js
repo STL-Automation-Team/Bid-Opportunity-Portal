@@ -139,11 +139,11 @@ const Sidebar = () => {
                 Settings
               </Link>
             </li>
+            {/* <li>
+              <Link to="/modellist">User Management</Link>
+            </li> */}
             <li>
-              <Link to="/modellist">Asset Model</Link>
-            </li>
-            <li>
-              <Link to="/customfieldslist">Custom Fields</Link>
+              <Link to="/customfieldslist">Data Management</Link>
             </li>
           </ul>
         </li>

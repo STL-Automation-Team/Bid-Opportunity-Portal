@@ -1,269 +1,284 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import DataTable from 'react-data-table-component';
-import { Link , useParams } from 'react-router-dom';
-import { Dropdown } from 'react-bootstrap';
-import '../../../styles/List.css';
-import { RiEditLine, RiBookReadFill } from 'react-icons/ri';
+import './style.css';
 
+const API_BASE_URL = 'http://localhost:8080';
+
+const modules = [
+  {
+    name: 'Department',
+    endpoint: '/api/department',
+    fields: [
+      { name: 'dep_name', label: 'Department Name', type: 'text', required: true },
+      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], required: true }
+    ],
+  },
+  {
+    name: 'Business Unit',
+    endpoint: '/api/business-units',
+    fields: [
+      { name: 'businessUnit', label: 'Business Unit', type: 'text', required: true },
+      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], required: true }
+    ],
+  },
+  {
+    name: 'Industry Segment',
+    endpoint: '/api/business-segments',
+    fields: [
+      { name: 'name', label: 'Segment Name', type: 'text', required: true }
+    ],
+  },
+  {
+    name: 'Financial Year',
+    endpoint: '/api/fy',
+    fields: [
+      { name: 'obFy', label: 'FY', type: 'number', required: true },
+    
+    ],
+  },
+  {
+    name: 'Priority',
+    endpoint: '/api/priority',
+    fields: [
+      { name: 'priority', label: 'Priority', type: 'text', required: true },
+      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], required: true }
+    ],
+  },
+  {
+    name: 'Deal Status',
+    endpoint: '/api/deals',
+    fields: [
+      { name: 'dealStatus', label: 'Deal Status', type: 'text', required: true },
+      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], required: true }
+    ],
+  },
+  {
+    name: 'Go-No-Go Status',
+    endpoint: '/api/go-no-go',
+    fields: [
+      { name: 'dealStatus', label: 'Go-No-Go value', type: 'text', required: true },
+      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], required: true }
+    ],
+  },
+];
+
+const DataForm = ({ module, onSubmit, initialData }) => {
+  const [formData, setFormData] = useState(initialData || {});
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    setFormData(initialData || {});
+  }, [initialData]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: '' });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    module.fields.forEach(field => {
+      if (field.required && !formData[field.name]) {
+        newErrors[field.name] = `${field.label} is required`;
+      }
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      onSubmit(formData);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="data-form">
+      {module.fields.map((field) => (
+        <div key={field.name} className="form-group">
+          <label htmlFor={field.name}>{field.label}</label>
+          {field.type === 'select' ? (
+            <select
+              id={field.name}
+              name={field.name}
+              value={formData[field.name] || ''}
+              onChange={handleChange}
+              className={errors[field.name] ? 'error' : ''}
+            >
+              <option value="">Select {field.label}</option>
+              {field.options.map(option => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          ) : (
+            <input
+              type={field.type}
+              id={field.name}
+              name={field.name}
+              value={formData[field.name] || ''}
+              onChange={handleChange}
+              className={errors[field.name] ? 'error' : ''}
+            />
+          )}
+          {errors[field.name] && <span className="error-message">{errors[field.name]}</span>}
+        </div>
+      ))}
+      <button type="submit" className="submit-btn">{initialData ? 'Update' : 'Create'}</button>
+    </form>
+  );
+};
+
+
+const DataTable = ({ data, module, onEdit, onDelete }) => (
+  <div className="table-container">
+    {data.length > 0 ? (
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            {module.fields.map((field) => (
+              <th key={field.name}>{field.label}</th>
+            ))}
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((item) => (
+            <tr key={item.id}>
+              <td>{item.id}</td>
+              {module.fields.map((field) => (
+                <td key={field.name}>{item[field.name]}</td>
+              ))}
+              <td>
+                <button onClick={() => onEdit(item)} className="edit-btn">Edit</button>
+                <button onClick={() => onDelete(item.id)} className="delete-btn">Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    ) : (
+      <p className="no-data">No data available</p>
+    )}
+  </div>
+);
 
 export default function CustomFieldsList() {
-    const [search, setSearch] = useState("");
-    const [customFields, setCustomFields] = useState([]);
-    const [filteredCustomFields, setFilteredCustomFields] = useState([]);
-    const [selectedColumns,setSelectedColumns] = useState(['id', 'name', 'type', 'validation','Actions']);
-    const [allColumns,setAllColumns] = useState([]);
-    //const [showDropdown, setShowDropdown] = useState(false);
-    const [showModal, setShowModal] = useState(false);
-  
-  
-  
-    const {Id}=useParams();
-  
-    // const handleCloseModal = () => {
-    //   setShowModal(false);
-    //   loadAssets();
-    // };
-  
-    // const handleShowModal = () => {
-    //   setShowModal(true);
-    // };
-    
-  
-    const loadCustomFields = async () => {
-      try {
-        const response = await axios.get("http://localhost:8080/v1/settings/custom-fields");
-      setCustomFields(response.data);
-      setFilteredCustomFields(response.data);
-        setAllColumns(columns);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  
-    // const deleteModel=async (id) => {
-    //   handleShowModal();
-    //   await axios.delete(`http://localhost:8080/v1/assets/${id}`)
-      
-    // }
-  
-    const handleColumnSelect = (selector) => {
-      if(selectedColumns.includes(selector)) {
-        setSelectedColumns(selectedColumns.filter((col) => col !== selector));
-      }
-      else {
-        setSelectedColumns([...selectedColumns,selector]);
-      }
-    };
-  
-  
-   const columns = [
-    {
-      name: "ID",
-      selector: 'id',
-      sortable: true,
-    },
-    {
-      name: "Name",
-      selector: 'name',
-      sortable: true,
-    },
-    {
-      name: "Type",
-      selector: 'type',
-      sortable: true,
-    },
-    {
-      name: "Validation",
-      selector: 'validation',
-      sortable: true,
-    },
-    {
-      name: "Actions",
-      selector: 'Actions',
-      maxWidth: '500px',
-      cell: (row) => (
-        // <div>
-        //   <Link className="btn btn-primary mx-1" to={`/editasset/${row.id}`}> Edit </Link>
-        //   <Link className="btn btn-danger mx-1" onClick={() => deleteLicense(row.id)}> Delete </Link>
-        // </div>
-        <div>
-        <Link title="Edit" className="btn btn-primary mx-1 editbtn" to={`/editasset/${row.id}`}>
-          <RiEditLine /> {/* Edit icon */}
-        </Link>
-        <Link title="More" className="btn btn-secondary mx-1 readbtn" to={`/readasset/${row.id}`}>
-          <RiBookReadFill/> {/* Read icon */}
-        </Link>
-      </div>
-        
-      ),
-    },
-  
-   ];
-  
-   const visibleColumns = [...columns.filter((col) => selectedColumns.includes(col.selector))];
-  
-  
-   useEffect(()=>{
-    loadCustomFields();
-  },[]);
-  
+  const [selectedModule, setSelectedModule] = useState(null);
+  const [data, setData] = useState([]);
+  const [editingItem, setEditingItem] = useState(null);
+
   useEffect(() => {
-    const result = customFields.filter((asset) => {
-      return visibleColumns.some((col) => {
-        const value = customFields[col.selector];
-        return String(value).toLowerCase().includes(search.toLowerCase());
+    if (selectedModule) {
+      fetchData();
+    }
+  }, [selectedModule]);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}${selectedModule.endpoint}`);
+      setData(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      alert('Error fetching data.');
+
+    }
+  };
+
+  const handleCreate = async (formData) => {
+    try {
+      const createdAt = new Date().toISOString();
+      const createdBy = 'Admin'; // You can replace this with the actual username if available
+
+      const response = await axios.post(`${API_BASE_URL}${selectedModule.endpoint}`, {
+        ...formData,
+        createdAt,
+        createdBy,
       });
-    });
-    setFilteredCustomFields(result);
-    //console.log(result);
-  }, [search, selectedColumns, customFields]);
-  
-  
-//   const fetchDataToExport = async () => {
-//     try {
-//       const response = await axios.get(`http://localhost:8080/v1/assets/export`, {
-//         responseType: 'blob',
-//       });
-//       const fileName = 'assets.csv';
-//       saveAs(response.data,fileName);
-//     }
-//     catch(error) {
-//       console.log(error);
-  
-//     }
-//   };
-  
-  
-  const tableCustomStyles = {
-    headCells: {
-      style: {
-        fontSize: "17px",
-        fontWeight: "bold",
-        justifyContent: "center",
-        backgroundColor: "midnightblue",
-      },
-    },
-  
-    rows: {
-      style: {
-        minHeight: "50px",
-      },
-    },
-    cells: {
-      style: {
-        justifyContent: "center",
-        padding: "0px",
-        margin: "0px",
-      },
-    },
+      fetchData();
+      setData([]);
+      alert('Item created successfully!');
+    } catch (error) {
+      console.error('Error creating item:', error);
+      alert('Error creating item.');
+    }
   };
-  
-  const rowCustomStyles = {
-    style: (index) => ({
-      backgroundColor: index % 2 === 0 ? 'lightgray' : 'white',
-    }),
+
+  const handleUpdate = async (formData) => {
+    try {
+      const updatedAt = new Date().toISOString();
+      const updatedBy = 'Admin'; // You can replace this with the actual username if available
+
+      await axios.put(`${API_BASE_URL}${selectedModule.endpoint}/${formData.id}`, {
+        ...formData,
+        updatedBy,
+        updatedAt,
+      });
+      fetchData();
+      setEditingItem(null);
+      setData([]);
+      alert('Item updated successfully!');
+    } catch (error) {
+      console.error('Error updating item:', error);
+      alert('Error updating item.');
+    }
   };
-  
-  //---------------------------------------------------------------------------------------------------------
-  //below code is for exporting data from UI , only visible columns data is downloaded
-  // const exportToCSV = () => {
-  //   // Add the column headers
-  //   let csvContent = visibleColumns.map((column) => column.name).join(',') + '\r\n';
-  
-  //   // Add the data rows
-  //   filteredAssets.forEach((asset) => {
-  //     const rowData = visibleColumns.map((column) => {
-  //       const value = asset[column.selector];
-  //       return typeof value === 'string' ? `"${value}"` : value;
-  //     });
-  //     csvContent += rowData.join(',') + '\r\n';
-  //   });
-  
-  //   // Create a Blob with the CSV content
-  //   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  
-  //   // Save the Blob as a CSV file
-  //   saveAs(blob, 'assets.csv');
-  // };
-  // -----------------------------------------------------------------------------------------------
-  
-  
-  
-    return (
-     <div className="datatable-container">
-     <h3 className="listheading"><b>All Custom Fields</b></h3>
-  <div className="d-flex justify-content-end align-items-center mb-3">
-  
-  <Dropdown>
-            <Dropdown.Toggle variant="primary" className="mx-2 columnselector">
-              <b>Select Columns</b>
-            </Dropdown.Toggle>
-            <Dropdown.Menu className="dropdown-menu-scrollable">
-              <div className="dropdown-column-wrapper">
-                {columns.map((col) => (
-                  <div key={col.selector} className="dropdown-item">
-                    <input
-                      type="checkbox"
-                      className="form-check-input"
-                      id={col.selector}
-                      checked={selectedColumns.includes(col.selector)}
-                      onChange={() => handleColumnSelect(col.selector)}
-                    />
-                    <label className="form-check-label" htmlFor={col.selector}>
-                      {col.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </Dropdown.Menu>
-          </Dropdown>
-          <Link className="btn btn-primary mx-2 add" to="/customfields">
-            <b>Add Custom Field</b>
-          </Link>
-  
-          {/* <Link className="btn btn-primary mx-2 import-btn" to="/uploader">
-            <b>Import</b>
-          </Link>
-  
-          <button className="btn btn-primary mx-2 export-btn" onClick={fetchDataToExport}>
-      <b>Export</b>
-    </button> */}
-  
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${API_BASE_URL}${selectedModule.endpoint}/${id}`);
+      fetchData();
+      setData([]);
+      alert('Item deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      alert('Error deleting item.');
+    }
+  };
+
+  const handleModuleChange = (module) => {
+    setSelectedModule(module);
+    setEditingItem(null);
+    setData([]);
+  };
+
+  return (
+    <div className="datatable-container">
+      <h3 className="listheading"><b>Data Management Module</b></h3>
+      <div className="data-management-layout">
+        <div className="modules-sidebar">
+          {modules.map((module) => (
+            <button
+              key={module.name}
+              onClick={() => handleModuleChange(module)}
+              className={selectedModule === module ? 'active' : ''}
+            >
+              {module.name}
+            </button>
+          ))}
         </div>
-  
-        <DataTable 
-        className="custom-datatable"
-        columns={visibleColumns}
-        data={filteredCustomFields}
-        pagination
-        subHeader
-        subHeaderComponent = {
-          <input type="text" placeholder="search" className="w-25 form-control my-search" value={search} onChange={(e)=> setSearch(e.target.value)}/>
-        }
-        customStyles={tableCustomStyles}
-            highlightOnHover
-            responsive
-            striped
-            theme="default"
-            noDataComponent={<span>No data available</span>}
-            conditionalRowStyles={rowCustomStyles}
-        />
-  
-  {/* <Modal show={showModal} onHide={handleCloseModal} >
-          <Modal.Header closeButton className="modal-style">
-            <Modal.Title>Deletion Successful</Modal.Title>
-          </Modal.Header>
-          <Modal.Body className="modal-style">
-            <p>Your assetmodel has been successfully deleted.</p>
-          </Modal.Body>
-          <Modal.Footer className="modal-style">
-            <Button variant="info" onClick={handleCloseModal}>
-              Close
-            </Button>
-          </Modal.Footer>
-        </Modal> */}
-  
+        <div className="module-content">
+          {selectedModule ? (
+            <>
+              <h4>{selectedModule.name}</h4>
+              <DataForm
+                module={selectedModule}
+                onSubmit={editingItem ? handleUpdate : handleCreate}
+                initialData={editingItem}
+              />
+              <DataTable
+                data={data}
+                module={selectedModule}
+                onEdit={setEditingItem}
+                onDelete={handleDelete}
+              />
+            </>
+          ) : (
+            <p className="select-module">Please select a module from the list on the left.</p>
+          )}
+        </div>
       </div>
-    )
+    </div>
+  );
 }

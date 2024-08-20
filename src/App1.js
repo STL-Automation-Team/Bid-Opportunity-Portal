@@ -3,6 +3,7 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import Uploader from "./components/Uploader";
+import UserManagement from './components/UserManagement';
 import AdminSettings from "./pages/AdminSettings";
 import AddAsset from "./pages/Assets/AddAsset";
 import AssetList from "./pages/Assets/AssetList";
@@ -26,7 +27,6 @@ import ModelList from "./pages/Settings/Model/ModelList";
 import AddUser from "./pages/Users/AddUser";
 import EditUser from "./pages/Users/EditUser";
 import ReadUser from "./pages/Users/ReadUser";
-import UsersList from "./pages/Users/UsersList";
 import "./styles/basic.css";
 import { BasicTable } from "./table/BasicTable";
 // import ReadOperation from './pages/Operations/ReadOperation'
@@ -71,7 +71,7 @@ function App1({onLogout}) {
               element={<CustomFieldsList />}
             />
             <Route exact path="/readasset/:id" element={<ReadAsset />} />
-            <Route exact path="/userslist" element={<UsersList />} />
+            <Route exact path="/userslist" element={<UserManagement />} />
             <Route exact path="/adduser" element={<AddUser />} />
             <Route exact path="/edituser/:id" element={<EditUser />} />
             <Route exact path="/readuser/:id" element={<ReadUser />} />
