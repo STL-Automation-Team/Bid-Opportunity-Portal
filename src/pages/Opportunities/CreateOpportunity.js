@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { default as React, useState } from 'react';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
-import { toast, ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -227,19 +227,16 @@ const CreateOpportunity = () => {
                               <Form.Control type="text" name="opportunity" value={formData.opportunity} onChange={handleChange} required />
                           </Form.Group>
                       </Row>
-                  </fieldset>
-
-                  <fieldset>
-                      <legend style={{borderRadius: '0px', border: 'none', background:'grey'}}>Financial Info</legend>
                       <Row className="mb-1">
+                      <Form.Group as={Col} controlId="amount_inr_cr_min">
+                              <Form.Label className="text-start">Amount INR Cr Min</Form.Label>
+                              <Form.Control type="number" name="amount_inr_cr_min" value={formData.amount_inr_cr_min} onChange={handleChange} required />
+                          </Form.Group>
                           <Form.Group as={Col} controlId="amount_inr_cr_max">
                               <Form.Label className="text-start">Amount INR Cr Max</Form.Label>
                               <Form.Control type="number" name="amount_inr_cr_max" value={formData.amount_inr_cr_max} onChange={handleChange} required />
                           </Form.Group>
-                          <Form.Group as={Col} controlId="amount_inr_cr_min">
-                              <Form.Label className="text-start">Amount INR Cr Min</Form.Label>
-                              <Form.Control type="number" name="amount_inr_cr_min" value={formData.amount_inr_cr_min} onChange={handleChange} required />
-                          </Form.Group>
+                         
                           <Form.Group as={Col} controlId="est_capex_inr_cr">
                               <Form.Label className="text-start">Est. Capex INR Cr</Form.Label>
                               <Form.Control type="number" name="est_capex_inr_cr" value={formData.est_capex_inr_cr} onChange={handleChange} required />
@@ -249,10 +246,6 @@ const CreateOpportunity = () => {
                               <Form.Control type="number" name="est_opex_inr_cr" value={formData.est_opex_inr_cr} onChange={handleChange} required />
                           </Form.Group>
                       </Row>
-                  </fieldset>
-
-                  <fieldset>
-                      <legend style={{borderRadius: '0px', border: 'none', background:'grey'}}>Status Info</legend>
                       <Row className="mb-1">
                           <Form.Group as={Col} controlId="deal_status">
                               <Form.Label className="text-start">Deal Status</Form.Label>
@@ -293,8 +286,72 @@ const CreateOpportunity = () => {
                       </Row>
                   </fieldset>
 
+                  {/* <fieldset>
+                      <legend style={{borderRadius: '0px', border: 'none', background:'grey'}}>Financial Info</legend>
+                      <Row className="mb-1">
+                          <Form.Group as={Col} controlId="amount_inr_cr_max">
+                              <Form.Label className="text-start">Amount INR Cr Max</Form.Label>
+                              <Form.Control type="number" name="amount_inr_cr_max" value={formData.amount_inr_cr_max} onChange={handleChange} required />
+                          </Form.Group>
+                          <Form.Group as={Col} controlId="amount_inr_cr_min">
+                              <Form.Label className="text-start">Amount INR Cr Min</Form.Label>
+                              <Form.Control type="number" name="amount_inr_cr_min" value={formData.amount_inr_cr_min} onChange={handleChange} required />
+                          </Form.Group>
+                          <Form.Group as={Col} controlId="est_capex_inr_cr">
+                              <Form.Label className="text-start">Est. Capex INR Cr</Form.Label>
+                              <Form.Control type="number" name="est_capex_inr_cr" value={formData.est_capex_inr_cr} onChange={handleChange} required />
+                          </Form.Group>
+                          <Form.Group as={Col} controlId="est_opex_inr_cr">
+                              <Form.Label className="text-start">Est. Opex INR Cr</Form.Label>
+                              <Form.Control type="number" name="est_opex_inr_cr" value={formData.est_opex_inr_cr} onChange={handleChange} required />
+                          </Form.Group>
+                      </Row>
+                  </fieldset> */}
+
+                  {/* <fieldset>
+                      <legend style={{borderRadius: '0px', border: 'none', background:'grey'}}>Status Info</legend>
+                      <Row className="mb-1">
+                          <Form.Group as={Col} controlId="deal_status">
+                              <Form.Label className="text-start">Deal Status</Form.Label>
+                              <Form.Control as="select" name="deal_status" value={formData.deal_status} onChange={handleChange} required>
+                                  <option value="Identified">Identified</option>
+                                  <option value="Qualified">Qualified</option>
+                                  <option value="No-Go">No-Go</option>
+                                  <option value="Work in Progress">Work in Progress</option>
+                                  <option value="Bid Submitted">Bid Submitted</option>
+                                  <option value="Won">Won</option>
+                                  <option value="Bid Dropped">Bid Dropped</option>
+                                  <option value="Lost">Lost</option>
+                              </Form.Control>
+                          </Form.Group>
+                          <Form.Group as={Col} controlId="go_no_go_status">
+                              <Form.Label className="text-start">Go/No Go Status</Form.Label>
+                              <Form.Control as="select" name="go_no_go_status" value={formData.go_no_go_status} onChange={handleChange} required>
+                                  <option value="">Select Go/No Go Status</option>
+                                  <option value="Done">Done</option>
+                                  <option value="Scheduled">Scheduled</option>
+                                  <option value="Pending">Pending</option>
+                              </Form.Control>
+                          </Form.Group>
+                      </Row>
+                      <Row className="mb-1">
+                          <Form.Group as={Col} controlId="go_no_go_date">
+                              <Form.Label className="text-start">Go/No Go Date</Form.Label>
+                              <Form.Control type="date" name="go_no_go_date" value={formData.go_no_go_date} onChange={handleChange} required />
+                          </Form.Group>
+                          <Form.Group as={Col} controlId="gm_percentage">
+                              <Form.Label className="text-start">GM Percentage</Form.Label>
+                              <Form.Control type="number" step="0.01" name="gm_percentage" value={formData.gm_percentage} onChange={handleChange} required />
+                          </Form.Group>
+                          <Form.Group as={Col} controlId="probability">
+                              <Form.Label className="text-start">Probability</Form.Label>
+                              <Form.Control type="number" step="0.01" name="probability" value={formData.probability} onChange={handleChange} required />
+                          </Form.Group>
+                      </Row>
+                  </fieldset> */}
+
                   <fieldset>
-                      <legend style={{borderRadius: '0px', border: 'none', background:'grey'}}>Contact Info</legend>
+                      <legend style={{borderRadius: '0px', border: 'none', background:'grey'}}>Other Info</legend>
                       <Row className="mb-1">
                           <Form.Group as={Col} controlId="sales_role">
                               <Form.Label className="text-start">Sales Role</Form.Label>
@@ -313,10 +370,6 @@ const CreateOpportunity = () => {
                               <Form.Control type="text" name="source_person" value={formData.source_person} onChange={handleChange} required />
                           </Form.Group>
                       </Row>
-                  </fieldset>
-
-                  <fieldset>
-                      <legend style={{borderRadius: '0px', border: 'none', background:'grey'}}>Date Info</legend>
                       <Row className="mb-1">
                           <Form.Group as={Col} controlId="lead_received_date">
                               <Form.Label className="text-start">Lead Received Date</Form.Label>
@@ -335,10 +388,6 @@ const CreateOpportunity = () => {
                               <Form.Control type="date" name="decision_date" value={formData.decision_date} onChange={handleChange} required />
                           </Form.Group>
                       </Row>
-                  </fieldset>
-
-                  <fieldset>
-                      <legend style={{borderRadius: '0px', border: 'none', background:'grey'}}>Remarks</legend>
                       <Row className="mb-3">
                           <Form.Group as={Col} controlId="additional_remarks">
                               <Form.Label className="text-start">Additional Remarks</Form.Label>
@@ -346,6 +395,15 @@ const CreateOpportunity = () => {
                           </Form.Group>
                       </Row>
                   </fieldset>
+
+                  {/* <fieldset>
+                     
+                  </fieldset> */}
+
+                  {/* <fieldset>
+                      <legend style={{borderRadius: '0px', border: 'none', background:'grey'}}>Remarks</legend>
+                      
+                  </fieldset> */}
 
                   <Button variant="success" type="submit">
                       Submit
