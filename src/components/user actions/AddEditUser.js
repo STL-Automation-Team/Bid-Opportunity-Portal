@@ -1,29 +1,29 @@
-import { Add, Delete, Edit, Visibility, VisibilityOff } from '@mui/icons-material';
+import { Add, Delete, Edit, PersonAdd, Visibility, VisibilityOff } from '@mui/icons-material';
 import './AddEditUser.css';
 
 import {
-    Box,
-    Button,
-    Chip,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Grid,
-    IconButton,
-    InputAdornment,
-    MenuItem,
-    Paper,
-    Select,
-    Snackbar,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
-    Typography,
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  Paper,
+  Select,
+  Snackbar,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
 } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
@@ -168,6 +168,8 @@ const AddEditUser = () => {
     <Box sx={{ padding: 3 }}>
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
       <Typography variant="h4" component="h1" gutterBottom>
+      <PersonAdd sx={{ mr: 1, verticalAlign: 'middle' }} />
+
         User Management
       </Typography>
       <Button
@@ -181,49 +183,55 @@ const AddEditUser = () => {
       </Button>
     </Box>
 
-      <Paper sx={{ width: '100%', overflow: 'hidden', mb: 3 }}>
-        <TableContainer sx={{ maxHeight: 440 }}>
-          <Table stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell> <b> Employee ID</b></TableCell>
-                <TableCell><b> Name</b></TableCell>
-                <TableCell><b>Email </b></TableCell>
-                <TableCell><b>Mobile </b></TableCell>
-                <TableCell><b>Department ID </b></TableCell>
-                <TableCell><b>Status </b></TableCell>
-                <TableCell><b>Actions</b></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id} hover>
-                  <TableCell>{user.employeeId}</TableCell>
-                  <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.mobile}</TableCell>
-                  <TableCell>{user.departmentId}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={user.status}
-                      color={user.status === 'ACTIVE' ? 'success' : 'default'}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <IconButton className="icon-button" onClick={() => handleOpen(user)} size="small">
-                      <Edit />
-                    </IconButton>
-                    <IconButton className="icon-button" onClick={() => handleDelete(user.id)} size="small">
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
+    <Paper sx={{ width: '100%', overflow: 'hidden', mb: 3 }}>
+  {users.length > 0 ? (
+    <TableContainer sx={{ maxHeight: 440 }}>
+      <Table stickyHeader>
+        <TableHead>
+          <TableRow>
+            <TableCell><b>Employee ID</b></TableCell>
+            <TableCell><b>Name</b></TableCell>
+            <TableCell><b>Email</b></TableCell>
+            <TableCell><b>Mobile</b></TableCell>
+            <TableCell><b>Department ID</b></TableCell>
+            <TableCell><b>Status</b></TableCell>
+            <TableCell><b>Actions</b></TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {users.map((user) => (
+            <TableRow key={user.id} hover>
+              <TableCell>{user.employeeId}</TableCell>
+              <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
+              <TableCell>{user.email}</TableCell>
+              <TableCell>{user.mobile}</TableCell>
+              <TableCell>{user.departmentId}</TableCell>
+              <TableCell>
+                <Chip
+                  label={user.status}
+                  color={user.status === 'ACTIVE' ? 'success' : 'default'}
+                  size="small"
+                />
+              </TableCell>
+              <TableCell>
+                <IconButton className="icon-button" onClick={() => handleOpen(user)} size="small">
+                  <Edit />
+                </IconButton>
+                <IconButton className="icon-button" onClick={() => handleDelete(user.id)} size="small">
+                  <Delete />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  ) : (
+    <Typography variant="body1" sx={{ p: 2, textAlign: 'center' }}>
+      No users found. Please add users to the system.
+    </Typography>
+  )}
+</Paper>
 
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle className="dialog-title1">{editingUser ? 'Edit User' : 'Add New User'}</DialogTitle>

@@ -182,7 +182,7 @@ const OpportunityDetails = () => {
       <div className="follow-ups-header">
         <h2>Follow Ups</h2>
       </div>
-        <button className='add-button' onClick={() => setPopupVisible(!isPopupVisible)}>
+        <button className='add-button_1' onClick={() => setPopupVisible(!isPopupVisible)}>
           <img src={img} alt="Add Info" />
         </button>
         {isPopupVisible && (

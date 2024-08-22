@@ -174,3 +174,23 @@ table {
     /* border-radius: 4px; */
     border: none !important;
 }
+
+.auto-complete1 button{
+    background-color: white !important;
+    color: #7f8c8d !important;
+    border-radius: 35px !important;
+    padding: 15px 15px;
+}
+
+.auto-complete1 button:hover{
+    background-color: #7f8c8d !important;
+    color: white !important;
+}
+
+.actions-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  

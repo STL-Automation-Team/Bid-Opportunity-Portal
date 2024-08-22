@@ -44,7 +44,7 @@
   }
   
   /* Ensure the button remains in the bottom-right corner */
-  .add-button {
+  .add-button_1 {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -58,12 +58,12 @@
     z-index: 10; /* Ensure it's above other content */
   }
   
-  .add-button img {
+  .add-button_1 img {
     width: 50px;
     height: 50px;
   }
   
-  .add-button:hover {
+  .add-button_1:hover {
     transform: scale(1.1);
   }
   

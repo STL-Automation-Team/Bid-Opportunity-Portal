@@ -124,7 +124,6 @@ const AddOpportunities = () => {
     e.preventDefault();
     const postData = {
       ...formData,
-      ob_fy: parseInt(formData.ob_fy, 10),
       amount_inr_cr_max: parseFloat(formData.amount_inr_cr_max),
       amount_inr_cr_min: parseFloat(formData.amount_inr_cr_min),
       est_capex_inr_cr: parseFloat(formData.est_capex_inr_cr),
@@ -184,9 +183,9 @@ const AddOpportunities = () => {
                                     onChange={handleChange}
                                     required
                                 >
-                                    <option value="2024">2024</option>
-                                    <option value="2025">2025</option>
-                                    <option value="2026">2026</option>
+                                    <option value="FY24">2024</option>
+                                    <option value="FY25">2025</option>
+                                    <option value="FY26">2026</option>
                                 </select>
                             </div>
                             <div className="form-group small">
