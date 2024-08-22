@@ -113,7 +113,7 @@
     align-items: center; /* Ensure all items are aligned vertically */
 }
 
-.filter-dropdown, .search-input {
+.search-input {
     flex: 1 1 200px;
     max-width: 300px;
 }
@@ -122,11 +122,33 @@
     width: 100%;
 }
 
+
+.filter-dropdown {
+    flex: 1 1 auto; /* Allow the dropdown to grow based on its content */
+    max-width: 100%; /* Allow it to take up the full width of its container if necessary */
+    min-width: 200px; /* Set a reasonable minimum width */
+}
+
 .react-select__control {
-    height: 40px; /* Set a fixed height to match the input field */
+    height: 40px; /* Keep the fixed height for consistency */
     display: flex;
     align-items: center; /* Center the content vertically */
+    width: auto; /* Allow the width to adjust based on content */
 }
+
+.react-select__single-value {
+    white-space: nowrap; /* Prevent the value from wrapping to the next line */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Add ellipsis if the content overflows */
+    max-width: 100%; /* Allow the value to take up as much space as available */
+}
+
+.react-select__menu {
+    width: auto; /* Allow the dropdown menu to expand based on content */
+    max-width: 100%; /* But don't let it overflow its container */
+}
+
+
 
 .search-input {
     flex: 1 1 200px;
@@ -252,13 +274,13 @@
     border-radius: 4px;
 }
 
-.expandable-header {
+/* .expandable-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px;
     background-color: #f0f0f0;
-}
+} */
 
 .expandable-header h3 {
     margin: 0;
@@ -473,11 +495,40 @@
 .account-table td:not(:nth-child(1)):not(:nth-child(2)) {
     min-width: 80px; /* Minimum width for other columns */
 }
-
-.expand-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 12px;
-    margin-left: 5px;
+.expandable-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f0f0f0;
 }
+
+.button-group {
+    display: flex;
+    gap: 10px; /* Space between the buttons */
+    align-items: center;
+}
+
+.btn-blue {
+    background-color: blue; /* Blue color for the Add Opportunity button */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-blue:hover {
+    background-color: #0033cc; /* Darker blue on hover */
+}
+
+.btn-secondary {
+    background-color: #4caf50; /* Green color for the Minimize/Maximize button */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+

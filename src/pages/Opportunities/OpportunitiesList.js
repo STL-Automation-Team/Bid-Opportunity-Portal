@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import assetIcon from '../../images/cardLogo/asseticon.png';
 import operationIcon from '../../images/cardLogo/operationicon.png';
@@ -14,6 +14,7 @@ const Opportunities = () => {
     const [isExpanded, setIsExpanded] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
+    const navigate = useNavigate();
 
     const [selectedFY, setSelectedFY] = useState('');
     const [accountData, setAccountData] = useState([]);
@@ -308,9 +309,21 @@ const Opportunities = () => {
             <div className="expandable-area">
                 <div className="expandable-header">
                     <h3>Account Segment Leaders Overview</h3>
+                    <div>
+                    <button 
+                onClick={() => navigate('/addopportunity')}
+                className="btn btn-blue"
+                style={{marginRight : "13px", backgroundColor:"blue"}}
+            >
+                Add Opportunity
+            </button>
                     <button onClick={() => setIsExpanded(!isExpanded)}>
                         {isExpanded ? 'Minimize' : 'Maximize'}
                     </button>
+
+
+                    </div>
+                                     
                 </div>
                 {isExpanded && (
                     <div className="expandable-content">
@@ -469,9 +482,7 @@ const Opportunities = () => {
                 )}
             </div>
             
-            <div className="fixed-button">
-                <Link to="/addopportunity" className="btn btn-primary">Add Opportunity</Link>
-            </div>
+          
         </div>
     );
 };
