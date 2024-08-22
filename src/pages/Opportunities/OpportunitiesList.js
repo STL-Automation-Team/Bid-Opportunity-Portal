@@ -243,7 +243,7 @@ const Opportunities = () => {
                             options={filterOptions[filterName].map(option => ({ value: option, label: option }))}
                             value={filters[filterName].map(value => ({ value, label: value }))}
                             onChange={(selectedOptions) => handleFilterChange(selectedOptions, filterName)}
-                            placeholder={`Select ${columnNames[filterName] || filterName}...`}
+                            placeholder={`Select `}
                             className="react-select-container"
                             classNamePrefix="react-select"
                         />
@@ -251,7 +251,7 @@ const Opportunities = () => {
                 ))}
                 <input 
                     type="text" 
-                    placeholder="Search for any Opportunity..." 
+                    placeholder="Search Opportunity..." 
                     value={filters.search}
                     onChange={handleSearchChange}
                     className="search-input"
@@ -260,7 +260,7 @@ const Opportunities = () => {
 
             {noFiltersApplied && (
                 <div className="no-filter-message">
-                    Please select filters or enter a search term to view opportunities.
+                    Please select filters or enter a search to view opportunities.
                 </div>
             )}
 

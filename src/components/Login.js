@@ -2,8 +2,8 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import './LoginPage.css';
 import logo from './i1.png'; // Update the path to your logo image
+import './LoginPage.css';
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -75,14 +75,15 @@ const Login = ({ onLogin }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-            <button type="submit" className="login-button login-button-primary">
-              Login
-            </button>
-            <button type="button" className="login-button login-button-secondary" onClick={handleSignupClick}>
-              Signup
-            </button>
-          </div>
+         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+  <button type="submit" className="login-button login-button-primary">
+    Login
+  </button>
+  {/* <button type="button" className="login-button login-button-secondary" onClick={handleSignupClick}>
+    Signup
+  </button> */}
+</div>
+
         </form>
       </div>
     </div>

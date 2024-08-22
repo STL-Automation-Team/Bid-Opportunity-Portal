@@ -95,7 +95,7 @@
     right: -30px; /* Move the arrow to the left on hover */
 }
 
-.filter-container {
+/* .filter-container {
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
@@ -104,6 +104,45 @@
 
 .filter-dropdown {
     flex: 1 1 200px;
+} */
+.filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+    align-items: center; /* Ensure all items are aligned vertically */
+}
+
+.filter-dropdown, .search-input {
+    flex: 1 1 200px;
+    max-width: 300px;
+}
+
+.react-select-container, .search-input {
+    width: 100%;
+}
+
+.react-select__control {
+    height: 40px; /* Set a fixed height to match the input field */
+    display: flex;
+    align-items: center; /* Center the content vertically */
+}
+
+.search-input {
+    flex: 1 1 200px;
+    max-width: 300px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    height: 40px; /* Ensure this height matches the Select control */
+    align-self: flex-end; /* Align the search input to the bottom */
+}
+
+
+.react-select-container, .search-input {
+    width: 100%;
 }
 
 .filter-dropdown label {
@@ -111,10 +150,6 @@
     margin-bottom: 5px;
     font-weight: bold;
     color: #333;
-}
-
-.react-select-container {
-    width: 100%;
 }
 
 .react-select__control {
@@ -165,13 +200,13 @@
     color: #757575;
 }
 
-.search-input {
+/* .search-input {
     flex: 1 1 200px;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 14px;
-}
+} */
 
 .no-filter-message {
     text-align: center;
