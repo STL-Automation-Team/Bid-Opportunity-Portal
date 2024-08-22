@@ -1,32 +1,21 @@
 import { Add, Delete, Edit, PersonAdd, Visibility, VisibilityOff } from '@mui/icons-material';
-import './AddEditUser.css';
-
 import {
   Box,
-  Button,
-  Chip,
-  Dialog,
+  Button, Chip, Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid,
-  IconButton,
-  InputAdornment,
-  MenuItem,
-  Paper,
-  Select,
-  Snackbar,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
+  Grid, IconButton, InputAdornment,
+  MenuItem, Paper, Select,
+  Snackbar, Table, TableBody, TableCell, TableContainer, TableHead,
+  TableRow, TextField, Typography
 } from '@mui/material';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+
+import { useEffect } from 'react';
+
+import './AddEditUser.css';
 
 const BASE_URL = 'http://localhost:8080';
 
@@ -51,6 +40,12 @@ const AddEditUser = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage] = useState(10);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -184,54 +179,58 @@ const AddEditUser = () => {
     </Box>
 
     <Paper sx={{ width: '100%', overflow: 'hidden', mb: 3 }}>
-  {users.length > 0 ? (
-    <TableContainer sx={{ maxHeight: 440 }}>
-      <Table stickyHeader>
-        <TableHead>
-          <TableRow>
-            <TableCell><b>Employee ID</b></TableCell>
-            <TableCell><b>Name</b></TableCell>
-            <TableCell><b>Email</b></TableCell>
-            <TableCell><b>Mobile</b></TableCell>
-            <TableCell><b>Department ID</b></TableCell>
-            <TableCell><b>Status</b></TableCell>
-            <TableCell><b>Actions</b></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id} hover>
-              <TableCell>{user.employeeId}</TableCell>
-              <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.mobile}</TableCell>
-              <TableCell>{user.departmentId}</TableCell>
-              <TableCell>
-                <Chip
-                  label={user.status}
-                  color={user.status === 'ACTIVE' ? 'success' : 'default'}
-                  size="small"
-                />
-              </TableCell>
-              <TableCell>
-                <IconButton className="icon-button" onClick={() => handleOpen(user)} size="small">
-                  <Edit />
-                </IconButton>
-                <IconButton className="icon-button" onClick={() => handleDelete(user.id)} size="small">
-                  <Delete />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  ) : (
-    <Typography variant="body1" sx={{ p: 2, textAlign: 'center' }}>
-      No users found. Please add users to the system.
-    </Typography>
-  )}
-</Paper>
+      {users.length > 0 ? (
+        
+          <TableContainer sx={{ maxHeight: 440 }}>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell><b>Employee ID</b></TableCell>
+                  <TableCell><b>Name</b></TableCell>
+                  <TableCell><b>Email</b></TableCell>
+                  <TableCell><b>Mobile</b></TableCell>
+                  <TableCell><b>Department ID</b></TableCell>
+                  <TableCell><b>Status</b></TableCell>
+                  <TableCell><b>Actions</b></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {users
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((user) => (
+                    <TableRow key={user.id} hover>
+                      <TableCell>{user.employeeId}</TableCell>
+                      <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.mobile}</TableCell>
+                      <TableCell>{user.departmentId}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={user.status}
+                          color={user.status === 'ACTIVE' ? 'success' : 'default'}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <IconButton className="icon-button" onClick={() => handleOpen(user)} size="small">
+                          <Edit />
+                        </IconButton>
+                        <IconButton className="icon-button" onClick={() => handleDelete(user.id)} size="small">
+                          <Delete />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        
+      ) : (
+        <Typography variant="body1" sx={{ p: 2, textAlign: 'center' }}>
+          No users found. Please add users to the system.
+        </Typography>
+      )}
+    </Paper>
 
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle className="dialog-title1">{editingUser ? 'Edit User' : 'Add New User'}</DialogTitle>

@@ -15,6 +15,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   TextField,
   Typography
@@ -38,8 +39,24 @@ const ManagePermissions = () => {
     updatedBy: 'Admin'
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarMessage, setSnackbarMessage] = useState(''); 
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const paginatedPermissions = permissions.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   useEffect(() => {
     fetchPermissions();
@@ -155,48 +172,56 @@ const ManagePermissions = () => {
           Add New Permission
         </Button>
       </Box>
-
       <Paper sx={{ width: '100%', overflow: 'hidden', mb: 3 }}>
-  {permissions.length > 0 ? (
-    <TableContainer sx={{ maxHeight: 440 }}>
-      <Table stickyHeader>
-        <TableHead>
-          <TableRow>
-            <TableCell><b>Permission</b></TableCell>
-            <TableCell><b>Created By</b></TableCell>
-            <TableCell><b>Created At</b></TableCell>
-            <TableCell><b>Updated By</b></TableCell>
-            <TableCell><b>Updated At</b></TableCell>
-            <TableCell><b>Actions</b></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {permissions.map((permission) => (
-            <TableRow key={permission.id} hover>
-              <TableCell>{permission.permission_name}</TableCell>
-              <TableCell>{permission.createdBy}</TableCell>
-              <TableCell>{new Date(permission.createdAt).toLocaleString()}</TableCell>
-              <TableCell>{permission.updatedBy}</TableCell>
-              <TableCell>{new Date(permission.updatedAt).toLocaleString()}</TableCell>
-              <TableCell>
-                <IconButton className="icon-button" onClick={() => handleOpen(permission)} size="small">
-                  <Edit />
-                </IconButton>
-                <IconButton className="icon-button" onClick={() => handleDelete(permission.id)} size="small">
-                  <Delete />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  ) : (
-    <Typography variant="h6" align="center" sx={{ p: 3 }}>
-      No permissions available. Please add a new permission.
-    </Typography>
-  )}
-</Paper>
+      {permissions.length > 0 ? (
+        <>
+          <TableContainer sx={{ maxHeight: 440 }}>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell><b>Permission</b></TableCell>
+                  <TableCell><b>Created By</b></TableCell>
+                  <TableCell><b>Created At</b></TableCell>
+                  <TableCell><b>Updated By</b></TableCell>
+                  <TableCell><b>Updated At</b></TableCell>
+                  <TableCell><b>Actions</b></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedPermissions.map((permission) => (
+                  <TableRow key={permission.id} hover>
+                    <TableCell>{permission.permission_name}</TableCell>
+                    <TableCell>{permission.createdBy}</TableCell>
+                    <TableCell>{new Date(permission.createdAt).toLocaleString()}</TableCell>
+                    <TableCell>{permission.updatedBy}</TableCell>
+                    <TableCell>{new Date(permission.updatedAt).toLocaleString()}</TableCell>
+                    <TableCell>
+                      <IconButton className="icon-button" onClick={() => handleOpen(permission)} size="small">
+                        <Edit />
+                      </IconButton>
+                      <IconButton className="icon-button" onClick={() => handleDelete(permission.id)} size="small">
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[10, 25, 50]}
+            component="div"
+            count={permissions.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </>
+      ) : (
+        <p>No permissions available.</p>
+      )}
+    </Paper>
 
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle className="dialog-title1">{editingPermission ? 'Edit Permission' : 'Add New Permission'}</DialogTitle>

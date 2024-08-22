@@ -43,6 +43,17 @@ const ManageRoles = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   useEffect(() => {
     fetchRoles();
@@ -161,6 +172,7 @@ const ManageRoles = () => {
 
       <Paper sx={{ width: '100%', overflow: 'hidden', mb: 3 }}>
         {roles.length > 0 ? (
+         
           <TableContainer sx={{ maxHeight: 440 }}>
             <Table stickyHeader>
               <TableHead>
@@ -194,6 +206,7 @@ const ManageRoles = () => {
               </TableBody>
             </Table>
           </TableContainer>
+        
         ) : (
           <Typography variant="h6" align="center" sx={{ p: 3 }}>
             No roles available. Please add a new role.

@@ -17,6 +17,17 @@ const AssignPermissionsToRole = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
   const fetchData = async () => {
     try {
       const rolesResponse = await axios.get(`${BASE_URL}/api/roles`);
@@ -126,8 +137,9 @@ const AssignPermissionsToRole = () => {
         
       </Box>
 
-      <Paper sx={{ width: '100%', overflow: 'hidden', mb: 3, p: 3 }} >
-        {roles.length > 0 ? (
+      <Paper sx={{ width: '100%', overflow: 'hidden', mb: 3, p: 3 }}>
+      {roles.length > 0 ? (
+      
           <TableContainer sx={{ maxHeight: 440 }}>
             <Table stickyHeader>
               <TableHead>
@@ -138,7 +150,7 @@ const AssignPermissionsToRole = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {roles.map((role) => (
+                {roles.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((role) => (
                   <TableRow key={role.id} hover>
                     <TableCell>{role.role}</TableCell>
                     <TableCell>
@@ -158,12 +170,13 @@ const AssignPermissionsToRole = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        ) : (
-          <Typography variant="h6" align="center" sx={{ p: 3 }} >
-            No role-permission mappings available. Please assign permissions to roles.
-          </Typography>
-        )}
-      </Paper>
+          
+      ) : (
+        <Typography variant="h6" align="center" sx={{ p: 3 }}>
+          No role-permission mappings available. Please assign permissions to roles.
+        </Typography>
+      )}
+    </Paper>
 
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle className="dialog-title1">Edit Permissions for {selectedRole?.role}</DialogTitle>

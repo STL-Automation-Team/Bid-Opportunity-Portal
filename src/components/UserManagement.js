@@ -1,13 +1,13 @@
 import {
-    AssignmentInd,
-    PersonAdd,
-    Security,
-    SupervisorAccount
+  AssignmentInd,
+  PersonAdd,
+  Security,
+  SupervisorAccount
 } from '@mui/icons-material';
 import {
-    AppBar,
-    Tab,
-    Tabs
+  AppBar,
+  Tab,
+  Tabs
 } from '@mui/material';
 import React, { useState } from 'react';
 import AddEditUser from './user actions/AddEditUser';
@@ -29,13 +29,13 @@ const UserManagement = () => {
       case 0:
         return <AddEditUser />;
       case 1:
-        return <ManageRoles />;
-      case 2:
-        return <ManagePermissions />;
-      case 3:
         return <AssignRoleToUser />;
-      case 4:
+      case 2:
         return <AssignPermissionsToRole />;
+      case 3:
+        return <ManageRoles />;
+      case 4:
+        return <ManagePermissions />;
       default:
         return <AddEditUser />;
     }
@@ -51,10 +51,10 @@ const UserManagement = () => {
           scrollButtons="auto"
         >
           <Tab icon={<PersonAdd />} label="Add/Edit User" />
-          <Tab icon={<SupervisorAccount />} label="Manage Roles" />
-          <Tab icon={<Security />} label="Manage Permissions" />
           <Tab icon={<AssignmentInd />} label="Assign Role to User" />
           <Tab icon={<Security />} label="Assign Permissions to Role" />
+          <Tab icon={<SupervisorAccount />} label="Manage Roles" />
+          <Tab icon={<Security />} label="Manage Permissions" />
         </Tabs>
       </AppBar>
       
