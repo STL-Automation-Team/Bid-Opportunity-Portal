@@ -31,7 +31,7 @@ const AssignRoleToUser = () => {
 
   const fetchData = async () => {
     try {
-      const usersResponse = await axios.get(`${BASE_URL}/api`);
+      const usersResponse = await axios.get(`${BASE_URL}/api/allusers`);
       setUsers(usersResponse.data);
 
       const rolesResponse = await axios.get(`${BASE_URL}/api/roles`);
