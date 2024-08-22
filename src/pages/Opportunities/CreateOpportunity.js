@@ -3,8 +3,7 @@ import { default as React, useState } from 'react';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-
+import { BASE_URL } from '../../components/constants';
 const CreateOpportunity = () => {
     const [formData, setFormData] = useState({
         priority_bid: '',
@@ -132,7 +131,7 @@ const CreateOpportunity = () => {
         };
         try {
             console.log(postData);
-          const response = await axios.post('http://localhost:8080/api/opportunities', postData, {
+          const response = await axios.post(`${BASE_URL}/api/opportunities`, postData, {
             headers: {
               'Content-Type': 'application/json',
             },

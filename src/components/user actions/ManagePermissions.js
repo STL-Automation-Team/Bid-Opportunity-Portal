@@ -22,9 +22,9 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { BASE_URL } from '../constants';
 import './AddEditUser.css';
 
-const BASE_URL = 'http://localhost:8080';
 
 const ManagePermissions = () => {
   const [permissions, setPermissions] = useState([]);

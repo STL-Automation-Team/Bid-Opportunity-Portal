@@ -1,4 +1,6 @@
 import { Add, Delete, Edit, PersonAdd, Visibility, VisibilityOff } from '@mui/icons-material';
+import { BASE_URL } from '../constants';
+
 import {
   Box,
   Button, Chip, Dialog,
@@ -17,7 +19,6 @@ import { useEffect } from 'react';
 
 import './AddEditUser.css';
 
-const BASE_URL = 'http://localhost:8080';
 
 const AddEditUser = () => {
   const [users, setUsers] = useState([]);

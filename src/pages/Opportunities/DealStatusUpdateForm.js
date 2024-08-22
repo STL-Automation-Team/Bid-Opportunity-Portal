@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Alert, Button, Form, Modal } from 'react-bootstrap';
-
+import { BASE_URL } from '../../components/constants';
 const DealStatusUpdateForm = ({ show, handleClose, form_id }) => {
   const [dealStatus, setDealStatus] = useState('');
   const [status, setStatus] = useState('');
@@ -27,7 +27,7 @@ const DealStatusUpdateForm = ({ show, handleClose, form_id }) => {
             ...updateData
         }
         console.log(postData);
-        const response = await axios.post('http://localhost:8080/api/deal-status', postData, {
+        const response = await axios.post(`${BASE_URL}/api/deal-status`, postData, {
           headers: {
             'Content-Type': 'application/json',
           },

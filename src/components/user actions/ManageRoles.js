@@ -1,4 +1,5 @@
 import { Add, Delete, Edit, SupervisorAccount } from '@mui/icons-material';
+import { BASE_URL } from '../constants';
 import './AddEditUser.css';
 
 import {
@@ -27,7 +28,6 @@ import {
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
-const BASE_URL = 'http://localhost:8080';
 
 const ManageRoles = () => {
   const [roles, setRoles] = useState([]);

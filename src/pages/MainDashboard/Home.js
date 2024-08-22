@@ -7,8 +7,8 @@ import {
 } from 'chart.js';
 import React, { Component } from 'react';
 import { Chart as ChartJSComponent } from 'react-chartjs-2';
+import { BASE_URL } from '../../components/constants';
 import './home.css';
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -27,21 +27,21 @@ const graphConfigs = [
       { type: 'select', name: 'year', label: 'Financial Year', options: ['FY24', 'FY25', 'FY26'] },
       { type: 'select', name: 'priority', label: 'Priority', options: ['Commit', 'TBD', 'Upside'] }
     ],
-    dataFetch: (inputs) => `http://localhost:8080/api/opportunities/filtered?ob_fy=${inputs.year}`
+    dataFetch: (inputs) => `${BASE_URL}/api/opportunities/filtered?ob_fy=${inputs.year}`
   },
   {
     title: "Segment Wise Order Book",
     inputs: [
       { type: 'select', name: 'year', label: 'Financial Year', options: ['FY24', 'FY25', 'FY26'] },
     ],
-    dataFetch: (inputs) => `http://localhost:8080/api/opportunities/filtered?ob_fy=${inputs.year}`
+    dataFetch: (inputs) => `${BASE_URL}/api/opportunities/filtered?ob_fy=${inputs.year}`
   },
   {
     title: "Public vs Private Order Book",
     inputs: [
       { type: 'select', name: 'year', label: 'Financial Year', options: ['FY24', 'FY25', 'FY26'] },
     ],
-    dataFetch: (inputs) => `http://localhost:8080/api/opportunities/filtered?ob_fy=${inputs.year}`
+    dataFetch: (inputs) => `${BASE_URL}/api/opportunities/filtered?ob_fy=${inputs.year}`
   }
 ];
 

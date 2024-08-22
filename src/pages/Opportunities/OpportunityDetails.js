@@ -8,6 +8,7 @@ import CountCard1 from '../MainDashboard/sidecard';
 import CountCard2 from '../MainDashboard/sidecard1';
 import CountCard3 from '../MainDashboard/sidecard2';
 
+import { BASE_URL } from '../../components/constants';
 import DealStatusUpdateForm from './DealStatusUpdateForm';
 import GoNoGoStatusForm from './GoNoGoStatusForm';
 import './OpportunityDetails.css'; // Ensure this path is correct
@@ -33,14 +34,14 @@ const OpportunityDetails = () => {
   }, [id]);
   
   const fetchOpportunityData = (id) => {
-    fetch(`http://localhost:8080/api/opportunities/${id}`)
+    fetch(`${BASE_URL}/api/opportunities/${id}`)
       .then(response => response.json())
       .then(data => setOpportunity(data))
       .catch(error => console.error('Error fetching data:', error));
   };
 
   const fetchSubmittedData = (id) => {
-    axios.get(`http://localhost:8080/api/plans?form_id=${id}`)
+    axios.get(`${BASE_URL}/api/plans?form_id=${id}`)
       .then(response => setSubmittedData(response.data))
       .catch(error => console.error('Error fetching submitted data:', error));
   };
@@ -52,7 +53,7 @@ const OpportunityDetails = () => {
         go_no_go_status: Status_
     }
     console.log(updateData);
-    axios.put(`http://localhost:8080/api/opportunities/${id}`, updateData)
+    axios.put(`${BASE_URL}/api/opportunities/${id}`, updateData)
           .then(updateResponse => {
             console.log('Opportunity updated successfully:', updateResponse.data);
             fetchOpportunityData(id);
@@ -62,7 +63,7 @@ const OpportunityDetails = () => {
           });
 
 
-    axios.get(`http://localhost:8080/api/gonogostatus?form_id=${id}`)
+    axios.get(`${BASE_URL}/api/gonogostatus?form_id=${id}`)
       .then(response => setSubmittedData1(response.data))
       .catch(error => console.error('Error fetching submitted data:', error));
 
@@ -79,7 +80,7 @@ const OpportunityDetails = () => {
   
     console.log("---------")
     console.log(updateData)
-    axios.put(`http://localhost:8080/api/opportunities/${id}`, updateData)
+    axios.put(`${BASE_URL}/api/opportunities/${id}`, updateData)
           .then(updateResponse => {
             console.log('Opportunity updated successfully:', updateResponse.data);
             fetchOpportunityData(id);
@@ -89,7 +90,7 @@ const OpportunityDetails = () => {
           });
 
 
-    axios.get(`http://localhost:8080/api/deal-status?form_id=${id}`)
+    axios.get(`${BASE_URL}/api/deal-status?form_id=${id}`)
       .then(response => setSubmittedData2(response.data))
       .catch(error => console.error('Error fetching submitted data:', error));
 

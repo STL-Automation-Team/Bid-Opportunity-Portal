@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { default as React, useState } from 'react';
 import { Alert, Button, Form, Modal } from 'react-bootstrap';
-
+import { BASE_URL } from '../../components/constants';
 
 const GoNoGoStatusForm = ({ show, handleClose, form_id }) => {
     const [dateTime, setDateTime] = useState('');
@@ -26,7 +26,7 @@ const GoNoGoStatusForm = ({ show, handleClose, form_id }) => {
           const postData = {
             ...data
           }
-          const response = await axios.post('http://localhost:8080/api/gonogostatus', data, {
+          const response = await axios.post(`${BASE_URL}/api/gonogostatus`, data, {
             headers: {
               'Content-Type': 'application/json',
             },

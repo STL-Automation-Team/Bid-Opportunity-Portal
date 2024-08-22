@@ -2,8 +2,10 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { BASE_URL } from './constants';
 import logo from './i1.png'; // Update the path to your logo image
 import './LoginPage.css';
+
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -12,7 +14,7 @@ const Login = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8080/api/login', {
+      const response = await axios.post(`${BASE_URL}/api/login`, {
         email: username,
         passwordHash: password,
       });
@@ -27,7 +29,7 @@ const Login = ({ onLogin }) => {
 
   const handleSignupClick = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/api/register', {
+      const response = await axios.post(`${BASE_URL}/api/register`, {
         username,
         password,
       },

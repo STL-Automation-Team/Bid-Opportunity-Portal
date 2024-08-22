@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { Alert, Button, Form, Modal } from 'react-bootstrap';
+import { BASE_URL } from '../../components/constants';
 
 const PlanActionsForm = ({ show, handleClose, form_id }) => {
   const [week, setWeek] = useState('');
@@ -29,7 +30,7 @@ const PlanActionsForm = ({ show, handleClose, form_id }) => {
     }
     try {
         console.log(data)
-        const response = await axios.post('http://localhost:8080/api/plans', postData, {
+        const response = await axios.post(`${BASE_URL}/api/plans`, postData, {
             headers: {
               'Content-Type': 'application/json',
             },

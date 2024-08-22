@@ -2,9 +2,9 @@ import { AssignmentInd, Edit } from '@mui/icons-material';
 import { Autocomplete, Box, Button, Dialog, DialogContent, DialogTitle, Grid, IconButton, Paper, Snackbar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { BASE_URL } from '../constants';
 import './AddEditUser.css';
 
-const BASE_URL = 'http://localhost:8080';
 
 const AssignPermissionsToRole = () => {
   const [roles, setRoles] = useState([]);

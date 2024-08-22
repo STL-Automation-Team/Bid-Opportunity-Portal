@@ -3,6 +3,7 @@ import { Card } from 'react-bootstrap';
 import { FaMinus, FaPlus } from 'react-icons/fa'; // Import icons from react-icons
 import './sidecard.css';
 
+
 const CountCard = ({ title, baseColor, details }) => {
   const [expanded, setExpanded] = useState(false);
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
+import { BASE_URL } from '../../components/constants';
 import assetIcon from '../../images/cardLogo/asseticon.png';
 import operationIcon from '../../images/cardLogo/operationicon.png';
 import serviceIcon from '../../images/cardLogo/serviceicon.png';
@@ -92,7 +93,7 @@ const Opportunities = () => {
     }, [selectedFY]);
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/opportunities')
+        fetch(`${BASE_URL}/api/opportunities`)
             .then(response => response.json())
             .then(data => {
                 setOpportunities(data);

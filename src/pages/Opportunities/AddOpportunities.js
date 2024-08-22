@@ -4,8 +4,8 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { BASE_URL } from '../../components/constants';
 import '../../styles/Opportunities.css'; // Import the CSS file for styling
-
 const AddOpportunities = () => {
   const [formData, setFormData] = useState({
     priority_bid: '',
@@ -133,7 +133,7 @@ const AddOpportunities = () => {
     };
     try {
         console.log(postData);
-      const response = await axios.post('http://localhost:8080/api/opportunities', postData, {
+      const response = await axios.post(`${BASE_URL}/api/opportunities`, postData, {
         headers: {
           'Content-Type': 'application/json',
         },

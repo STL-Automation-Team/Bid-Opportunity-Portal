@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { Button, Card, Form, Modal } from 'react-bootstrap';
 import { FaMinus, FaPlus } from 'react-icons/fa';
+import { BASE_URL } from '../../components/constants';
 import './sidecard.css';
 
 const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id }) => {
@@ -29,7 +30,7 @@ const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id })
       action: updatedDetails[2].value,
     };
     console.log(updatedPayload);
-    axios.put(`http://localhost:8080/api/plans/${box_id}`, updatedPayload)
+    axios.put(`${BASE_URL}/api/plans/${box_id}`, updatedPayload)
       .then(response => {
         console.log('Data updated successfully:', response.data);
         handleUpdate();
