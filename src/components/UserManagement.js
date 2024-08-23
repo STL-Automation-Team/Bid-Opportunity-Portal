@@ -1,5 +1,6 @@
 import {
   AssignmentInd,
+  DataObject,
   PersonAdd,
   Security,
   SupervisorAccount
@@ -10,6 +11,7 @@ import {
   Tabs
 } from '@mui/material';
 import React, { useState } from 'react';
+import AddAGP from './user actions/AddAGP.js';
 import AddEditUser from './user actions/AddEditUser';
 import AssignPermissionsToRole from './user actions/AssignPermissionsToRole';
 import AssignRoleToUser from './user actions/AssignRoleToUser';
@@ -36,6 +38,8 @@ const UserManagement = () => {
         return <ManageRoles />;
       case 4:
         return <ManagePermissions />;
+      case 5:
+        return <AddAGP />;
       default:
         return <AddEditUser />;
     }
@@ -55,6 +59,7 @@ const UserManagement = () => {
           <Tab icon={<Security />} label="Assign Permissions to Role" />
           <Tab icon={<SupervisorAccount />} label="Manage Roles" />
           <Tab icon={<Security />} label="Manage Permissions" />
+          <Tab icon={< DataObject/>} label="Add AGP Value" />
         </Tabs>
       </AppBar>
       

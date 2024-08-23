@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { default as React, useState } from 'react';
+import { default as React, useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Row } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -53,6 +53,8 @@ const CreateOpportunity = () => {
       const [error, setError] = useState('');
       const [success, setSuccess] = useState('');
       const [showModal, setShowModal] = useState(false);
+      const [users, setUsers] = useState([]);
+
       const handleCloseModal = () => {
         setShowModal(false);
         // navigate("/userslist");
@@ -68,6 +70,17 @@ const CreateOpportunity = () => {
           [e.target.name]: e.target.value,
         });
       };
+
+      useEffect(() => {
+        // Fetch user data from the API
+        axios.get(`${BASE_URL}/api/allusers`)
+          .then(response => {
+            setUsers(response.data);
+          })
+          .catch(error => {
+            console.error('Error fetching users:', error);
+          });
+      }, []);
     
       const handleClose = () => {
         setFormData({
@@ -121,7 +134,6 @@ const CreateOpportunity = () => {
         e.preventDefault();
         const postData = {
           ...formData,
-          ob_fy: parseInt(formData.ob_fy, 10),
           amount_inr_cr_max: parseFloat(formData.amount_inr_cr_max),
           amount_inr_cr_min: parseFloat(formData.amount_inr_cr_min),
           est_capex_inr_cr: parseFloat(formData.est_capex_inr_cr),
@@ -160,9 +172,9 @@ const CreateOpportunity = () => {
                           <Form.Group as={Col} controlId="ob_fy">
                               <Form.Label className="text-start">OB FY</Form.Label>
                               <Form.Control as="select" name="ob_fy" value={formData.ob_fy} onChange={handleChange} required>
-                                  <option value="FY24">2024</option>
-                                  <option value="FY25">2025</option>
-                                  <option value="FY26">2026</option>
+                                  <option value="FY24">FY24</option>
+                                  <option value="FY25">FY25</option>
+                                  <option value="FY26">FY26</option>
                               </Form.Control>
                           </Form.Group>
                           <Form.Group as={Col} controlId="ob_qtr">
@@ -356,9 +368,26 @@ const CreateOpportunity = () => {
                               <Form.Label className="text-start">Sales Role</Form.Label>
                               <Form.Control type="text" name="sales_role" value={formData.sales_role} onChange={handleChange} required />
                           </Form.Group>
-                          <Form.Group as={Col} controlId="primary_owner">
+                          {/* <Form.Group as={Col} controlId="primary_owner">
                               <Form.Label className="text-start">Primary Owner</Form.Label>
                               <Form.Control type="text" name="primary_owner" value={formData.primary_owner} onChange={handleChange} required />
+                          </Form.Group> */}
+                          <Form.Group as={Col} controlId="primary_owner">
+                            <Form.Label className="text-start">Primary Owner</Form.Label>
+                            <Form.Control 
+                                as="select"
+                                name="primary_owner"
+                                value={formData.primary_owner}
+                                onChange={handleChange}
+                                required
+                            >
+                                <option value="">Select Primary Owner</option>
+                                {users.map(user => (
+                                <option key={user.id} value={user.id}>
+                                    {user.firstName} {user.lastName}
+                                </option>
+                                ))}
+                            </Form.Control>
                           </Form.Group>
                           <Form.Group as={Col} controlId="source">
                               <Form.Label className="text-start">Source</Form.Label>

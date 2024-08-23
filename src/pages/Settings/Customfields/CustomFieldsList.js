@@ -1,8 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { BASE_URL as API_BASE_URL } from '../../../components/constants';
 import './style.css';
 
-const API_BASE_URL = 'http://localhost:8080';
 
 const modules = [
   {

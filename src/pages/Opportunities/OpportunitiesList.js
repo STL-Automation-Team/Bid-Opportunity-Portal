@@ -6,6 +6,7 @@ import assetIcon from '../../images/cardLogo/asseticon.png';
 import operationIcon from '../../images/cardLogo/operationicon.png';
 import serviceIcon from '../../images/cardLogo/serviceicon.png';
 import CountCard from '../MainDashboard/CountCard';
+import ExpandableTable from './ExpandableTable';
 import './Opportunities.css';
 
 const Opportunities = () => {
@@ -327,160 +328,17 @@ const Opportunities = () => {
                                      
                 </div>
                 {isExpanded && (
-                    <div className="expandable-content">
-                        <div className="fy-selector">
-                            <select value={selectedFY} onChange={handleFYChange}>
-                                {['FY23', 'FY24', 'FY25', 'FY26'].map(fy => (
-                                    <option key={fy} value={fy}>{fy}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="table-scroll-container">
-                                <table className="account-table">
-                                <thead>
-                                    <tr>
-                                        <th rowSpan="2">Account Segment Leader</th>
-                                        <th rowSpan="2">Account</th>
-                                        {['q1', 'q2', 'q3', 'q4'].map(quarter => (
-                                            <th key={quarter} colSpan={expandedQuarters[quarter] ? 5 : 2}>
-                                                {quarter.toUpperCase()}{selectedFY}
-                                                <button onClick={() => toggleQuarterExpansion(quarter)} className="expand-button">
-                                                    {expandedQuarters[quarter] ? '▼' : '►'}
-                                                </button>
-                                            </th>
-                                        ))}
-                                        <th colSpan="2">H1{selectedFY}</th>
-                                        <th colSpan="2">H2{selectedFY}</th>
-                                        <th colSpan="2">Total</th>
-                                    </tr>
-                                    <tr>
-                                        {['q1', 'q2', 'q3', 'q4'].map(quarter => (
-                                            <React.Fragment key={quarter}>
-                                                <th>AGP</th>
-                                                <th>
-                                                    <select value={columnValues[quarter]} onChange={(e) => handleColumnValueChange(quarter, e.target.value)}>
-                                                        <option value="Act">Act</option>
-                                                        <option value="Vis">Vis</option>
-                                                    </select>
-                                                </th>
-                                                {expandedQuarters[quarter] && (
-                                                    <>
-                                                        <th>{getMonthLabel(quarter, 1)}</th>
-                                                        <th>{getMonthLabel(quarter, 2)}</th>
-                                                        <th>{getMonthLabel(quarter, 3)}</th>
-                                                    </>
-                                                )}
-                                            </React.Fragment>
-                                        ))}
-                                        <th>AGP</th>
-                                        <th>
-                                            <select value={columnValues.h1} onChange={(e) => handleColumnValueChange('h1', e.target.value)}>
-                                                <option value="Act">Act</option>
-                                                <option value="Vis">Vis</option>
-                                            </select>
-                                        </th>
-                                        <th>AGP</th>
-                                        <th>
-                                            <select value={columnValues.h2} onChange={(e) => handleColumnValueChange('h2', e.target.value)}>
-                                                <option value="Act">Act</option>
-                                                <option value="Vis">Vis</option>
-                                            </select>
-                                        </th>
-                                        <th>AGP Total</th>
-                                        <th>Act/Vis Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {accountData.map((row, index) => (
-                                        <tr key={index}>
-                                            <td>{row.leader}</td>
-                                            <td>{row.account}</td>
-                                            {['q1', 'q2', 'q3', 'q4'].map(quarter => (
-                                                <React.Fragment key={quarter}>
-                                                    <td>5</td>
-                                                    <td>{getValueForPeriod(row, quarter, columnValues[quarter])}</td>
-                                                    {expandedQuarters[quarter] && (
-                                                        <>
-                                                            <td>{Math.round(getValueForPeriod(row, quarter, columnValues[quarter]) / 3)}</td>
-                                                            <td>{Math.round(getValueForPeriod(row, quarter, columnValues[quarter]) / 3)}</td>
-                                                            <td>{Math.round(getValueForPeriod(row, quarter, columnValues[quarter]) / 3)}</td>
-                                                        </>
-                                                    )}
-                                                </React.Fragment>
-                                            ))}
-                                            <td>10</td>
-                                            <td>{getValueForPeriod(row, 'h1', columnValues.h1)}</td>
-                                            <td>10</td>
-                                            <td>{getValueForPeriod(row, 'h2', columnValues.h2)}</td>
-                                            <td>
-                                                {5 + 5 + 10 + 5 + 5 + 10}
-                                            </td>
-                                            <td>
-                                                {getValueForPeriod(row, 'q1', columnValues.q1) + 
-                                                getValueForPeriod(row, 'q2', columnValues.q2) + 
-                                                getValueForPeriod(row, 'q3', columnValues.q3) + 
-                                                getValueForPeriod(row, 'q4', columnValues.q4)}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {/* Update total rows similarly */}
-                                    <tr className="total-row agp-total">
-                                        <td colSpan="2">Total AGP</td>
-                                        {['q1', 'q2', 'q3', 'q4'].map(quarter => (
-                                            <React.Fragment key={quarter}>
-                                                <td>{accountData.length * 5}</td>
-                                                <td>-</td>
-                                                {expandedQuarters[quarter] && (
-                                                    <>
-                                                        <td>-</td>
-                                                        <td>-</td>
-                                                        <td>-</td>
-                                                    </>
-                                                )}
-                                            </React.Fragment>
-                                        ))}
-                                        <td>{accountData.length * 10}</td>
-                                        <td>-</td>
-                                        <td>{accountData.length * 10}</td>
-                                        <td>-</td>
-                                        <td>{accountData.length * 40}</td>
-                                        <td>-</td>
-                                    </tr>
-                                    <tr className="total-row vis-act-total">
-                                        <td colSpan="2">Total {Object.values(columnValues)[0]}</td>
-                                        {['q1', 'q2', 'q3', 'q4'].map(quarter => (
-                                            <React.Fragment key={quarter}>
-                                                <td>-</td>
-                                                <td>{accountData.reduce((sum, row) => sum + getValueForPeriod(row, quarter, columnValues[quarter]), 0)}</td>
-                                                {expandedQuarters[quarter] && (
-                                                    <>
-                                                        <td>{Math.round(accountData.reduce((sum, row) => sum + getValueForPeriod(row, quarter, columnValues[quarter]), 0) / 3)}</td>
-                                                        <td>{Math.round(accountData.reduce((sum, row) => sum + getValueForPeriod(row, quarter, columnValues[quarter]), 0) / 3)}</td>
-                                                        <td>{Math.round(accountData.reduce((sum, row) => sum + getValueForPeriod(row, quarter, columnValues[quarter]), 0) / 3)}</td>
-                                                    </>
-                                                )}
-                                            </React.Fragment>
-                                        ))}
-                                        <td>-</td>
-                                        <td>{accountData.reduce((sum, row) => sum + getValueForPeriod(row, 'h1', columnValues.h1), 0)}</td>
-                                        <td>-</td>
-                                        <td>{accountData.reduce((sum, row) => sum + getValueForPeriod(row, 'h2', columnValues.h2), 0)}</td>
-                                        <td>-</td>
-                                        <td>
-                                            {accountData.reduce((sum, row) => 
-                                                sum + 
-                                                getValueForPeriod(row, 'q1', columnValues.q1) + 
-                                                getValueForPeriod(row, 'q2', columnValues.q2) + 
-                                                getValueForPeriod(row, 'q3', columnValues.q3) + 
-                                                getValueForPeriod(row, 'q4', columnValues.q4), 
-                                            0)}
-                                        </td>
-                                    </tr>
-                                </tbody>
-        </table>
-</div>
+                <div>
+                    <div className="fy-selector">
+                        <select value={selectedFY} onChange={handleFYChange}>
+                            {['FY23', 'FY24', 'FY25', 'FY26'].map(fy => (
+                                <option key={fy} value={fy}>{fy}</option>
+                            ))}
+                        </select>
                     </div>
-                )}
+                    <ExpandableTable selectedFY={selectedFY} />
+                </div>
+            )}
             </div>
             
           

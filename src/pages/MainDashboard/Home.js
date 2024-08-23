@@ -4,7 +4,7 @@ import axios from 'axios';
 import {
   BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement,
   PointElement, Title, Tooltip
-} from 'chart.js';
+} from 'chart.js/auto';
 import React, { Component } from 'react';
 import { Chart as ChartJSComponent } from 'react-chartjs-2';
 import { BASE_URL } from '../../components/constants';

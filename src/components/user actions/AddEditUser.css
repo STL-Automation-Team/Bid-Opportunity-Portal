@@ -193,4 +193,18 @@ table {
     gap: 16px;
     margin-top: 16px;
   }
+
   
+  .MuiInputLabel-root {
+    color: rgba(0, 0, 0, 0.6) !important;
+    width: auto !important;
+  }
+  
+  .MuiInputLabel-root.Mui-focused {
+    color: #1976d2 !important;
+  }
+  
+  .MuiSelect-select {
+    display: flex !important;
+    align-items: center !important;
+  }
