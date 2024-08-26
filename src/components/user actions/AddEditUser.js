@@ -197,7 +197,6 @@ const AddEditUser = () => {
               </TableHead>
               <TableBody>
                 {users
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((user) => (
                     <TableRow key={user.id} hover>
                       <TableCell>{user.employeeId}</TableCell>

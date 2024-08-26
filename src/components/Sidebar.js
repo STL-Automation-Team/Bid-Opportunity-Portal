@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import logo from '../images/itamlogo.png';
 import '../styles/sidebar.css';
 
 const Sidebar = () => {
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isSidebarOpen, setSidebarOpen] = useState(true);
 
   const handleDropdownToggle = (e) => {
     const arrowParent = e.target.parentElement.parentElement;
@@ -17,6 +18,7 @@ const Sidebar = () => {
   return (
     <div className={`sidebar ${isSidebarOpen ? "open" : "close"}`}>
         <div className="toggle-btn">
+        <img className="logoimg" src={logo} />
           <i
             className="bi bi-list"
             onClick={handleSidebarToggle}
@@ -83,7 +85,7 @@ const Sidebar = () => {
         <li>
           <Link to="/addopportunity">
             <i className="bi bi-file-earmark-text-fill"></i>
-            <span className="link_name">Create Opportunity</span>
+            <span className="link_name">Add Opportunity</span>
           </Link>
           <ul className="sub-menu blank">
             <li>
@@ -112,7 +114,7 @@ const Sidebar = () => {
         <li>
           <Link to="/userslist">
             <i className="bi bi-people-fill"></i>
-            <span className="link_name">Users</span>
+            <span className="link_name">Manage User</span>
           </Link>
           <ul className="sub-menu blank">
             <li>

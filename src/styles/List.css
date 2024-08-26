@@ -27,8 +27,11 @@
   }
 
   .logoimg {
-    width: 80px;
-     height: 40px;
+    width: 65px;
+     height: auto;
+     margin-right: 25%;
+
+
   }
 
   .navbar .navbar-nav .nav-link:hover {

@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { BASE_URL } from '../../components/constants';
-import assetIcon from '../../images/cardLogo/asseticon.png';
-import operationIcon from '../../images/cardLogo/operationicon.png';
-import serviceIcon from '../../images/cardLogo/serviceicon.png';
 import CountCard from '../MainDashboard/CountCard';
 import ExpandableTable from './ExpandableTable';
 import './Opportunities.css';
@@ -212,41 +209,41 @@ const Opportunities = () => {
                     title="Total Opportunities"
                     count={totalOpportunities}
                     baseColor="#4caf50"
-                    cardLogo={operationIcon}
+                    // cardLogo={operationIcon}
                     onClick={() => handleCardClick('Total Opportunities')}
                 />
                 <CountCard
                     title="Qualified"
                     count={qualifiedCount}
                     baseColor="#2196f3"
-                    cardLogo={serviceIcon}
+                    // cardLogo={serviceIcon}
                     onClick={() => handleCardClick('Qualified')}
                 />
                 <CountCard
                     title="Work in Progress"
                     count={workInProgressCount}
                     baseColor="#ff9800"
-                    cardLogo={assetIcon}
+                    // cardLogo={assetIcon}
                     onClick={() => handleCardClick('Work in Progress')}
                 />
                 <CountCard
                     title="Bid Submitted"
                     count={bidSubmittedCount}
                     baseColor="#00b7b7"
-                    cardLogo={assetIcon}
+                    // cardLogo={assetIcon}
                     onClick={() => handleCardClick('Bid Submitted')}
                 />
             </div>
             <div className="filter-container">
                 {Object.keys(filterOptions).map(filterName => (
                     <div key={filterName} className="filter-dropdown">
-                        <label>{columnNames[filterName] || filterName}</label>
+                        {/* <label>{columnNames[filterName] || filterName}</label> */}
                         <Select
                             isMulti
                             options={filterOptions[filterName].map(option => ({ value: option, label: option }))}
                             value={filters[filterName].map(value => ({ value, label: value }))}
                             onChange={(selectedOptions) => handleFilterChange(selectedOptions, filterName)}
-                            placeholder={`Select `}
+                            placeholder={`${columnNames[filterName] || filterName }`}
                             className="react-select-container"
                             classNamePrefix="react-select"
                         />

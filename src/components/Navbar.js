@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Assuming you're using React Router
-import logo from '../images/itamlogo.png';
 import '../styles/List.css';
 import '../styles/navbar.scss';
 
@@ -18,7 +17,7 @@ export default function Navbar({onLogout}) {
 <nav>
   <ul id="navbar">
   <a className="navbar-brand" href="/">
-    <img className="logoimg" src={logo} />
+    {/* <img className="logoimg" src={logo} /> */}
   </a>
   {/* <div class="search-box">
     <button class="btn-search"><i class="bi bi-search"></i></button>

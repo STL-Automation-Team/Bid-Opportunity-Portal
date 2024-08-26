@@ -33,11 +33,11 @@ export default class CountCard extends Component {
           onClick={onClick}
         >
           <div className="card-body">
-            <h5 className="card-title" style={{ textDecoration: "none" }}>
+            <h5 className="card-title" style={{ position: "static", textDecoration: "none" }}>
               {count}
             </h5>
-            <p className="card-text">{title}</p>
-            <img className="col-sm-6 cardicon" src={cardLogo} alt="sans" />
+            <p className="card-text" style={{ position: "static"}}>{title}</p>
+            {/* <img className="col-sm-6 cardicon" src={cardLogo} alt="sans" /> */}
           </div>
         </div>
       
