@@ -9,18 +9,13 @@ import './Opportunities.css';
 const Opportunities = () => {
     const [opportunities, setOpportunities] = useState([]);
     const [filteredOpportunities, setFilteredOpportunities] = useState([]);
-    const [selectedStatus, setSelectedStatus] = useState(null);
     const [isExpanded, setIsExpanded] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
     const navigate = useNavigate();
-
     const [selectedFY, setSelectedFY] = useState('');
-    const [accountData, setAccountData] = useState([]);
-    const [columnValues, setColumnValues] = useState({
-        q1: 'Vis', q2: 'Vis', h1: 'Vis', q3: 'Vis', q4: 'Vis', h2: 'Vis'
-    });
-    
+    const [selectedStatus, setSelectedStatus] = useState(null);
+    const [searchPerformed, setSearchPerformed] = useState(false);
     const [filters, setFilters] = useState({
         ob_fy: [],
         ob_qtr: [],
@@ -30,11 +25,9 @@ const Opportunities = () => {
         primary_owner: [],
         search: ''
     });
-
     const columns = [
         'ob_fy', 'ob_qtr', 'ob_mmm', 'opportunity', 'industry_segment', 'primary_owner', 'tender_no'
     ];
-
     const columnNames = {
         ob_fy: 'OB FY',
         ob_qtr: 'OB Quarter',
@@ -46,7 +39,6 @@ const Opportunities = () => {
         deal_status: 'Deal Status',
         priority: 'Priority'
     };
-
     const filterOptions = {
         ob_fy: ['FY23', 'FY24', 'FY25', 'FY26'],
         ob_qtr: ['Q1', 'Q2', 'Q3', 'Q4'],
@@ -59,7 +51,6 @@ const Opportunities = () => {
             "Vijayanand Choudhury", "Ronak Soni"
         ]
     };
-
     const getCurrentQuarterAndFY = () => {
         const today = new Date();
         const month = today.getMonth() + 1;
@@ -75,75 +66,54 @@ const Opportunities = () => {
     }, []);
 
     useEffect(() => {
-        const dummyData = [
-            { leader: 'Mrityunjay Nautiyal', account: 'Public Sector', q1: 100, q2: 150, q3: 200, q4: 250 },
-            { leader: 'Amit Kar', account: 'Bharatnet/CN', q1: 120, q2: 170, q3: 220, q4: 270 },
-            { leader: 'Vaibhav Misra', account: 'Defense', q1: 90, q2: 140, q3: 190, q4: 240 },
-            { leader: 'Srinivasulu AN', account: 'Telecom', q1: 110, q2: 160, q3: 210, q4: 260 },
-            { leader: 'Vivek Nigam', account: 'Mining & Energy', q1: 80, q2: 130, q3: 180, q4: 230 },
-            { leader: 'Sumeet Banerjee', account: 'GCC', q1: 130, q2: 180, q3: 230, q4: 280 },
-            { leader: 'Puneet Garg', account: 'Public Sector', q1: 95, q2: 145, q3: 195, q4: 245 },
-            { leader: 'Ishwar Chandra', account: 'Bharatnet/CN', q1: 105, q2: 155, q3: 205, q4: 255 },
-            { leader: 'Vijayanand Choudhury', account: 'Defense', q1: 115, q2: 165, q3: 215, q4: 265 },
-            { leader: 'Ronak Soni', account: 'Telecom', q1: 85, q2: 135, q3: 185, q4: 235 },
-        ];
-        setAccountData(dummyData);
-    }, [selectedFY]);
-
-    useEffect(() => {
         fetch(`${BASE_URL}/api/opportunities`)
             .then(response => response.json())
             .then(data => {
-                setOpportunities(data);
-                setFilteredOpportunities(data);
+                const sortedData = data.sort((a, b) => b.id - a.id);
+                setOpportunities(sortedData);
+                setFilteredOpportunities(sortedData);
             })
             .catch(error => console.error('Error fetching data:', error));
     }, []);
 
     useEffect(() => {
-        const filtered = opportunities.filter(op => {
-            return Object.keys(filters).every(key => {
-                if (key === 'search') {
-                    return filters.search === '' || Object.values(op).some(value => 
-                        value != null && value.toString().toLowerCase().includes(filters.search.toLowerCase())
-                    );
-                }
-                return filters[key].length === 0 || filters[key].includes(op[key]);
+        if (!noFiltersApplied) {
+            const filtered = opportunities.filter(op => {
+                return Object.keys(filters).every(key => {
+                    if (key === 'search') {
+                        return filters.search === '' || Object.values(op).some(value => 
+                            value != null && value.toString().toLowerCase().includes(filters.search.toLowerCase())
+                        );
+                    }
+                    return filters[key].length === 0 || filters[key].includes(op[key]);
+                });
             });
-        });
-        setFilteredOpportunities(filtered);
-        setCurrentPage(1);
+            const sortedFiltered = filtered.sort((a, b) => b.id - a.id);
+            setFilteredOpportunities(sortedFiltered);
+            setCurrentPage(1);
+        } else {
+            setFilteredOpportunities([]);
+        }
     }, [opportunities, filters]);
 
     const handleFilterChange = (selectedOptions, filterName) => {
         const value = selectedOptions ? selectedOptions.map(option => option.value) : [];
         setFilters(prev => ({ ...prev, [filterName]: value }));
-    };
-
-    const [expandedQuarters, setExpandedQuarters] = useState({
-        q1: false,
-        q2: false,
-        q3: false,
-        q4: false
-    });
-
-    const toggleQuarterExpansion = (quarter) => {
-        setExpandedQuarters(prev => ({
-            ...prev,
-            [quarter]: !prev[quarter]
-        }));
+        setSearchPerformed(true);
     };
 
     const handleSearchChange = (e) => {
-        setFilters(prev => ({ ...prev, search: e.target.value }));
+        if (!noFiltersApplied) {
+            setFilters(prev => ({ ...prev, search: e.target.value }));
+            setSearchPerformed(true);
+        }
     };
 
+    const noFiltersApplied = Object.values(filters).every(filter => 
+        Array.isArray(filter) ? filter.length === 0 : filter === ''
+    );
     const handleFYChange = (e) => {
         setSelectedFY(e.target.value);
-    };
-
-    const handleColumnValueChange = (column, value) => {
-        setColumnValues(prev => ({ ...prev, [column]: value }));
     };
 
     const totalOpportunities = opportunities.length;
@@ -155,7 +125,7 @@ const Opportunities = () => {
         setSelectedStatus(status);
         if (status === 'Total Opportunities') {
             setFilters({
-        ob_fy: ['FY23', 'FY24', 'FY25', 'FY26'],
+                ob_fy: ['FY23', 'FY24', 'FY25', 'FY26'],
                 ob_qtr: [],
                 priority: [],
                 industry_segment: [],
@@ -168,39 +138,15 @@ const Opportunities = () => {
         }
     };
 
-    const getValueForPeriod = (row, period, type) => {
-        const dummyData = {
-            Vis: { q1: 100, q2: 150, q3: 200, q4: 250 },
-            Act: { q1: 90, q2: 140, q3: 190, q4: 240 }
-        };
-        
-        if (period === 'h1') {
-            return dummyData[type].q1 + dummyData[type].q2;
-        } else if (period === 'h2') {
-            return dummyData[type].q3 + dummyData[type].q4;
-        } else {
-            return dummyData[type][period];
-        }
-    };
-    const getMonthLabel = (quarter, monthIndex) => {
-        const months = {
-            q1: ['Apr', 'May', 'Jun'],
-            q2: ['Jul', 'Aug', 'Sep'],
-            q3: ['Oct', 'Nov', 'Dec'],
-            q4: ['Jan', 'Feb', 'Mar']
-        };
-        return months[quarter][monthIndex - 1];
-    };
-
     // Pagination
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredOpportunities.slice(indexOfFirstItem, indexOfLastItem);
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    const noFiltersApplied = Object.values(filters).every(filter => 
-        Array.isArray(filter) ? filter.length === 0 : filter === ''
-    );
+    // const noFiltersApplied = Object.values(filters).every(filter => 
+    //     Array.isArray(filter) ? filter.length === 0 : filter === ''
+    // );
 
     return (
         <div className="opportunities-container">
@@ -209,35 +155,30 @@ const Opportunities = () => {
                     title="Total Opportunities"
                     count={totalOpportunities}
                     baseColor="#4caf50"
-                    // cardLogo={operationIcon}
                     onClick={() => handleCardClick('Total Opportunities')}
                 />
                 <CountCard
                     title="Qualified"
                     count={qualifiedCount}
                     baseColor="#2196f3"
-                    // cardLogo={serviceIcon}
                     onClick={() => handleCardClick('Qualified')}
                 />
                 <CountCard
                     title="Work in Progress"
                     count={workInProgressCount}
                     baseColor="#ff9800"
-                    // cardLogo={assetIcon}
                     onClick={() => handleCardClick('Work in Progress')}
                 />
                 <CountCard
                     title="Bid Submitted"
                     count={bidSubmittedCount}
                     baseColor="#00b7b7"
-                    // cardLogo={assetIcon}
                     onClick={() => handleCardClick('Bid Submitted')}
                 />
             </div>
             <div className="filter-container">
                 {Object.keys(filterOptions).map(filterName => (
                     <div key={filterName} className="filter-dropdown">
-                        {/* <label>{columnNames[filterName] || filterName}</label> */}
                         <Select
                             isMulti
                             options={filterOptions[filterName].map(option => ({ value: option, label: option }))}
@@ -251,20 +192,27 @@ const Opportunities = () => {
                 ))}
                 <input 
                     type="text" 
-                    placeholder="Search Opportunity..." 
+                    placeholder={noFiltersApplied ? "Select filters to enable search" : "Search Opportunity..."}
                     value={filters.search}
                     onChange={handleSearchChange}
                     className="search-input"
+                    disabled={noFiltersApplied}
                 />
             </div>
 
             {noFiltersApplied && (
                 <div className="no-filter-message">
-                    Please select filters or enter a search to view opportunities.
+                    Please select filters to view opportunities.
                 </div>
             )}
 
-            {!noFiltersApplied && (
+            {!noFiltersApplied && filteredOpportunities.length === 0 && (
+                <div className="no-filter-message">
+                    No opportunities found matching your search.
+                </div>
+            )}
+
+            {!noFiltersApplied && filteredOpportunities.length > 0 && (
                 <>
                     <div className="table-container">
                         <table className="opportunities-table">
@@ -304,43 +252,71 @@ const Opportunities = () => {
                 </>
             )}
 
-            
             <div className="expandable-area">
                 <div className="expandable-header">
                     <h3>Account Segment Leaders Overview</h3>
                     <div>
-                    <button 
-                onClick={() => navigate('/addopportunity')}
-                className="btn btn-blue"
-                style={{marginRight : "13px", backgroundColor:"blue"}}
-            >
-                Add Opportunity
-            </button>
-                    <button onClick={() => setIsExpanded(!isExpanded)}>
-                        {isExpanded ? 'Minimize' : 'Maximize'}
-                    </button>
-
-
+                        <button 
+                            onClick={() => navigate('/addopportunity')}
+                            className="btn btn-blue"
+                            style={{marginRight : "13px", backgroundColor:"blue"}}
+                        >
+                            Add Opportunity
+                        </button>
+                        <button onClick={() => setIsExpanded(!isExpanded)}>
+                            {isExpanded ? 'Minimize' : 'Maximize'}
+                        </button>
                     </div>
-                                     
                 </div>
                 {isExpanded && (
-                <div>
-                    <div className="fy-selector">
-                        <select value={selectedFY} onChange={handleFYChange}>
-                            {['FY23', 'FY24', 'FY25', 'FY26'].map(fy => (
-                                <option key={fy} value={fy}>{fy}</option>
-                            ))}
-                        </select>
+                    <div>
+                        <div className="fy-selector">
+                            <select value={selectedFY} onChange={handleFYChange}>
+                                {['FY23', 'FY24', 'FY25', 'FY26'].map(fy => (
+                                    <option key={fy} value={fy}>{fy}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <ExpandableTable selectedFY={selectedFY} />
                     </div>
-                    <ExpandableTable selectedFY={selectedFY} />
-                </div>
-            )}
+                )}
             </div>
-            
-          
         </div>
     );
 };
 
 export default Opportunities;
+
+
+  // const toggleQuarterExpansion = (quarter) => {
+    //     setExpandedQuarters(prev => ({
+    //         ...prev,
+    //         [quarter]: !prev[quarter]
+    //     }));
+    // };
+    // const handleColumnValueChange = (column, value) => {
+    //     setColumnValues(prev => ({ ...prev, [column]: value }));
+    // };
+    // const getValueForPeriod = (row, period, type) => {
+    //     const dummyData = {
+    //         Vis: { q1: 100, q2: 150, q3: 200, q4: 250 },
+    //         Act: { q1: 90, q2: 140, q3: 190, q4: 240 }
+    //     };
+        
+    //     if (period === 'h1') {
+    //         return dummyData[type].q1 + dummyData[type].q2;
+    //     } else if (period === 'h2') {
+    //         return dummyData[type].q3 + dummyData[type].q4;
+    //     } else {
+    //         return dummyData[type][period];
+    //     }
+    // };
+    // const getMonthLabel = (quarter, monthIndex) => {
+    //     const months = {
+    //         q1: ['Apr', 'May', 'Jun'],
+    //         q2: ['Jul', 'Aug', 'Sep'],
+    //         q3: ['Oct', 'Nov', 'Dec'],
+    //         q4: ['Jan', 'Feb', 'Mar']
+    //     };
+    //     return months[quarter][monthIndex - 1];
+    // };

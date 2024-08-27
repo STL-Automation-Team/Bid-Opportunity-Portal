@@ -340,7 +340,7 @@ const CreateOpportunity = () => {
                 required 
                 min={0}
                 step={0.01}
-                max={20000}
+                max={200000}
                 placeholder="Enter minimum amount"
               />
             </Form.Group>
@@ -354,7 +354,7 @@ const CreateOpportunity = () => {
                 required 
                 min={0}
                 step={0.01}
-                max={20000}
+                max={200000}
                 placeholder="Enter maximum amount"
               />
             </Form.Group>
@@ -367,7 +367,7 @@ const CreateOpportunity = () => {
                 onChange={handleChange} 
                 min={0}
                 step={0.01}
-                max={20000}
+                max={200000}
                 placeholder="Enter estimated CAPEX"
               />
             </Form.Group>
@@ -380,7 +380,7 @@ const CreateOpportunity = () => {
                 onChange={handleChange} 
                 min={0}
                 step={0.01}
-                max={20000}
+                max={200000}
                 placeholder="Enter estimated OPEX"
               />
             </Form.Group>
