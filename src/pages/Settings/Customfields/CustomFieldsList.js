@@ -168,7 +168,7 @@ export default function CustomFieldsList() {
   const [selectedModule, setSelectedModule] = useState(null);
   const [data, setData] = useState([]);
   const [editingItem, setEditingItem] = useState(null);
-
+  const token = localStorage.getItem('token');
   useEffect(() => {
     if (selectedModule) {
       fetchData();
@@ -177,7 +177,11 @@ export default function CustomFieldsList() {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}${selectedModule.endpoint}`);
+      const response = await axios.get(`${API_BASE_URL}${selectedModule.endpoint}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setData(response.data);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -195,6 +199,10 @@ export default function CustomFieldsList() {
         ...formData,
         createdAt,
         createdBy,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       fetchData();
       setData([]);
@@ -214,6 +222,10 @@ export default function CustomFieldsList() {
         ...formData,
         updatedBy,
         updatedAt,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       fetchData();
       setEditingItem(null);
@@ -227,7 +239,11 @@ export default function CustomFieldsList() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API_BASE_URL}${selectedModule.endpoint}/${id}`);
+      await axios.delete(`${API_BASE_URL}${selectedModule.endpoint}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       fetchData();
       setData([]);
       alert('Item deleted successfully!');
