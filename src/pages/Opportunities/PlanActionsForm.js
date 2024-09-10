@@ -29,12 +29,13 @@ const PlanActionsForm = ({ show, handleClose, form_id }) => {
         ...data
     }
     try {
+      const token = localStorage.getItem('token');
         console.log(data)
         const response = await axios.post(`${BASE_URL}/api/plans`, postData, {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });        console.log('Data updated successfully:', response.data);
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });        console.log('Data updated successfully:', response.data);
 
       console.log('Data submitted successfully:');
       setSuccess(true);

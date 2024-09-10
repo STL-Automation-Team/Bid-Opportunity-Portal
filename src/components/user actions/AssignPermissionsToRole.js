@@ -19,6 +19,7 @@ const AssignPermissionsToRole = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const token = localStorage.getItem('token'); // Retrieve the token from storage
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -30,13 +31,25 @@ const AssignPermissionsToRole = () => {
   };
   const fetchData = async () => {
     try {
-      const rolesResponse = await axios.get(`${BASE_URL}/api/roles`);
+      const rolesResponse = await axios.get(`${BASE_URL}/api/roles`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setRoles(rolesResponse.data);
 
-      const permissionsResponse = await axios.get(`${BASE_URL}/api/permissions`);
+      const permissionsResponse = await axios.get(`${BASE_URL}/api/permissions`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setPermissions(permissionsResponse.data);
 
-      const mappingsResponse = await axios.get(`${BASE_URL}/api/roles-permission`);
+      const mappingsResponse = await axios.get(`${BASE_URL}/api/roles-permission`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setRoleMappings(mappingsResponse.data);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -47,13 +60,25 @@ const AssignPermissionsToRole = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const rolesResponse = await axios.get(`${BASE_URL}/api/roles`);
+        const rolesResponse = await axios.get(`${BASE_URL}/api/roles`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setRoles(rolesResponse.data);
 
-        const permissionsResponse = await axios.get(`${BASE_URL}/api/permissions`);
+        const permissionsResponse = await axios.get(`${BASE_URL}/api/permissions`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setPermissions(permissionsResponse.data);
 
-        const mappingsResponse = await axios.get(`${BASE_URL}/api/roles-permission`);
+        const mappingsResponse = await axios.get(`${BASE_URL}/api/roles-permission`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setRoleMappings(mappingsResponse.data);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -94,7 +119,11 @@ const AssignPermissionsToRole = () => {
         const mapping = roleMappings.find(
           (mapping) => mapping.roleId === selectedRole.id && mapping.permissionId === permissionId
         );
-        await axios.delete(`${BASE_URL}/api/roles-permission/${mapping.id}`);
+        await axios.delete(`${BASE_URL}/api/roles-permission/${mapping.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
       }
 
       // Add new permissions
@@ -106,6 +135,10 @@ const AssignPermissionsToRole = () => {
         await axios.post(`${BASE_URL}/api/roles-permission`, {
           roleId: selectedRole.id,
           permissionId: permission.id
+        },  {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
       }
       fetchData();

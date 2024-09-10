@@ -49,7 +49,7 @@ const ManageRoles = () => {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-
+  const token = localStorage.getItem('token');
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -61,7 +61,11 @@ const ManageRoles = () => {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/roles`);
+      const response = await axios.get(`${BASE_URL}/api/roles`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setRoles(response.data);
     } catch (error) {
       console.error('Error fetching roles:', error);
@@ -114,10 +118,18 @@ const ManageRoles = () => {
         updatedAt: currentTime,
       };
       if (editingRole) {
-        await axios.put(`${BASE_URL}/api/roles/${editingRole.id}`, data);
+        await axios.put(`${BASE_URL}/api/roles/${editingRole.id}`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         showSnackbar('Role updated successfully', 'success');
       } else {
-        await axios.post(`${BASE_URL}/api/roles`, data);
+        await axios.post(`${BASE_URL}/api/roles`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         showSnackbar('Role created successfully', 'success');
       }
       fetchRoles();
@@ -131,7 +143,11 @@ const ManageRoles = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this role?')) {
       try {
-        await axios.delete(`${BASE_URL}/api/roles/${id}`);
+        await axios.delete(`${BASE_URL}/api/roles/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         showSnackbar('Role deleted successfully', 'success');
         fetchRoles();
       } catch (error) {

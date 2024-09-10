@@ -26,9 +26,10 @@ const GoNoGoStatusForm = ({ show, handleClose, form_id }) => {
           const postData = {
             ...data
           }
+          const token = localStorage.getItem('token');
           const response = await axios.post(`${BASE_URL}/api/gonogostatus`, data, {
             headers: {
-              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
             },
           });
           console.log('Data submitted successfully:', response);

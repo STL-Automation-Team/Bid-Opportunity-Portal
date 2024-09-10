@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import App1 from './App1';
+import { AccessDeniedProvider } from './components/AccessDeniedProvider';
 import LoginPage from './pages/LoginPage';
 import "./styles/basic.css";
-
 // import ReadOperation from './pages/Operations/ReadOperation'
 
 function App() {
@@ -27,14 +27,20 @@ function App() {
   // const navigate = useNavigate();
 
   return (
-    <div>
-    {!isAuthenticated ? (
-      <LoginPage onLogin={handleLogin} />
-      
-    ) : (
-      <App1 onLogout={handleLogout}/>
-    )}
-  </div>
+      <div>
+          {!isAuthenticated ? (
+            <LoginPage onLogin={handleLogin} />
+            
+          ) : (
+    <AccessDeniedProvider>
+            <App1 onLogout={handleLogout}/>
+
+    </AccessDeniedProvider>
+
+          )}
+        </div>
+  
+   
   )
 }
 

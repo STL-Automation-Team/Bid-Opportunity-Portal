@@ -23,6 +23,7 @@ const AssignRoleToUser = () => {
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+  const token = localStorage.getItem('token'); // Retrieve the token from storage
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
@@ -31,13 +32,25 @@ const AssignRoleToUser = () => {
 
   const fetchData = async () => {
     try {
-      const usersResponse = await axios.get(`${BASE_URL}/api/allusers`);
+      const usersResponse = await axios.get(`${BASE_URL}/api/allusers`,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setUsers(usersResponse.data);
 
-      const rolesResponse = await axios.get(`${BASE_URL}/api/roles`);
+      const rolesResponse = await axios.get(`${BASE_URL}/api/roles`,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setRoles(rolesResponse.data);
 
-      const mappingsResponse = await axios.get(`${BASE_URL}/api/user-roles`);
+      const mappingsResponse = await axios.get(`${BASE_URL}/api/user-roles`,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setUserRoleMappings(mappingsResponse.data);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -80,7 +93,11 @@ const AssignRoleToUser = () => {
         const mapping = userRoleMappings.find(
           (mapping) => mapping.userID === selectedUser.id && mapping.roleID === roleId
         );
-        await axios.delete(`${BASE_URL}/api/user-roles/${mapping.id}`);
+        await axios.delete(`${BASE_URL}/api/user-roles/${mapping.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
       }
 
       // Add new roles
@@ -92,6 +109,10 @@ const AssignRoleToUser = () => {
         await axios.post(`${BASE_URL}/api/user-roles`, {
           userID: selectedUser.id,
           roleID: role.id
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
       }
       fetchData();

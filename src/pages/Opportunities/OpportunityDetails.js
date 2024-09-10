@@ -32,16 +32,24 @@ const OpportunityDetails = () => {
       fetchSubmittedData_gonogo(id);
       fetchSubmittedData_deal_status(id);
   }, [id]);
-  
+  const token = localStorage.getItem('token');
   const fetchOpportunityData = (id) => {
-    fetch(`${BASE_URL}/api/opportunities/${id}`)
+    fetch(`${BASE_URL}/api/opportunities/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then(response => response.json())
       .then(data => setOpportunity(data))
       .catch(error => console.error('Error fetching data:', error));
   };
 
   const fetchSubmittedData = (id) => {
-    axios.get(`${BASE_URL}/api/plans?form_id=${id}`)
+    axios.get(`${BASE_URL}/api/plans?form_id=${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then(response => setSubmittedData(response.data))
       .catch(error => console.error('Error fetching submitted data:', error));
   };
@@ -53,7 +61,11 @@ const OpportunityDetails = () => {
         go_no_go_status: Status_
     }
     console.log(updateData);
-    axios.put(`${BASE_URL}/api/opportunities/${id}`, updateData)
+    axios.put(`${BASE_URL}/api/opportunities/${id}`, updateData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
           .then(updateResponse => {
             console.log('Opportunity updated successfully:', updateResponse.data);
             fetchOpportunityData(id);
@@ -63,7 +75,11 @@ const OpportunityDetails = () => {
           });
 
 
-    axios.get(`${BASE_URL}/api/gonogostatus?form_id=${id}`)
+    axios.get(`${BASE_URL}/api/gonogostatus?form_id=${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then(response => setSubmittedData1(response.data))
       .catch(error => console.error('Error fetching submitted data:', error));
 
@@ -80,7 +96,11 @@ const OpportunityDetails = () => {
   
     console.log("---------")
     console.log(updateData)
-    axios.put(`${BASE_URL}/api/opportunities/${id}`, updateData)
+    axios.put(`${BASE_URL}/api/opportunities/${id}`, updateData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
           .then(updateResponse => {
             console.log('Opportunity updated successfully:', updateResponse.data);
             fetchOpportunityData(id);
@@ -90,7 +110,11 @@ const OpportunityDetails = () => {
           });
 
 
-    axios.get(`${BASE_URL}/api/deal-status?form_id=${id}`)
+    axios.get(`${BASE_URL}/api/deal-status?form_id=${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then(response => setSubmittedData2(response.data))
       .catch(error => console.error('Error fetching submitted data:', error));
 

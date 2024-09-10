@@ -66,8 +66,14 @@ const Opportunities = () => {
     }, []);
 
     useEffect(() => {
-        fetch(`${BASE_URL}/api/opportunities`)
-            .then(response => response.json())
+        const token = localStorage.getItem('token'); // Or sessionStorage.getItem('token');
+        console.log(token);
+        fetch(`${BASE_URL}/api/opportunities`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+            ).then(response => response.json())
             .then(data => {
                 const sortedData = data.sort((a, b) => b.id - a.id);
                 setOpportunities(sortedData);

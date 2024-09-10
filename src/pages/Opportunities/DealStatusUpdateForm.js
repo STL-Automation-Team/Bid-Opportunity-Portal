@@ -21,7 +21,7 @@ const DealStatusUpdateForm = ({ show, handleClose, form_id }) => {
         status: status,
       
     };
-   
+   const token = localStorage.getItem('token');
     try {
         const postData = {
             ...updateData
@@ -29,7 +29,7 @@ const DealStatusUpdateForm = ({ show, handleClose, form_id }) => {
         console.log(postData);
         const response = await axios.post(`${BASE_URL}/api/deal-status`, postData, {
           headers: {
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
         });
         console.log('Data submitted successfully:', response);

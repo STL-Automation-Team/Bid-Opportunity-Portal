@@ -21,10 +21,23 @@ const ExpandableTable = ({ selectedFY }) => {
 
     const fetchData = async () => {
         try {
+        const token = localStorage.getItem('token'); // Or sessionStorage.getItem('token');
             const [agpResponse, opportunitiesResponse, allUsersResponse] = await Promise.all([
-                axios.get(`${BASE_URL}/api/agp`),
-                axios.get(`${BASE_URL}/api/opportunities`),
-                axios.get(`${BASE_URL}/api/allusers`)
+                axios.get(`${BASE_URL}/api/agp`,{
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }),
+                axios.get(`${BASE_URL}/api/opportunities`,{
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  }),
+                axios.get(`${BASE_URL}/api/allusers`, {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                    },
+                  })
             ]);
             
             const agpData = agpResponse.data.filter(item => item.obFY === selectedFY);

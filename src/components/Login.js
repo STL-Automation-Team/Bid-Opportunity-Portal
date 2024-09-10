@@ -18,14 +18,16 @@ const Login = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${BASE_URL}/api/login`, {
-        email: username,
-        passwordHash: password,
+      const response = await axios.post(`${BASE_URL}/user/loginUser`, {
+        username: username,
+        password: password,
       });
   
       // Handle successful login
       if (response.status === 200) {
+        const token = response.data.token;
         console.log('Login successful');
+        localStorage.setItem('token', token);
         toast.success('Login successful!');
         onLogin(); // Call the onLogin function to proceed to the next page
       }
@@ -60,7 +62,7 @@ const Login = ({ onLogin }) => {
 
   const handleSignupClick = async () => {
     try {
-      const response = await axios.post(`${BASE_URL}/api/register`, {
+      const response = await axios.post(`${BASE_URL}/user/saveUser`, {
         username,
         password,
       },

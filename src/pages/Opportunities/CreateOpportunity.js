@@ -94,7 +94,7 @@ const CreateOpportunity = () => {
           [name]: value
         }));
       };
-    
+      const token = localStorage.getItem('token');
       const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -133,7 +133,7 @@ const CreateOpportunity = () => {
           console.log(postData);
           const response = await axios.post(`${BASE_URL}/api/opportunities`, postData, {
             headers: {
-              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
             },
           });
           if (response.status === 201 || response.status === 200) {
@@ -171,7 +171,11 @@ const CreateOpportunity = () => {
 
       useEffect(() => {
         // Fetch user data from the API
-        axios.get(`${BASE_URL}/api/allusers`)
+        axios.get(`${BASE_URL}/api/allusers`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
           .then(response => {
             setUsers(response.data);
           })

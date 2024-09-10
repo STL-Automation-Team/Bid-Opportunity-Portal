@@ -24,13 +24,17 @@ const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id })
   const handleEditClose = () => {
     setShowEditModal(false);
   };
-
+  const token = localStorage.getItem('token');
   const onUpdate = (updatedDetails) => {
     const updatedPayload = {
       action: updatedDetails[2].value,
     };
     console.log(updatedPayload);
-    axios.put(`${BASE_URL}/api/plans/${box_id}`, updatedPayload)
+    axios.put(`${BASE_URL}/api/plans/${box_id}`, updatedPayload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then(response => {
         console.log('Data updated successfully:', response.data);
         handleUpdate();

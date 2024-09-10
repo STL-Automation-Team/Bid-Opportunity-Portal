@@ -71,8 +71,13 @@ export default class Home extends Component {
   fetchData = async (index) => {
     const { inputs } = this.state.graphs[index];
     const { dataFetch } = graphConfigs[index];
+    const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(dataFetch(inputs));
+      const response = await axios.get(dataFetch(inputs),{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       this.processData(response.data, index);
     } catch (error) {
       console.error('Error fetching data:', error);

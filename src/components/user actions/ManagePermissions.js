@@ -43,6 +43,7 @@ const ManagePermissions = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const token = localStorage.getItem('token'); // Retrieve the token from storage
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -64,7 +65,11 @@ const ManagePermissions = () => {
 
   const fetchPermissions = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/permissions`);
+      const response = await axios.get(`${BASE_URL}/api/permissions`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setPermissions(response.data);
     } catch (error) {
       console.error('Error fetching permissions:', error);
@@ -117,10 +122,18 @@ const ManagePermissions = () => {
         updatedAt: new Date().toISOString()
       };
       if (editingPermission) {
-        await axios.put(`${BASE_URL}/api/permissions/${editingPermission.id}`, data);
+        await axios.put(`${BASE_URL}/api/permissions/${editingPermission.id}`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         showSnackbar('Permission updated successfully', 'success');
       } else {
-        await axios.post(`${BASE_URL}/api/permissions`, data);
+        await axios.post(`${BASE_URL}/api/permissions`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         showSnackbar('Permission created successfully', 'success');
       }
       fetchPermissions();
@@ -134,7 +147,11 @@ const ManagePermissions = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this permission?')) {
       try {
-        await axios.delete(`${BASE_URL}/api/permissions/${id}`);
+        await axios.delete(`${BASE_URL}/api/permissions/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         showSnackbar('Permission deleted successfully', 'success');
         fetchPermissions();
       } catch (error) {

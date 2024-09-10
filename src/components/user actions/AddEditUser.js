@@ -19,6 +19,7 @@ import { useEffect } from 'react';
 
 import './AddEditUser.css';
 
+const token = localStorage.getItem('token'); // Retrieve the token from storage
 
 const AddEditUser = () => {
   const [users, setUsers] = useState([]);
@@ -54,7 +55,12 @@ const AddEditUser = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/allusers`);
+      const token = localStorage.getItem('token'); // Retrieve the token from storage
+      const response = await axios.get(`${BASE_URL}/api/allusers`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -112,6 +118,8 @@ const AddEditUser = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem('token'); // Retrieve the token from storage
+
       const currentTime = new Date().toISOString();
       const data = {
         ...formData,
@@ -119,10 +127,18 @@ const AddEditUser = () => {
         updatedAt: currentTime,
       };
       if (editingUser) {
-        await axios.put(`${BASE_URL}/api/${editingUser.id}`, data);
+        await axios.put(`${BASE_URL}/api/${editingUser.id}`, data,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         showSnackbar('User updated successfully', 'success');
       } else {
-        await axios.post(`${BASE_URL}/api/create`, data);
+        await axios.post(`${BASE_URL}/user/saveUser`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         showSnackbar('User created successfully', 'success');
       }
       fetchUsers();
@@ -136,7 +152,13 @@ const AddEditUser = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        await axios.delete(`${BASE_URL}/api/${id}`);
+        const token = localStorage.getItem('token'); // Retrieve the token from storage
+
+        await axios.delete(`${BASE_URL}/api/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         showSnackbar('User deleted successfully', 'success');
         fetchUsers();
       } catch (error) {

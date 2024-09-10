@@ -1,11 +1,11 @@
 import { Add, Assessment, Delete, Edit } from '@mui/icons-material';
 import {
-    Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
-    FormControl,
-    Grid, IconButton,
-    InputLabel,
-    MenuItem, Paper, Select, Snackbar, Table, TableBody,
-    TableCell, TableContainer, TableHead, TableRow, TextField, Typography
+  Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle,
+  FormControl,
+  Grid, IconButton,
+  InputLabel,
+  MenuItem, Paper, Select, Snackbar, Table, TableBody,
+  TableCell, TableContainer, TableHead, TableRow, TextField, Typography
 } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
@@ -41,7 +41,13 @@ const AddAGP = () => {
 
   const fetchAGPEntries = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/agp`);
+      const token = localStorage.getItem('token'); // Retrieve token from storage
+      const response = await axios.get(`${BASE_URL}/api/agp`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+      );
       setAGPEntries(response.data);
     } catch (error) {
       console.error('Error fetching AGP entries:', error);
@@ -51,7 +57,13 @@ const AddAGP = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/allusers`);
+      const token = localStorage.getItem('token'); // Retrieve token from storage
+
+      const response = await axios.get(`${BASE_URL}/api/allusers`,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -61,7 +73,12 @@ const AddAGP = () => {
 
   const fetchFiscalYears = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/fy`);
+      const token = localStorage.getItem('token'); // Retrieve token from storage
+
+      const response = await axios.get(`${BASE_URL}/api/fy`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },});
       setFiscalYears(response.data);
     } catch (error) {
       console.error('Error fetching fiscal years:', error);
@@ -71,7 +88,12 @@ const AddAGP = () => {
 
   const fetchBusinessSegments = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/api/business-segments`);
+      const token = localStorage.getItem('token'); // Retrieve token from storage
+
+      const response = await axios.get(`${BASE_URL}/api/business-segments`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },});
       setBusinessSegments(response.data);
     } catch (error) {
       console.error('Error fetching business segments:', error);
@@ -108,42 +130,63 @@ const AddAGP = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const currentTime = new Date().toISOString();
-      const data = {
+    
+    const token = localStorage.getItem('token'); // Retrieve the token from storage
+
+    const currentTime = new Date().toISOString();
+    const data = {
         ...formData,
         createdAt: editingEntry ? formData.createdAt : currentTime,
         updatedAt: currentTime,
         createdBy: 'admin',
         updatedBy: 'admin',
-      };
-      if (editingEntry) {
-        await axios.put(`${BASE_URL}/api/agp/${editingEntry.id}`, data);
-        showSnackbar('AGP entry updated successfully', 'success');
-      } else {
-        await axios.post(`${BASE_URL}/api/agp`, data);
-        showSnackbar('AGP entry created successfully', 'success');
-      }
-      fetchAGPEntries();
-      handleClose();
-    } catch (error) {
-      console.error('Error saving AGP entry:', error);
-      showSnackbar('Error saving AGP entry', 'error');
-    }
-  };
+    };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this AGP entry?')) {
-      try {
-        await axios.delete(`${BASE_URL}/api/agp/${id}`);
-        showSnackbar('AGP entry deleted successfully', 'success');
+    try {
+        if (editingEntry) {
+            await axios.put(`${BASE_URL}/api/agp/${editingEntry.id}`, data, {
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
+                    'Content-Type': 'application/json' // Optional, depending on your API requirements
+                }
+            });
+            showSnackbar('AGP entry updated successfully', 'success');
+        } else {
+            await axios.post(`${BASE_URL}/api/agp`, data, {
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
+                    'Content-Type': 'application/json' // Optional, depending on your API requirements
+                }
+            });
+            showSnackbar('AGP entry created successfully', 'success');
+        }
         fetchAGPEntries();
-      } catch (error) {
-        console.error('Error deleting AGP entry:', error);
-        showSnackbar('Error deleting AGP entry', 'error');
-      }
+        handleClose();
+    } catch (error) {
+        console.error('Error saving AGP entry:', error);
+        showSnackbar('Error saving AGP entry', 'error');
     }
-  };
+};
+
+const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this AGP entry?')) {
+        const token = localStorage.getItem('token'); // Retrieve the token from storage
+
+        try {
+            await axios.delete(`${BASE_URL}/api/agp/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
+                }
+            });
+            showSnackbar('AGP entry deleted successfully', 'success');
+            fetchAGPEntries();
+        } catch (error) {
+            console.error('Error deleting AGP entry:', error);
+            showSnackbar('Error deleting AGP entry', 'error');
+        }
+    }
+};
+
 
   const showSnackbar = (message, severity) => {
     setSnackbarMessage(message);
