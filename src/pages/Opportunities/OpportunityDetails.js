@@ -55,70 +55,182 @@ const OpportunityDetails = () => {
   };
 
   const fetchSubmittedData_gonogo = (id, dateTime, Status_) => {
-    const updateData = {
-        ...opportunity,
-        go_no_go_date: dateTime,
-        go_no_go_status: Status_
+    // Check for null or undefined values
+    if (!id) {
+      console.error('Error: Missing id for fetchSubmittedData_gonogo');
+      return; // Exit the function early
     }
-    console.log(updateData);
-    axios.put(`${BASE_URL}/api/opportunities/${id}`, updateData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-          .then(updateResponse => {
-            console.log('Opportunity updated successfully:', updateResponse.data);
-            fetchOpportunityData(id);
-          })
-          .catch(updateError => {
-            console.error('Error updating opportunity:', updateError);
-          });
-
-
+  
+    // Only create updateData if there are actual changes
+    let updateData = {};
+    let hasChanges = false;
+  
+    if (dateTime !== undefined && dateTime !== null && dateTime !== opportunity.go_no_go_date) {
+      updateData.go_no_go_date = dateTime;
+      hasChanges = true;
+    }
+  
+    if (Status_ !== undefined && Status_ !== null && Status_ !== opportunity.go_no_go_status) {
+      updateData.go_no_go_status = Status_;
+      hasChanges = true;
+    }
+  
+    // Only make the PUT call if there are changes
+    if (hasChanges) {
+      console.log('Update data:', updateData);
+  
+      axios.put(`${BASE_URL}/api/opportunities/${id}`, updateData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then(updateResponse => {
+          console.log('Opportunity updated successfully:', updateResponse.data);
+          fetchOpportunityData(id);
+        })
+        .catch(updateError => {
+          console.error('Error updating opportunity:', updateError);
+          if (updateError.response) {
+            console.error('Error status:', updateError.response.status);
+            console.error('Error data:', updateError.response.data);
+            
+            if (updateError.response.status === 403) {
+              console.error('Permission denied. You may not have the necessary rights to perform this action.');
+              // You might want to show a user-friendly message here
+            }
+          } else if (updateError.request) {
+            console.error('No response received:', updateError.request);
+          } else {
+            console.error('Error message:', updateError.message);
+          }
+          // You might want to show an error message to the user here
+        });
+    } else {
+      console.log('No changes detected. Skipping update.');
+    }
+  
+    // Always fetch the latest go/no-go status
     axios.get(`${BASE_URL}/api/gonogostatus?form_id=${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then(response => setSubmittedData1(response.data))
-      .catch(error => console.error('Error fetching submitted data:', error));
-
-
+      .then(response => {
+        console.log('Go/No-Go status fetched successfully:', response.data);
+        setSubmittedData1(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching go/no-go status:', error);
+        if (error.response) {
+          console.error('Error status:', error.response.status);
+          console.error('Error data:', error.response.data);
+          
+          if (error.response.status === 403) {
+            console.error('Permission denied. You may not have the necessary rights to view this data.');
+            // You might want to show a user-friendly message here
+          }
+        } else if (error.request) {
+          console.error('No response received:', error.request);
+        } else {
+          console.error('Error message:', error.message);
+        }
+        // You might want to show an error message to the user here
+      });
   };
 
   const fetchSubmittedData_deal_status = (id, deal_status, additional_remarks_, amount_inr_cr_max) => {
-    const updateData = {
-      ...opportunity,
-      amount_inr_cr_max: parseFloat(amount_inr_cr_max),
-      deal_status: deal_status,
-      additional_remarks: additional_remarks_,
-  };
+    // Check for null or undefined id
+    if (!id) {
+      console.error('Error: Missing id for fetchSubmittedData_deal_status');
+      return; // Exit the function early
+    }
   
-    console.log("---------")
-    console.log(updateData)
-    axios.put(`${BASE_URL}/api/opportunities/${id}`, updateData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-          .then(updateResponse => {
-            console.log('Opportunity updated successfully:', updateResponse.data);
-            fetchOpportunityData(id);
-          })
-          .catch(updateError => {
-            console.error('Error updating opportunity:', updateError);
-          });
-
-
+    // Initialize updateData and hasChanges flag
+    let updateData = {};
+    let hasChanges = false;
+  
+    // Check and add amount_inr_cr_max if it's changed
+    if (amount_inr_cr_max !== undefined && amount_inr_cr_max !== null) {
+      const parsedAmount = parseFloat(amount_inr_cr_max);
+      if (!isNaN(parsedAmount) && parsedAmount !== opportunity.amount_inr_cr_max) {
+        updateData.amount_inr_cr_max = parsedAmount;
+        hasChanges = true;
+      }
+    }
+  
+    // Check and add deal_status if it's changed
+    if (deal_status !== undefined && deal_status !== null && deal_status !== opportunity.deal_status) {
+      updateData.deal_status = deal_status;
+      hasChanges = true;
+    }
+  
+    // Check and add additional_remarks if it's changed
+    if (additional_remarks_ !== undefined && additional_remarks_ !== null && additional_remarks_ !== opportunity.additional_remarks) {
+      updateData.additional_remarks = additional_remarks_;
+      hasChanges = true;
+    }
+  
+    // Only make the PUT call if there are changes
+    if (hasChanges) {
+      console.log("Updating with data:", updateData);
+  
+      axios.put(`${BASE_URL}/api/opportunities/${id}`, updateData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then(updateResponse => {
+          console.log('Opportunity updated successfully:', updateResponse.data);
+          fetchOpportunityData(id);
+        })
+        .catch(updateError => {
+          console.error('Error updating opportunity:', updateError);
+          if (updateError.response) {
+            console.error('Error status:', updateError.response.status);
+            console.error('Error data:', updateError.response.data);
+            
+            if (updateError.response.status === 403) {
+              console.error('Permission denied. You may not have the necessary rights to perform this action.');
+              // You might want to show a user-friendly message here
+            }
+          } else if (updateError.request) {
+            console.error('No response received:', updateError.request);
+          } else {
+            console.error('Error message:', updateError.message);
+          }
+          // You might want to show an error message to the user here
+        });
+    } else {
+      console.log('No changes detected. Skipping update.');
+    }
+  
+    // Always fetch the latest deal status data
     axios.get(`${BASE_URL}/api/deal-status?form_id=${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
-      .then(response => setSubmittedData2(response.data))
-      .catch(error => console.error('Error fetching submitted data:', error));
-
-
+      .then(response => {
+        console.log('Deal status fetched successfully:', response.data);
+        setSubmittedData2(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching deal status:', error);
+        if (error.response) {
+          console.error('Error status:', error.response.status);
+          console.error('Error data:', error.response.data);
+          
+          if (error.response.status === 403) {
+            console.error('Permission denied. You may not have the necessary rights to view this data.');
+            // You might want to show a user-friendly message here
+          }
+        } else if (error.request) {
+          console.error('No response received:', error.request);
+        } else {
+          console.error('Error message:', error.message);
+        }
+        // You might want to show an error message to the user here
+      });
   };
 
   
