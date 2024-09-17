@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import React, { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Icons for visibility toggle
 import { toast, ToastContainer } from 'react-toastify';
@@ -28,6 +29,12 @@ const Login = ({ onLogin }) => {
         const token = response.data.token;
         console.log('Login successful');
         localStorage.setItem('token', token);
+        
+        const decodedToken = jwtDecode(token);
+    
+        // Extract permissions from the token claims
+        const permissions = decodedToken.permissions || [];
+        localStorage.setItem('auth', permissions);
         toast.success('Login successful!');
         onLogin(); // Call the onLogin function to proceed to the next page
       }

@@ -143,6 +143,14 @@ const Opportunities = () => {
             setFilters(prev => ({ ...prev, deal_status: [status] }));
         }
     };
+    const [permissions, setPermissions] = useState([]);
+
+    useEffect(() => {
+        // Retrieve permissions from localStorage when the component mounts
+        const storedPermissions = localStorage.getItem('auth') || [];
+        setPermissions(storedPermissions);
+    }, []);
+    const hasPermission = permissions.includes('Admin') || permissions.includes('Edit');
 
     // Pagination
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -263,6 +271,7 @@ const Opportunities = () => {
                     <h3>Account Segment Leaders Overview</h3>
                     <div>
                         <button 
+                            disabled={!hasPermission}
                             onClick={() => navigate('/addopportunity')}
                             className="btn btn-blue"
                             style={{marginRight : "13px", backgroundColor:"blue"}}

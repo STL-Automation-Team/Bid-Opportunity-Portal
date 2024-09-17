@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card, Form, Modal } from 'react-bootstrap';
 import { FaMinus, FaPlus } from 'react-icons/fa';
 import { BASE_URL } from '../../components/constants';
@@ -9,7 +9,14 @@ const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id })
   const [expanded, setExpanded] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editDetails, setEditDetails] = useState(details);
+  const [permissions, setPermissions] = useState([]);
 
+  useEffect(() => {
+    // Retrieve permissions from localStorage when the component mounts
+    const storedPermissions = localStorage.getItem('auth') || [];
+    setPermissions(storedPermissions);
+  }, []);
+  const hasPermission = permissions.includes('Admin') || permissions.includes('Edit');
   // Extract the week number from the details
   const week = details.find(detail => detail.label.toLowerCase() === 'week')?.value;
 
@@ -67,7 +74,9 @@ const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id })
           <span className="card-title">
             {`Week ${week} Plan`} - {title}
           </span>
-          <Button variant="link" onClick={handleEditClick} style={{ color: 'white' }}>Add Action</Button>
+          <Button variant="link"
+          disabled={!hasPermission}
+          onClick={handleEditClick} style={{ color: 'white' }}>Add Action</Button>
         </Card.Header>
         <Card.Body style={{ display: expanded ? 'block' : 'none', textAlign: 'left' }}>
           <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>

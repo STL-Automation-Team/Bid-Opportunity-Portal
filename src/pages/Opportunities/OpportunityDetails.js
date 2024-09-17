@@ -24,6 +24,14 @@ const OpportunityDetails = () => {
   const [submittedData1, setSubmittedData1] = useState([]);
   const [submittedData2, setSubmittedData2] = useState([]);
 
+  const [permissions, setPermissions] = useState([]);
+
+  useEffect(() => {
+    // Retrieve permissions from localStorage when the component mounts
+    const storedPermissions = localStorage.getItem('auth') || [];
+    setPermissions(storedPermissions);
+  }, []);
+  const hasPermission = permissions.includes('Admin') || permissions.includes('Edit');
 
 
   useEffect(() => {
@@ -319,7 +327,9 @@ const OpportunityDetails = () => {
       <div className="follow-ups-header">
         <h2>Follow Ups</h2>
       </div>
-        <button className='add-button_1' onClick={() => setPopupVisible(!isPopupVisible)}>
+        <button className='add-button_1' 
+        disabled={!hasPermission} 
+        onClick={() => setPopupVisible(!isPopupVisible)}>
           <img src={img} alt="Add Info" />
         </button>
         {isPopupVisible && (

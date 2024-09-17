@@ -15,7 +15,8 @@ function App() {
     setIsAuthenticated(false);
     // Optionally clear tokens, local storage, or perform any cleanup
     // localStorage.removeItem('accessToken');
-    localStorage.removeItem('accessToken');
+    localStorage.removeItem('token');
+    localStorage.removeItem('auth');
         
     // Redirect to the root URL
     window.location.href = '/';

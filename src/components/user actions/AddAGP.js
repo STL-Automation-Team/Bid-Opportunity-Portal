@@ -131,7 +131,7 @@ const AddAGP = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    const token = localStorage.getItem('token'); // Retrieve the token from storage
+    const token = localStorage.getItem('token');
 
     const currentTime = new Date().toISOString();
     const data = {
@@ -143,28 +143,49 @@ const AddAGP = () => {
     };
 
     try {
+        let response;
         if (editingEntry) {
-            await axios.put(`${BASE_URL}/api/agp/${editingEntry.id}`, data, {
+            response = await axios.put(`${BASE_URL}/api/agp/${editingEntry.id}`, data, {
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
-                    'Content-Type': 'application/json' // Optional, depending on your API requirements
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
-            showSnackbar('AGP entry updated successfully', 'success');
         } else {
-            await axios.post(`${BASE_URL}/api/agp`, data, {
+            response = await axios.post(`${BASE_URL}/api/agp`, data, {
                 headers: {
-                    'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
-                    'Content-Type': 'application/json' // Optional, depending on your API requirements
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
-            showSnackbar('AGP entry created successfully', 'success');
         }
-        fetchAGPEntries();
-        handleClose();
+
+        // Check if the operation was successful
+        if (response.status === 200 || response.status === 201) {
+            showSnackbar(editingEntry ? 'AGP entry updated successfully' : 'AGP entry created successfully', 'success');
+            fetchAGPEntries();
+            handleClose();
+        }
     } catch (error) {
         console.error('Error saving AGP entry:', error);
-        showSnackbar('Error saving AGP entry', 'error');
+        
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            if (error.response.status === 422) {
+                // Forbidden - outside of edit window
+                const errorMessage = error.response.headers['Error-Message'] || 'Operation not allowed at this time.';
+                showSnackbar(errorMessage, 'error');
+            } else {
+                showSnackbar('Error saving AGP entry: ' + error.response.data, 'error');
+            }
+        } else if (error.request) {
+            // The request was made but no response was received
+            showSnackbar('No response received from server. Please try again.', 'error');
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            showSnackbar('Error setting up the request: ' + error.message, 'error');
+        }
     }
 };
 
