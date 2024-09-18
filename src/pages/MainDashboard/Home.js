@@ -42,6 +42,13 @@ const graphConfigs = [
       { type: 'select', name: 'year', label: 'Financial Year', options: ['FY24', 'FY25', 'FY26'] },
     ],
     dataFetch: (inputs) => `${BASE_URL}/api/opportunities/filtered?ob_fy=${inputs.year}`
+  },
+  {
+    title: "MS/FD/SI Order Book",
+    inputs: [
+      { type: 'select', name: 'year', label: 'Financial Year', options: ['FY24', 'FY25', 'FY26'] },
+    ],
+    dataFetch: (inputs) => `${BASE_URL}/api/opportunities/filtered?ob_fy=${inputs.year}`
   }
 ];
 
@@ -151,6 +158,31 @@ export default class Home extends Component {
         return [
           { quarter: `${quarter} Commit`, public: publicAmount, private: privateAmount, total: totalAmount },
           { quarter: `${quarter} Vis`, public: publicAmount, private: privateAmount, total: totalAmount }
+        ];
+      });
+
+      this.setState(prevState => {
+        const newGraphs = [...prevState.graphs];
+        newGraphs[index].chartData = chartData;
+        return { graphs: newGraphs };
+      });
+    } else if (index ===3){
+      const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+      const chartData = quarters.flatMap(quarter => {
+        const calculateAmount = (filter) => {
+          const filteredData = data.opportunities.filter(opp =>
+            opp.ob_qtr === quarter && filter(opp)
+          );
+          return filteredData.reduce((sum, opp) => sum + (opp.amount_inr_cr_max || 0), 0);
+        };
+        const ms = calculateAmount(opp => opp.business_services === "Managed Sevices");
+        const fd = calculateAmount(opp => opp.business_services === "Fibre Deployment");
+        const si = calculateAmount(opp => opp.business_services === "System Integration");
+
+        const totalAmount = ms + fd + si;
+        return [
+          { quarter: `${quarter} Commit`, ms: ms, fd: fd, si: si, total: totalAmount },
+          { quarter: `${quarter} Vis`, ms: ms, fd: fd, si: si, total: totalAmount }
         ];
       });
 
@@ -328,6 +360,59 @@ export default class Home extends Component {
           title: {
             display: true,
             text: 'Public vs Private Order Book',
+          },
+        },
+        scales: {
+          x: {
+            stacked: true,
+          },
+          y: {
+            stacked: true,
+          },
+        },
+      };
+      return <ChartJSComponent type="bar" data={data} options={options} />;
+    } else if(index===3 ) {
+      const data = {
+        labels: chartData.map(item => item.quarter),
+        datasets: [
+          {
+            label: 'Managed Services',
+            data: chartData.map(item => item.ms),
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+            stack: 'stack',
+          },
+          {
+            label: 'System Integration',
+            data: chartData.map(item => item.si),
+            backgroundColor: 'rgba(153, 102, 255, 0.6)',
+            stack: 'stack',
+          },
+          {
+            label: 'Fibre Deployment',
+            data: chartData.map(item => item.fd),
+            backgroundColor: 'rgba(108, 80, 78, 0.5)',
+            stack: 'stack',
+          },
+          {
+            type: 'line',
+            label: 'Total',
+            data: chartData.map(item => item.total),
+            borderColor: 'rgba(255, 159, 64, 1)',
+            borderWidth: 2,
+            fill: false,
+          },
+        ],
+      };
+      const options = {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: 'MS/FD/SI Order Book',
           },
         },
         scales: {

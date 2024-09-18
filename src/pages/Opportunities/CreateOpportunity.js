@@ -49,6 +49,9 @@ const CreateOpportunity = () => {
         additional_remarks: '',
         tender_no: '',
         scope_of_work: '',
+        created_at: '',
+        created_by: '',
+        business_services: ''
       });
     
       const [error, setError] = useState('');
@@ -232,6 +235,9 @@ const CreateOpportunity = () => {
             additional_remarks: '',
             tender_no: '',
             scope_of_work: '',
+            created_at: '',
+            created_by: '',
+            business_services: ''
         });
         setError('');
         setSuccess('');
@@ -306,6 +312,17 @@ const CreateOpportunity = () => {
                 <option value="Digital">Digital</option>
               </Form.Control>
             </Form.Group>
+
+            <Form.Group as={Col} controlId="business_services">
+              <Form.Label className="text-start">Business Services *</Form.Label>
+              <Form.Control as="select" name="business_services" value={formData.business_services} onChange={handleChange} required>
+                <option value="">Select Business Services</option>
+                <option value="System Integration">System Integration</option>
+                <option value="Fibre Deployment">Fibre Deployment</option>
+                <option value="Managed Sevices">Managed Sevices</option>
+              </Form.Control>
+            </Form.Group>
+
             <Form.Group as={Col} controlId="industry_segment">
               <Form.Label className="text-start">Industry Segment *</Form.Label>
               <Form.Control as="select" name="industry_segment" value={formData.industry_segment} onChange={handleChange} required>
