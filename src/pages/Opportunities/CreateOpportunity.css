@@ -1,0 +1,46 @@
+/* Modal ID-based styling */
+#duplicateModal {
+    max-width: 900px; /* Adjust the modal width */
+    width: 100%;
+  }
+  
+  /* Modal Header Styling */
+  #modalHeader {
+    background-color: #f5f5f5; /* Light background for header */
+    border-bottom: none;
+  }
+  
+  #modalTitle {
+    color: #333;
+    font-weight: bold;
+  }
+  
+  /* Warning Message Styling */
+  #warningMessage {
+    background-color: rgba(255, 193, 7, 0.2); /* Light warning background */
+    color: rgb(214, 1, 1) !important; /* Warning text color */
+  }
+  
+  /* Table Styling */
+  #duplicateTable th {
+    background-color: #007bff; /* Blue background for headers */
+    color: #fff;               /* White text for headers */
+    font-weight: bold;
+  }
+  
+  #duplicateTable td {
+    text-align: center;
+  }
+  
+  #duplicateTable tr:nth-of-type(odd) {
+    background-color: rgba(0, 123, 255, 0.1); /* Soft blue for striped rows */
+  }
+  
+  /* Modal Footer Styling */
+  #modalFooter {
+    background-color: #f9f9f9;
+    padding: 15px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  

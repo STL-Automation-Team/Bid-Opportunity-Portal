@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { AlertCircle } from 'lucide-react';
 import { default as React, useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
+import { Card, Col, Form, Row } from 'react-bootstrap';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BASE_URL } from '../../components/constants';
-import './CreateOpportunity.css';
+
 const CreateOpportunity = () => {
     const [formData, setFormData] = useState({
         priority_bid: '',
@@ -54,23 +54,58 @@ const CreateOpportunity = () => {
         created_by: '',
         business_services: '',
         est_capex_phase: '',
-        est_opex_phase: '',
-        customer_name: '',
-        logo: '',
-        updated_by: '',
-        Updated_at: ''
+        est_opex_phase: ''
       });
-      const [isSubmitting, setIsSubmitting] = useState(false);
-      const [error, setError] = useState('');
-      const [success, setSuccess] = useState('');
-      const [showModal, setShowModal] = useState(false);
-      const [users, setUsers] = useState([]);
-      const [errors, setErrors] = useState({});
+    
+    const [originalData, setOriginalData] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [users, setUsers] = useState([]);
+    const [errors, setErrors] = useState({});
+    const { id } = useParams();
+    const navigate = useNavigate();
+    useEffect(() => {
+        // Fetch the opportunity data
+        const fetchOpportunityData = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get(`${BASE_URL}/api/opportunities/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setFormData(response.data);
+                setOriginalData(response.data);
 
-      const [showDuplicateModal, setShowDuplicateModal] = useState(false);
-      const [potentialDuplicates, setPotentialDuplicates] = useState([]);
+            } catch (err) {
+                console.error('Error fetching opportunity data:', err);
+                toast.error('Failed to fetch opportunity data');
+            }
+        };
 
-      const validateForm = () => {
+        fetchOpportunityData();
+    }, [id]);
+    useEffect(() => {
+        // Fetch user data
+        const fetchUsers = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get(`${BASE_URL}/api/allusers`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setUsers(response.data);
+            } catch (err) {
+                console.error('Error fetching users:', err);
+                toast.error('Failed to fetch user data');
+            }
+        };
+
+        fetchUsers();
+    }, []);
+    const validateForm = () => {
         let newErrors = {};
     
         // Validate each field
@@ -95,6 +130,7 @@ const CreateOpportunity = () => {
         });
     
         setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
       };
     
       useEffect(() => {
@@ -104,127 +140,56 @@ const CreateOpportunity = () => {
       const handleChange = (e) => {
         const { name, value } = e.target;
         updateRelatedFields(name, value);
-
-        setFormData(prevState => ({
-          ...prevState,
-          [name]: value
-        }));
-      };
-      const token = localStorage.getItem('token');
-
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-        
-        // Check if there are any errors
-        const hasErrors = Object.values(errors).some(error => error !== '');
-        if (hasErrors) {
-          toast.error('Please correct the errors before submitting.');
-          return;
-        }
-    
-        // Check if all required fields are filled
-        const requiredFields = [
-          'ob_fy', 'ob_qtr', 'ob_mmm', 'priority', 'business_unit', 'industry_segment',
-          'opportunity', 'amount_inr_cr_min', 'amount_inr_cr_max', 'deal_status',
-          'sales_role', 'primary_owner', 'submission_date', 'additional_remarks'
-        ];
-    
-        const missingFields = requiredFields.filter(field => !formData[field]);
-        if (missingFields.length > 0) {
-          toast.error(`Please fill in all required fields: ${missingFields.join(', ')}`);
-          return;
-        }
-    
-        // If all validations pass, proceed with form submission
-        const postData = {
-          ...formData,
-          amount_inr_cr_max: parseFloat(formData.amount_inr_cr_max),
-          amount_inr_cr_min: parseFloat(formData.amount_inr_cr_min),
-          est_capex_inr_cr: parseFloat(formData.est_capex_inr_cr),
-          est_opex_inr_cr: parseFloat(formData.est_opex_inr_cr),
-          gm_percentage: parseFloat(formData.gm_percentage),
-          probability: parseFloat(formData.probability),
-          est_capex_phase: parseInt(formData.est_capex_phase),
-          est_opex_phase: parseInt(formData.est_opex_phase)
-        };
-        
-        setIsSubmitting(true);
-
-        try {
-          console.log(postData);
-          const response = await axios.post(`${BASE_URL}/api/opportunities`, postData, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          if (response.status === 201 || response.status === 200) {
-            toast.success('Entry created successfully.');
-            handleClose();
-          } else if(response.status === 409){
-            setPotentialDuplicates(error.response.data.potentialDuplicates);
-            setShowDuplicateModal(true);
-          } else {
-            toast.error('Failed to create entry.');
-          }
-        } catch (err) {
-          if (err.response && err.response.status === 409) {
-            // Potential duplicates found
-            // console.log("]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]");
-            console.log(err.response.data.potentialDuplicates); // Correct access
-            setPotentialDuplicates(err.response.data.potentialDuplicates);
-            setShowDuplicateModal(true);
-        }
-         else {
-            toast.error('Failed to create entry.');
-            console.error(err);
-          }
-          
-        }finally {
-          setIsSubmitting(false);
-      }
-
       };
 
-      const handleAddAnyway = async () => {
+    const token = localStorage.getItem('token');
+    const handleReset = () => {
+        if (originalData) {
+            setFormData(originalData);
+            setErrors({});
+            toast.info('Form has been reset to original data');
+        }
+    };
+    const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+        toast.error('Please correct the errors before submitting.');
+        return;
+    }
+    setIsSubmitting(true);
+
+    try {
         const token = localStorage.getItem('token');
-
-        try {
-
-          const response = await axios.post(`${BASE_URL}/api/opportunities?forcecreate=true`, formData, {
+        const response = await axios.put(`${BASE_URL}/api/opportunities/${id}`, formData, {
             headers: {
-              Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
-          });
-          if (response.status === 200) {
-            toast.success('Opportunity created successfully');
-            setShowDuplicateModal(false);
-            handleClose();
-            // Reset form or redirect
-          }
-        } catch (error) {
-          console.error('Error creating opportunity:', error);
-        }
-      };
-    
-      // ErrorMessage component
-      const ErrorMessage = ({ error }) => {
-        return error ? <div className="text-danger">{error}</div> : null;
-      };
+        });
 
-      const handleCloseModal = () => {
-        setShowModal(false);
-        // navigate("/userslist");
-      };
-     
-      const handleShowModal = () => {
-        setShowModal(true);
-      };
-    //   const handleChange = (e) => {
-    //     setFormData({
-    //       ...formData,
-    //       [e.target.name]: e.target.value,
-    //     });
-    //   };
+        if (response.status === 200) {
+            toast.success('Opportunity updated successfully');
+            
+            // Wait for 1 second (1000 milliseconds) before redirecting
+            setTimeout(() => {
+                navigate(`/opportunity/${id}`);
+            }, 1000);  // Adjust the delay as needed (1000 ms = 1 second)
+        } else {
+            toast.error('Failed to update opportunity');
+        }
+    } catch (err) {
+        console.error('Error updating opportunity:', err);
+        toast.error('Failed to update opportunity');
+    }finally {
+        setIsSubmitting(false);
+    }
+};
+
+
+    const handleCancel = () => {
+        navigate(`/opportunity/${id}`);
+    };
+    
       
     const updateRelatedFields = (name, value) => {
       const updatedData = { ...formData, [name]: value };
@@ -254,21 +219,6 @@ const CreateOpportunity = () => {
       setFormData(updatedData);
     };
     const today = new Date().toISOString().split('T')[0];
-
-    useEffect(() => {
-        // Fetch user data from the API
-        axios.get(`${BASE_URL}/api/allusers`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-          .then(response => {
-            setUsers(response.data);
-          })
-          .catch(error => {
-            console.error('Error fetching users:', error);
-          });
-      }, []);
       const redStyle = {
         color: 'red',
         fontWeight: 'bold', // additional style example
@@ -322,16 +272,15 @@ const CreateOpportunity = () => {
             created_by: '',
             business_services: '',
             est_capex_phase: '',
-            est_opex_phase: ''
+            est_opex_phase: '',
+            customer_name: '',
+            logo: '',
+            updated_by: '',
+            Updated_at: ''
         });
         setError('');
         setSuccess('');
       };
-
-      const handleReset = () => {
-       handleClose();
-       toast.info('Form has been reset');
-    };
   return (
     
     <>
@@ -716,66 +665,27 @@ const CreateOpportunity = () => {
             </Form.Group>
           </Row>
         </fieldset>
-        <Button variant="success" type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'Submitting...' : 'Submit'}       
-        </Button>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <button type="button" onClick={handleReset} disabled={isSubmitting}>
+       
+        <Row className="mt-3">
+                            <Col>
+                            <div>
+                            <button type="submit" disabled={isSubmitting}>
+                                {isSubmitting ? 'Updating...' : 'Update'}
+                            </button>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <button type="button" onClick={handleCancel} disabled={isSubmitting}>
+                                Cancel
+                            </button>
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <button type="button" onClick={handleReset} disabled={isSubmitting}>
                                 Reset
                             </button>
+                        </div>
+                            </Col>
+                        </Row>
       </Form>
     </Card.Body>
   </Card>
-  <Modal 
-  show={showDuplicateModal} 
-  onHide={() => setShowDuplicateModal(false)} 
-  id="duplicateModal"
->
-  <Modal.Header closeButton id="modalHeader">
-    <Modal.Title id="modalTitle">Potential Duplicates Found</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <div className="d-flex align-items-center mb-3 text-warning p-2 rounded" id="warningMessage">
-      <AlertCircle className="me-2" />
-      <p className="mb-0">
-        We found potential duplicates for this opportunity. Please review before proceeding.
-      </p>
-    </div>
-    <Table striped bordered hover id="duplicateTable">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Opportunity Name</th>
-          <th>Submission Date</th>
-          <th>Business Segment</th>
-          <th>Fiscal Year</th>
-          <th>Quarter</th>
-        </tr>
-      </thead>
-      <tbody>
-        {potentialDuplicates.map(duplicate => (
-          <tr key={duplicate.id}>
-            <td>{duplicate.id}</td>
-            <td>{duplicate.opportunityName}</td>
-            <td>{duplicate.submissionDate}</td>
-            <td>{duplicate.businessSegment}</td>
-            <td>{duplicate.fiscalYear}</td>
-            <td>{duplicate.quarter}</td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
-  </Modal.Body>
-  <Modal.Footer id="modalFooter">
-    <Button variant="secondary" onClick={() => setShowDuplicateModal(false)}>
-      Don't Add
-    </Button>
-    <Button variant="primary" onClick={handleAddAnyway}>
-      Add Anyway
-    </Button>
-  </Modal.Footer>
-</Modal>
-
 </>
   );
 };

@@ -37,6 +37,7 @@ const AddEditUser = () => {
     createdAt: '',
     updatedAt: '',
     status: 'ACTIVE',
+    parentId: ''
   });
   const [showPassword, setShowPassword] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -84,6 +85,7 @@ const AddEditUser = () => {
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
             status: user.status,
+            parentId: user.parent ? user.parent.id : '' 
           }
         : {
             id: 0,
@@ -112,7 +114,13 @@ const AddEditUser = () => {
   };
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'parentId') {
+      setFormData({ ...formData, parentId: value === '' ? null : Number(value) });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+    // setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -126,28 +134,37 @@ const AddEditUser = () => {
         createdAt: editingUser ? formData.createdAt : currentTime,
         updatedAt: currentTime,
       };
-      if (editingUser) {
-        await axios.put(`${BASE_URL}/api/${editingUser.id}`, data,{
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        showSnackbar('User updated successfully', 'success');
+
+      if (data.parentId) {
+        data.parent = { id: data.parentId };
       } else {
-        await axios.post(`${BASE_URL}/user/saveUser`, data, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        showSnackbar('User created successfully', 'success');
+        data.parent = null;
       }
-      fetchUsers();
-      handleClose();
-    } catch (error) {
-      console.error('Error saving user:', error);
-      showSnackbar('Error saving user', 'error');
-    }
-  };
+      delete data.parentId;
+
+
+       const url = editingUser 
+      ? `${BASE_URL}/api/${editingUser.id}`
+      : `${BASE_URL}/user/saveUser`;
+    const method = editingUser ? 'put' : 'post';
+
+    await axios({
+      method,
+      url,
+      data,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    showSnackbar(`User ${editingUser ? 'updated' : 'created'} successfully`, 'success');
+    fetchUsers();
+    handleClose();
+  } catch (error) {
+    console.error('Error saving user:', error);
+    showSnackbar('Error saving user', 'error');
+  }
+};
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
@@ -214,6 +231,7 @@ const AddEditUser = () => {
                   <TableCell><b>Mobile</b></TableCell>
                   <TableCell><b>Department ID</b></TableCell>
                   <TableCell><b>Status</b></TableCell>
+                  <TableCell><b>Parent</b></TableCell>
                   <TableCell><b>Actions</b></TableCell>
                 </TableRow>
               </TableHead>
@@ -233,6 +251,8 @@ const AddEditUser = () => {
                           size="small"
                         />
                       </TableCell>
+                      <TableCell>{user.parent ? user.parent.firstName+' '+user.parent.lastName : ''}</TableCell>
+
                       <TableCell>
                         <IconButton className="icon-button" onClick={() => handleOpen(user)} size="small">
                           <Edit />
@@ -351,6 +371,33 @@ const AddEditUser = () => {
                   }}
                 />
               </Grid>
+              <Grid item xs={12} sm={6} className="grid-item1">
+                <Select
+                  className="text-field1"
+                  name="parentId"
+                  fullWidth
+                  value={formData.parentId === null ? '' : formData.parentId}
+                  onChange={handleInputChange}
+                  displayEmpty
+                  renderValue={(selected) => {
+                    if (!selected) {
+                      return <span style={{ color: 'black' }}>Select Parent User</span>;  // Placeholder text
+                    }
+                    // Display selected user's full name
+                    const selectedUser = users.find(user => user.id === selected);
+                    return selectedUser ? `${selectedUser.firstName} ${selectedUser.lastName}` : "";
+                  }}
+                >
+                  <MenuItem value="">No Parent</MenuItem>
+                  {users.map((user) => (
+                    <MenuItem key={user.id} value={user.id}>
+                      {`${user.firstName} ${user.lastName}`}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </Grid>
+
+
               <Grid item xs={12} className="grid-item1">
                 <TextField
                   name="createdAt"

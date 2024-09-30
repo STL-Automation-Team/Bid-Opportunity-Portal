@@ -64,4 +64,29 @@
   }
 
 
+  .left1 {
+    position: relative; /* This makes positioning the button easier */
+    width: 100%; /* Adjust based on your container width */
+  }
+  
+  .button-container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    margin-bottom: 10px; /* Space below the button */
+  }
+  
+  .edit-button {
+    background-color: #4CAF50; /* Green background */
+    color: white !important; /* White text */
+    padding: 10px 20px; /* Some padding */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer/hand icon */
+    font-size: 16px; /* Font size */
+    transition: background-color 0.3s ease; /* Smooth transition */
+  }
+  
+  .edit-button:hover {
+    background-color: #45a049; /* Darker green when hovered */
+  }
   

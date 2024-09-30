@@ -20,6 +20,7 @@ import AddOpportunities from './pages/Opportunities/AddOpportunities';
 import CreateOpportunity from './pages/Opportunities/CreateOpportunity';
 import OpportunitiesPage from './pages/Opportunities/OpportunitiesList';
 import OpportunityDetails from './pages/Opportunities/OpportunityDetails';
+import UpdateOpportunity from "./pages/Opportunities/UpdateOpportunity";
 import CustomFields from "./pages/Settings/Customfields/CustomFields";
 import CustomFieldsList from "./pages/Settings/Customfields/CustomFieldsList";
 import AssetModel from "./pages/Settings/Model/AssetModel";
@@ -27,10 +28,11 @@ import ModelList from "./pages/Settings/Model/ModelList";
 import AddUser from "./pages/Users/AddUser";
 import EditUser from "./pages/Users/EditUser";
 import ReadUser from "./pages/Users/ReadUser";
+
 import "./styles/basic.css";
 import { BasicTable } from "./table/BasicTable";
 // import ReadOperation from './pages/Operations/ReadOperation'
-
+import { AccessDeniedProvider } from './components/AccessDeniedProvider';
 function App1({onLogout}) {
   // const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -42,7 +44,8 @@ function App1({onLogout}) {
     
     <div className="app">
       <Router>
-        
+      <AccessDeniedProvider onLogout={onLogout}>
+
         <Sidebar />
         <div className="page-container">
         <Navbar onLogout={onLogout}/>
@@ -51,7 +54,7 @@ function App1({onLogout}) {
             <Route exact path="/analytics" element={<Home />} />
             <Route exact path="/addopportunity" element={<CreateOpportunity />} />
             <Route exact path="/addopportunity1" element={<AddOpportunities />} />
-
+            <Route exact path="/updateOpportunity/:id" element={<UpdateOpportunity />} />
             <Route exact path="/opportunity/:id" element={<OpportunityDetails />} />
             <Route exact path="/licenseslist" element={<LicensesList />} />
             <Route exact path="/addlicense" element={<AddLicense />} />
@@ -87,6 +90,9 @@ function App1({onLogout}) {
             <Route exact path="/adminsettings" element={<AdminSettings />} />
           </Routes>
         </div>
+
+        </AccessDeniedProvider>
+
       </Router>
     </div>
   );

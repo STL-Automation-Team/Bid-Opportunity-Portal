@@ -95,7 +95,8 @@ const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id })
   </Modal.Header>
   <Modal.Body>
     <Form>
-      {editDetails.map((detail, index) => (
+        {editDetails.map((detail, index) => (
+      detail.label.toLowerCase() !== 'created at' && (  // Skip if the label is "Created At"
         <Form.Group controlId={`formDetail${index}`} key={index}>
           <Form.Label>{detail.label}</Form.Label>
           <Form.Control
@@ -105,7 +106,9 @@ const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id })
             readOnly={detail.label.toLowerCase() !== 'action'} // Make all fields except "Action" read-only
           />
         </Form.Group>
-      ))}
+      )
+    ))}
+
     </Form>
   </Modal.Body>
   <Modal.Footer>

@@ -1,7 +1,7 @@
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import img from '../../images/add.png';
 import CountCard from '../MainDashboard/OppDetailsCard';
 import CountCard1 from '../MainDashboard/sidecard';
@@ -25,6 +25,7 @@ const OpportunityDetails = () => {
   const [submittedData2, setSubmittedData2] = useState([]);
 
   const [permissions, setPermissions] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Retrieve permissions from localStorage when the component mounts
@@ -314,10 +315,19 @@ const OpportunityDetails = () => {
     ...submittedData1,
     ...submittedData2,
   ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  const handleEditClick = () => {
+    navigate(`/updateOpportunity/${opportunity.id}`);
+  };
 
   return (
     <div className='main1'>
+      
       <div className='left1'>
+      <div className="button-container">
+        <button className='edit-button' onClick={handleEditClick}>
+          Edit Opportunity
+        </button>
+      </div>
         <CountCard 
           title={opportunity.opportunity}
           baseColor="#FFDE95"

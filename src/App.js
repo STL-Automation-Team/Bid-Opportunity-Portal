@@ -1,48 +1,48 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import App1 from './App1';
-import { AccessDeniedProvider } from './components/AccessDeniedProvider';
 import LoginPage from './pages/LoginPage';
 import "./styles/basic.css";
-// import ReadOperation from './pages/Operations/ReadOperation'
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check if the user is authenticated by checking localStorage when the app loads
+  useEffect(() => {
+    const token = localStorage.getItem('login');
+    if (token) {
+      setIsAuthenticated(true); // User is authenticated
+    }
+  }, []); // Runs only once when the component mounts
+
   const handleLogin = () => {
     setIsAuthenticated(true);
+    // Store the authentication state in localStorage
+    localStorage.setItem('login', 'true');
   };
+
   const handleLogout = () => {
     // Clear authentication state and perform any additional logout actions
     setIsAuthenticated(false);
-    // Optionally clear tokens, local storage, or perform any cleanup
-    // localStorage.removeItem('accessToken');
-    localStorage.removeItem('token');
+    // Clear tokens and localStorage
+    localStorage.removeItem('login');
     localStorage.removeItem('auth');
-        
+    localStorage.removeItem('token');
+    
     // Redirect to the root URL
     window.location.href = '/';
-
   };
-  // if (!isAuthenticated) {
-  //   return <LoginPage onLogin={setIsAuthenticated} />;
-  // }
-  // const navigate = useNavigate();
 
   return (
-      <div>
-          {!isAuthenticated ? (
-            <LoginPage onLogin={handleLogin} />
-            
-          ) : (
-    <AccessDeniedProvider>
-            <App1 onLogout={handleLogout}/>
-
-    </AccessDeniedProvider>
-
-          )}
-        </div>
-  
-   
-  )
+    <div>
+      {!isAuthenticated ? (
+        <LoginPage onLogin={handleLogin} />
+      ) : (
+        // <AccessDeniedProvider>
+          <App1 onLogout={handleLogout} />
+        // </AccessDeniedProvider>
+      )}
+    </div>
+  );
 }
 
 export default App;
