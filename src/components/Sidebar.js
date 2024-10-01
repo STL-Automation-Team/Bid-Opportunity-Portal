@@ -77,6 +77,20 @@ const Sidebar = () => {
           </li>
         )}
 
+        {hasPermission("View") && (
+          <li>
+            <Link to="/sourcedBid">
+            <i className="bi bi-info-circle-fill"></i>
+            <span className="link_name">Auto-Sourced Bids</span>
+            </Link>
+            <ul className="sub-menu blank">
+              <li>
+                <Link className="link_name" to="/operationslist">Auto-Sourced Bids</Link>
+              </li>
+            </ul>
+          </li>
+        )}
+
         {hasPermission("Edit") && (
           <li>
             <Link to="/userslist">

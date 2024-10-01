@@ -17,6 +17,7 @@ import Home from './pages/MainDashboard/Home';
 import AddOperation from "./pages/Operations/AddOperation";
 import EditOperation from "./pages/Operations/EditOperation";
 import AddOpportunities from './pages/Opportunities/AddOpportunities';
+import OpportunitiesDashboard from './pages/Opportunities/AutoSourcedBids';
 import CreateOpportunity from './pages/Opportunities/CreateOpportunity';
 import OpportunitiesPage from './pages/Opportunities/OpportunitiesList';
 import OpportunityDetails from './pages/Opportunities/OpportunityDetails';
@@ -79,6 +80,8 @@ function App1({onLogout}) {
             <Route exact path="/edituser/:id" element={<EditUser />} />
             <Route exact path="/readuser/:id" element={<ReadUser />} />
             <Route exact path="/operationslist" element={<OpportunitiesPage />} />
+            <Route exact path="/sourcedBid" element={<OpportunitiesDashboard />} />
+
             <Route exact path="/addoperation" element={<AddOperation />} />
             <Route
               exact
