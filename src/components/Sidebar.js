@@ -63,6 +63,20 @@ const Sidebar = () => {
           </li>
         )}
 
+        {hasPermission("Edit") && (
+          <li>
+            <Link to="/approvals">
+              <i className="bi bi-check-circle-fill"></i>
+              <span className="link_name">My Approvals</span>
+            </Link>
+            <ul className="sub-menu blank">
+              <li>
+                <Link className="link_name" to="/approvals">My Approvals</Link>
+              </li>
+            </ul>
+          </li>
+        )}
+
         {hasPermission("View") && (
           <li>
             <Link to="/operationslist">

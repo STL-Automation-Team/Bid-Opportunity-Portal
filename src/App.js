@@ -27,7 +27,7 @@ function App() {
     localStorage.removeItem('login');
     localStorage.removeItem('auth');
     localStorage.removeItem('token');
-    
+    localStorage.removeItem('user_id');    
     // Redirect to the root URL
     window.location.href = '/';
   };

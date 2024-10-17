@@ -23,6 +23,7 @@ const OpportunityDetails = () => {
   const [submittedData, setSubmittedData] = useState([]);
   const [submittedData1, setSubmittedData1] = useState([]);
   const [submittedData2, setSubmittedData2] = useState([]);
+  const [goNoGoStatusflag, setGoNoGoStatusflag] = useState('none');
 
   const [permissions, setPermissions] = useState([]);
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ const OpportunityDetails = () => {
       fetchSubmittedData(id);
       fetchSubmittedData_gonogo(id);
       fetchSubmittedData_deal_status(id);
+      fetchSubmittedData_gonogoflag(id);
   }, [id]);
   const token = localStorage.getItem('token');
   const fetchOpportunityData = (id) => {
@@ -53,6 +55,26 @@ const OpportunityDetails = () => {
       .catch(error => console.error('Error fetching data:', error));
   };
 
+  const [goNoGoStatus, setGoNoGoStatus] = useState(null);
+
+  const fetchSubmittedData_gonogoflag = (id) => {
+    axios.get(`${BASE_URL}/api/approval-requests/check-action/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(response => {
+        console.log('Go/No-Go status fetched successfully:', response.data);
+        // setSubmittedData1(response.data);
+        setGoNoGoStatusflag(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching go/no-go status:', error);
+        alert('Error fetching go/no-go status. Please try again later.');
+      });
+  };
+  
+
   const fetchSubmittedData = (id) => {
     axios.get(`${BASE_URL}/api/plans?form_id=${id}`, {
       headers: {
@@ -64,62 +86,9 @@ const OpportunityDetails = () => {
   };
 
   const fetchSubmittedData_gonogo = (id, dateTime, Status_) => {
-    // Check for null or undefined values
-    if (!id) {
-      console.error('Error: Missing id for fetchSubmittedData_gonogo');
-      return; // Exit the function early
-    }
-  
-    // Only create updateData if there are actual changes
-    let updateData = {};
-    let hasChanges = false;
-  
-    if (dateTime !== undefined && dateTime !== null && dateTime !== opportunity.go_no_go_date) {
-      updateData.go_no_go_date = dateTime;
-      hasChanges = true;
-    }
-  
-    if (Status_ !== undefined && Status_ !== null && Status_ !== opportunity.go_no_go_status) {
-      updateData.go_no_go_status = Status_;
-      hasChanges = true;
-    }
-  
-    // Only make the PUT call if there are changes
-    if (hasChanges) {
-      console.log('Update data:', updateData);
-  
-      axios.put(`${BASE_URL}/api/opportunities/${id}`, updateData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then(updateResponse => {
-          console.log('Opportunity updated successfully:', updateResponse.data);
-          fetchOpportunityData(id);
-        })
-        .catch(updateError => {
-          console.error('Error updating opportunity:', updateError);
-          if (updateError.response) {
-            console.error('Error status:', updateError.response.status);
-            console.error('Error data:', updateError.response.data);
-            
-            if (updateError.response.status === 403) {
-              console.error('Permission denied. You may not have the necessary rights to perform this action.');
-              // You might want to show a user-friendly message here
-            }
-          } else if (updateError.request) {
-            console.error('No response received:', updateError.request);
-          } else {
-            console.error('Error message:', updateError.message);
-          }
-          // You might want to show an error message to the user here
-        });
-    } else {
-      console.log('No changes detected. Skipping update.');
-    }
-  
+    fetchSubmittedData_gonogoflag(id);
     // Always fetch the latest go/no-go status
-    axios.get(`${BASE_URL}/api/gonogostatus?form_id=${id}`, {
+    axios.get(`${BASE_URL}/api/approval-requests/notifications/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -303,7 +272,7 @@ const OpportunityDetails = () => {
     setActiveForm(null); // Close the form modal
   };
   const handleFormSubmission1 = (dateTime, Status_) => {
-    fetchSubmittedData_gonogo(opportunity.id, dateTime, Status_); // Refresh submitted data after form submission
+    fetchSubmittedData_gonogo(opportunity.id); // Refresh submitted data after form submission
     setActiveForm(null);
   };
   const handleFormSubmission2 = (deal_status, additional_remarks_, amount_inr_cr_max) => {
@@ -345,7 +314,20 @@ const OpportunityDetails = () => {
         {isPopupVisible && (
           <div className='popup'>
             <div className='popup-option' onClick={() => handleOptionClick('PlanActions')}>Add plan & Actions</div>
-            <div className='popup-option' onClick={() => handleOptionClick('GoNoGoStatus')}>Go-no-go status update</div>
+            {/* <div className='popup-option' onClick={() => handleOptionClick('GoNoGoStatus')}>Go-no-go status update</div> */}
+            <div 
+              className={`popup-option ${goNoGoStatusflag === 'no' || goNoGoStatusflag === 'yes' ? 'disabled' : ''}`} 
+              onClick={() => (goNoGoStatusflag !== 'yes' && goNoGoStatusflag !== 'no') && handleOptionClick('GoNoGoStatus')}
+            >
+              {goNoGoStatusflag === 'no' 
+                ? 'Go-no-go status : update (Pending)' 
+                : goNoGoStatusflag === 'yes' 
+                  ? 'Go-no-go status : Done' 
+                  : 'Go-no-go status : init'
+              }
+
+            </div>
+
             <div className='popup-option' onClick={() => handleOptionClick('DealStatusUpdate')}>Deal Status Update</div>
           </div>
         )}
@@ -357,7 +339,8 @@ const OpportunityDetails = () => {
         />
         <GoNoGoStatusForm show={activeForm === 'GoNoGoStatus'} 
             handleClose={handleFormSubmission1}
-            form_id={opportunity.id} />
+            form_id={opportunity.id}
+            primary_owner= {opportunity.primary_owner} />
 
         <DealStatusUpdateForm show={activeForm === 'DealStatusUpdate'}
             handleClose={handleFormSubmission2}
@@ -384,20 +367,36 @@ const OpportunityDetails = () => {
     </div>
      
     );
-  } else if (data.status !== undefined) {
+  } else if (data.notificationId !== undefined) {
     return (
       <div key={index} className="submitted-card">
         <CountCard2
-          title={data.status}
+          title={
+            data.userName + 
+            (data.action === null 
+              ? ' : Pending' 
+              : data.action === false 
+                ? ' : Rejected' 
+                : ' : Approved')
+          }
           baseColor="#FFDE95"
           details={[
-            { label: 'Status', value: data.status },
-            { label: 'Date', value: data.date },
-            { label: 'Created By', value: data.created_by },
-            { label: 'Created At', value: data.created_at },
+            { label: 'Remarks', value: data.remarks },
+            { 
+              label: 'Action', 
+              value: data.action === null 
+                ? 'Pending' 
+                : data.action === false 
+                  ? 'Rejected' 
+                  : 'Approved' 
+            },
+            { label: 'Pending by', value: data.userName },
+            { label: 'Created At', value: data.createdAt },
           ]}
         />
       </div>
+
+
     );
   } else {
     // PlanActions data

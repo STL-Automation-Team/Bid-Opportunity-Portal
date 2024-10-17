@@ -23,7 +23,7 @@ const ExpandableTable = ({ selectedFY }) => {
         try {
         const token = localStorage.getItem('token'); // Or sessionStorage.getItem('token');
             const [agpResponse, opportunitiesResponse, allUsersResponse] = await Promise.all([
-                axios.get(`${BASE_URL}/api/agp`,{
+                axios.get(`${BASE_URL}/api/agp1`,{
                     headers: {
                       Authorization: `Bearer ${token}`,
                     },

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BASE_URL } from '../../components/constants';
 import CountCard from '../MainDashboard/CountCard';
+import EnhancedFilterControls from './EnhancedFilterControls';
 import './Opportunities.css';
 
 const OpportunitiesDashboard = () => {
@@ -25,6 +26,7 @@ const OpportunitiesDashboard = () => {
         organization: '',
         keyword: ''
     });
+    const [activePanel, setActivePanel] = useState('open'); // 'open' or 'closed'
 
     const columns = [
         'tenderId', 'organisation', 'amount', 'publishedDate', 'closingDate', 'title'
@@ -46,7 +48,7 @@ const OpportunitiesDashboard = () => {
 
     useEffect(() => {
         applyFilters();
-    }, [opportunities, filters]);
+    }, [opportunities, filters, activePanel]);
 
     const fetchOpportunities = async () => {
         try {
@@ -59,7 +61,6 @@ const OpportunitiesDashboard = () => {
             const data = await response.json();
             const sortedData = data.sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
             setOpportunities(sortedData);
-            setFilteredOpportunities(sortedData);
         } catch (error) {
             console.error('Error fetching opportunities:', error);
         }
@@ -81,6 +82,7 @@ const OpportunitiesDashboard = () => {
     };
 
     const applyFilters = () => {
+        const currentDate = new Date();
         const filtered = opportunities.filter(opp => {
             const amountInRange = (filters.amountMin === '' || opp.amount >= parseFloat(filters.amountMin)) &&
                                   (filters.amountMax === '' || opp.amount <= parseFloat(filters.amountMax));
@@ -95,7 +97,10 @@ const OpportunitiesDashboard = () => {
             
             const keywordMatch = filters.keyword === '' || opp.title.toLowerCase().includes(filters.keyword.toLowerCase());
 
-            return amountInRange && publishedDateInRange && closingDateInRange && organizationMatch && keywordMatch;
+            const isOpen = new Date(opp.closingDate) >= currentDate;
+
+            return amountInRange && publishedDateInRange && closingDateInRange && organizationMatch && keywordMatch &&
+                   (activePanel === 'open' ? isOpen : !isOpen);
         });
 
         setFilteredOpportunities(filtered);
@@ -107,7 +112,36 @@ const OpportunitiesDashboard = () => {
     };
 
     const handleCardClick = (status) => {
-        // Implement card click functionality if needed
+        const currentDate = new Date();
+        let newFilters = { ...filters };
+
+        switch (status) {
+            case 'New Today':
+                newFilters.publishedDateStart = currentDate.toISOString().split('T')[0];
+                newFilters.publishedDateEnd = currentDate.toISOString().split('T')[0];
+                break;
+            case 'New This Week':
+                const weekStart = new Date(currentDate.setDate(currentDate.getDate() - 7));
+                newFilters.publishedDateStart = weekStart.toISOString().split('T')[0];
+                newFilters.publishedDateEnd = new Date().toISOString().split('T')[0];
+                break;
+            case 'Closing Soon':
+                const closingSoonDate = new Date(currentDate.setDate(currentDate.getDate() + 7));
+                newFilters.closingDateStart = currentDate.toISOString().split('T')[0];
+                newFilters.closingDateEnd = closingSoonDate.toISOString().split('T')[0];
+                break;
+            case 'Current Quarter':
+                const quarterStart = new Date(currentDate.getFullYear(), Math.floor(currentDate.getMonth() / 3) * 3, 1);
+                const quarterEnd = new Date(quarterStart.getFullYear(), quarterStart.getMonth() + 3, 0);
+                newFilters.publishedDateStart = quarterStart.toISOString().split('T')[0];
+                newFilters.publishedDateEnd = quarterEnd.toISOString().split('T')[0];
+                break;
+            default:
+                break;
+        }
+
+        setFilters(newFilters);
+        setActivePanel('open');
     };
 
     // Pagination
@@ -120,89 +154,61 @@ const OpportunitiesDashboard = () => {
         <div className="opportunities-container">
             <div className="cards-container">
                 <CountCard
-                    title="New Opportunities Today"
+                    title="New Bids Today"
                     count={summaryData.newToday}
                     baseColor="#4caf50"
                     onClick={() => handleCardClick('New Today')}
                 />
                 <CountCard
-                    title="New Opportunities This Week"
+                    title="New Bids This Week"
                     count={summaryData.newThisWeek}
                     baseColor="#2196f3"
                     onClick={() => handleCardClick('New This Week')}
                 />
                 <CountCard
-                    title="Opportunities Closing Soon"
+                    title="Bids Closing Soon"
                     count={summaryData.closingSoon}
                     baseColor="#ff9800"
                     onClick={() => handleCardClick('Closing Soon')}
                 />
                 <CountCard
-                    title="Current Quarter Total Opportunities"
+                    title="Current Quarter Total Bids"
                     count={summaryData.currentQtrTotal}
                     baseColor="#00b7b7"
                     onClick={() => handleCardClick('Current Quarter')}
                 />
             </div>
-            <div className="filter-container">
-                <input
-                    type="number"
-                    placeholder="Min Amount"
-                    value={filters.amountMin}
-                    onChange={(e) => handleFilterChange('amountMin', e.target.value)}
-                    className="filter-input"
-                />
-                <input
-                    type="number"
-                    placeholder="Max Amount"
-                    value={filters.amountMax}
-                    onChange={(e) => handleFilterChange('amountMax', e.target.value)}
-                    className="filter-input"
-                />
-               <input 
-                type="date" 
-                placeholder="Start Published Date" 
-                onChange={(e) => handleFilterChange('publishedDateStart', e.target.value)} 
-                className="filter-input1" 
-                />
-
-                <input 
-                type="date" 
-                placeholder="End Published Date" 
-                onChange={(e) => handleFilterChange('publishedDateEnd', e.target.value)} 
-                className="filter-input1" 
-                />
-
-                <input 
-                type="date" 
-                placeholder="Start Closing Date" 
-                onChange={(e) => handleFilterChange('closingDateStart', e.target.value)} 
-                className="filter-input1" 
-                />
-
-                <input 
-                type="date" 
-                placeholder="End Closing Date" 
-                onChange={(e) => handleFilterChange('closingDateEnd', e.target.value)} 
-                className="filter-input1" 
-                />
-
-                <input
-                    type="text"
-                    placeholder="Organization"
-                    value={filters.organization}
-                    onChange={(e) => handleFilterChange('organization', e.target.value)}
-                    className="filter-input"
-                />
-                <input
-                    type="text"
-                    placeholder="Keyword"
-                    value={filters.keyword}
-                    onChange={(e) => handleFilterChange('keyword', e.target.value)}
-                    className="filter-input"
-                />
+         
+            <EnhancedFilterControls filters={filters} handleFilterChange={handleFilterChange} />
+            <div className="panel-toggle-container1">
+                <div className="panel-toggle1">
+                    <input 
+                        type="checkbox" 
+                        id="panel-switch1" 
+                        className="panel-switch1"
+                        checked={activePanel === 'closed'}
+                        onChange={() => setActivePanel(prev => prev === 'open' ? 'closed' : 'open')}
+                    />
+                    <label htmlFor="panel-switch1" className="panel-switch-label1">
+                        <span className="panel-switch-inner1"></span>
+                        <span className="panel-switch-switch1"></span>
+                    </label>
+                </div>
+                <div className="panel-labels1">
+                    <span 
+                        className={activePanel === 'open' ? 'active1' : ''}
+                        onClick={() => setActivePanel('open')}
+                    >
+                        Open Bids
+                    </span>
+                    <span 
+                        className={activePanel === 'closed' ? 'active1' : ''}
+                        onClick={() => setActivePanel('closed')}
+                    >
+                        Closed Bids
+                    </span>
+                </div>
             </div>
-
             {filteredOpportunities.length === 0 ? (
                 <div className="no-filter-message">
                     No opportunities found matching your search.
@@ -224,7 +230,7 @@ const OpportunitiesDashboard = () => {
                                         {columns.map(column => (
                                             <td key={column}>
                                                 <Link to={`/opportunity/${opportunity.id}`}>
-                                                    {opportunity[column]}
+                                                    {column === 'amount' ? `₹${opportunity[column].toLocaleString('en-IN')}` : opportunity[column]}
                                                 </Link>
                                             </td>
                                         ))}

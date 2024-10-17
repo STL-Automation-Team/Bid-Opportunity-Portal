@@ -19,7 +19,7 @@ const Login = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${BASE_URL}/user/loginUser`, {
+      const response = await axios.post(`${BASE_URL}/api/user/loginUser`, {
         username: username,
         password: password,
       });
@@ -31,7 +31,8 @@ const Login = ({ onLogin }) => {
         localStorage.setItem('token', token);
         
         const decodedToken = jwtDecode(token);
-    
+        const userId = decodedToken.user_id;
+        localStorage.setItem('user_id', userId);
         // Extract permissions from the token claims
         const permissions = decodedToken.permissions || [];
         localStorage.setItem('auth', permissions);
@@ -69,7 +70,7 @@ const Login = ({ onLogin }) => {
 
   const handleSignupClick = async () => {
     try {
-      const response = await axios.post(`${BASE_URL}/user/saveUser`, {
+      const response = await axios.post(`${BASE_URL}/api/user/saveUser`, {
         username,
         password,
       },

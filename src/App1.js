@@ -14,6 +14,7 @@ import EditLicense from "./pages/Licenses/EditLicense";
 import LicensesList from "./pages/Licenses/LicensesList";
 import ReadLicense from "./pages/Licenses/ReadLicense";
 import Home from './pages/MainDashboard/Home';
+import MyApprovals from './pages/MyApprovals';
 import AddOperation from "./pages/Operations/AddOperation";
 import EditOperation from "./pages/Operations/EditOperation";
 import AddOpportunities from './pages/Opportunities/AddOpportunities';
@@ -55,6 +56,8 @@ function App1({onLogout}) {
             <Route exact path="/analytics" element={<Home />} />
             <Route exact path="/addopportunity" element={<CreateOpportunity />} />
             <Route exact path="/addopportunity1" element={<AddOpportunities />} />
+            <Route exact path="/approvals" element={<MyApprovals />} />
+
             <Route exact path="/updateOpportunity/:id" element={<UpdateOpportunity />} />
             <Route exact path="/opportunity/:id" element={<OpportunityDetails />} />
             <Route exact path="/licenseslist" element={<LicensesList />} />
