@@ -52,14 +52,14 @@ const modules = [
       { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], required: true }
     ],
   },
-  {
-    name: 'Go-No-Go Status',
-    endpoint: '/api/go-no-go',
-    fields: [
-      { name: 'dealStatus', label: 'Go-No-Go value', type: 'text', required: true },
-      { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], required: true }
-    ],
-  },
+  // {
+  //   name: 'Go-No-Go Status',
+  //   endpoint: '/api/go-no-go',
+  //   fields: [
+  //     { name: 'dealStatus', label: 'Go-No-Go value', type: 'text', required: true },
+  //     { name: 'status', label: 'Status', type: 'select', options: ['Active', 'Inactive'], required: true }
+  //   ],
+  // },
 ];
 
 const DataForm = ({ module, onSubmit, initialData }) => {
@@ -68,10 +68,12 @@ const DataForm = ({ module, onSubmit, initialData }) => {
 
   useEffect(() => {
     setFormData(initialData || {});
+    setErrors({});
   }, [initialData]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // Clear error when user starts typing
     setErrors({ ...errors, [e.target.name]: '' });
   };
 
@@ -86,10 +88,18 @@ const DataForm = ({ module, onSubmit, initialData }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      onSubmit(formData);
+      try {
+        await onSubmit(formData);
+        setErrors({});
+      } catch (error) {
+        if (error.response?.status === 400 && error.response?.data) {
+          setErrors(error.response.data);
+          console.log(error.response.data)
+        }
+      }
     }
   };
 
@@ -121,7 +131,9 @@ const DataForm = ({ module, onSubmit, initialData }) => {
               className={errors[field.name] ? 'error' : ''}
             />
           )}
-          {errors[field.name] && <span className="error-message">{errors[field.name]}</span>}
+          {errors[field.name] && (
+            <span className="error-message">{errors[field.name]}</span>
+          )}
         </div>
       ))}
       <button type="submit" className="submit-btn">{initialData ? 'Update' : 'Create'}</button>
@@ -193,21 +205,29 @@ export default function CustomFieldsList() {
   const handleCreate = async (formData) => {
     try {
       const createdAt = new Date().toISOString();
-      const createdBy = 'Admin'; // You can replace this with the actual username if available
+      const createdBy = 'Admin';
 
-      const response = await axios.post(`${API_BASE_URL}${selectedModule.endpoint}`, {
-        ...formData,
-        createdAt,
-        createdBy,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.post(
+        `${API_BASE_URL}${selectedModule.endpoint}`,
+        {
+          ...formData,
+          createdAt,
+          createdBy,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       fetchData();
       setData([]);
       alert('Item created successfully!');
+      return response;
     } catch (error) {
+      if (error.response?.status === 400) {
+        throw error;  // Throw error to be handled by the form
+      }
       console.error('Error creating item:', error);
       alert('Error creating item.');
     }
@@ -232,6 +252,9 @@ export default function CustomFieldsList() {
       setData([]);
       alert('Item updated successfully!');
     } catch (error) {
+      if (error.response?.status === 400) {
+        throw error;
+      }
       console.error('Error updating item:', error);
       alert('Error updating item.');
     }

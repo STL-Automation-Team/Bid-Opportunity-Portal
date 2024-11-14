@@ -114,76 +114,83 @@ const CreateOpportunity = () => {
 
       const handleSubmit = async (e) => {
         e.preventDefault();
-        
+    
         // Check if there are any errors
         const hasErrors = Object.values(errors).some(error => error !== '');
         if (hasErrors) {
-          toast.error('Please correct the errors before submitting.');
-          return;
+            toast.error('Please correct the errors before submitting.');
+            return;
         }
     
         // Check if all required fields are filled
         const requiredFields = [
-          'ob_fy', 'ob_qtr', 'ob_mmm', 'priority', 'business_unit', 'industry_segment',
-          'opportunity', 'amount_inr_cr_min', 'amount_inr_cr_max', 'deal_status',
-          'sales_role', 'primary_owner', 'submission_date', 'additional_remarks'
+            'ob_fy', 'ob_qtr', 'ob_mmm', 'priority', 'business_unit', 'industry_segment',
+            'opportunity', 'amount_inr_cr_min', 'amount_inr_cr_max', 'deal_status',
+            'sales_role', 'primary_owner', 'submission_date', 'additional_remarks'
         ];
     
         const missingFields = requiredFields.filter(field => !formData[field]);
         if (missingFields.length > 0) {
-          toast.error(`Please fill in all required fields: ${missingFields.join(', ')}`);
-          return;
+            toast.error(`Please fill in all required fields: ${missingFields.join(', ')}`);
+            return;
         }
     
-        // If all validations pass, proceed with form submission
+        // Prepare data for submission
         const postData = {
-          ...formData,
-          amount_inr_cr_max: parseFloat(formData.amount_inr_cr_max),
-          amount_inr_cr_min: parseFloat(formData.amount_inr_cr_min),
-          est_capex_inr_cr: parseFloat(formData.est_capex_inr_cr),
-          est_opex_inr_cr: parseFloat(formData.est_opex_inr_cr),
-          gm_percentage: parseFloat(formData.gm_percentage),
-          probability: parseFloat(formData.probability),
-          est_capex_phase: parseInt(formData.est_capex_phase),
-          est_opex_phase: parseInt(formData.est_opex_phase)
+            ...formData,
+            amount_inr_cr_max: parseFloat(formData.amount_inr_cr_max),
+            amount_inr_cr_min: parseFloat(formData.amount_inr_cr_min),
+            est_capex_inr_cr: parseFloat(formData.est_capex_inr_cr),
+            est_opex_inr_cr: parseFloat(formData.est_opex_inr_cr),
+            gm_percentage: parseFloat(formData.gm_percentage),
+            probability: parseFloat(formData.probability),
+            est_capex_phase: parseInt(formData.est_capex_phase),
+            est_opex_phase: parseInt(formData.est_opex_phase)
         };
-        
+    
         setIsSubmitting(true);
-
+    
         try {
-          console.log(postData);
-          const response = await axios.post(`${BASE_URL}/api/opportunities`, postData, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          if (response.status === 201 || response.status === 200) {
-            toast.success('Entry created successfully.');
-            handleClose();
-          } else if(response.status === 409){
-            setPotentialDuplicates(error.response.data.potentialDuplicates);
-            setShowDuplicateModal(true);
-          } else {
-            toast.error('Failed to create entry.');
-          }
+            const response = await axios.post(`${BASE_URL}/api/opportunities`, postData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+    
+            if (response.status === 201 || response.status === 200) {
+                toast.success('Entry created successfully.');
+                handleClose();
+            } else if (response.status === 409) {
+                setPotentialDuplicates(response.data.potentialDuplicates);
+                setShowDuplicateModal(true);
+            } else {
+                toast.error('Failed to create entry.');
+            }
         } catch (err) {
-          if (err.response && err.response.status === 409) {
-            // Potential duplicates found
-            // console.log("]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]");
-            console.log(err.response.data.potentialDuplicates); // Correct access
-            setPotentialDuplicates(err.response.data.potentialDuplicates);
-            setShowDuplicateModal(true);
+            if (err.response) {
+                const { status, data } = err.response;
+                
+                if (status === 409) {
+                    // Handle duplicate entry
+                    setPotentialDuplicates(data.potentialDuplicates);
+                    setShowDuplicateModal(true);
+                } else if (status === 400 && typeof data === 'object') {
+                    // Loop through backend validation errors
+                    Object.values(data).forEach(errorMessage => toast.error(errorMessage));
+                } else {
+                    toast.error('Failed to create entry.');
+                    console.error(err);
+                }
+            } else {
+                toast.error('Failed to create entry.');
+                console.error(err);
+            }
+        } finally {
+            setIsSubmitting(false);
         }
-         else {
-            toast.error('Failed to create entry.');
-            console.error(err);
-          }
-          
-        }finally {
-          setIsSubmitting(false);
-      }
-
-      };
+    };
+    
+    
 
       const handleAddAnyway = async () => {
         const token = localStorage.getItem('token');

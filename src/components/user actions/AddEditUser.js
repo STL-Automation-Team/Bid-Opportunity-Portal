@@ -107,7 +107,7 @@ const AddEditUser = () => {
       };
       delete data.parentId;
 
-      const url = editingUser ? `${BASE_URL}/api/${editingUser.id}` : `${BASE_URL}/user/saveUser`;
+      const url = editingUser ? `${BASE_URL}/api/${editingUser.id}` : `${BASE_URL}/api/user/saveUser`;
       const method = editingUser ? 'put' : 'post';
 
       await axios({
@@ -121,8 +121,38 @@ const AddEditUser = () => {
       fetchData();
       handleClose();
     } catch (error) {
-      console.error('Error saving user:', error);
-      showSnackbar('Error saving user. Please try again.', 'error');
+      console.error('Error saving permission:', error);
+      
+      // Handle validation errors
+      if (error.response?.status === 400) {
+        // Validation errors
+        const validationErrors = error.response.data;
+        const errorMessages = Object.values(validationErrors).join('\n');
+        showSnackbar(errorMessages, 'error');
+      } 
+      // Handle not found errors
+      else if (error.response?.status === 404) {
+        showSnackbar('Permission not found', 'error');
+      }
+      // Handle unauthorized errors
+      else if (error.response?.status === 401) {
+        showSnackbar('Unauthorized access. Please login again.', 'error');
+        // Optionally redirect to login
+        // navigate('/login');
+      }
+      // Handle server errors
+      else if (error.response?.status === 500) {
+        const errorMessage = error.response.data?.message || 'Internal server error occurred';
+        showSnackbar(errorMessage, 'error');
+      }
+      // Handle network errors
+      else if (error.request) {
+        showSnackbar('Network error. Please check your connection.', 'error');
+      }
+      // Handle other errors
+      else {
+        showSnackbar('Error saving permission. Please try again.', 'error');
+      }
     }
   };
 

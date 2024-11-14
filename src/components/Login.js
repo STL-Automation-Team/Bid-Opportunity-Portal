@@ -27,14 +27,17 @@ const Login = ({ onLogin }) => {
       // Handle successful login
       if (response.status === 200) {
         const token = response.data.token;
+        const refreshToken = response.data.refreshToken;
         console.log('Login successful');
         localStorage.setItem('token', token);
+        localStorage.setItem('refreshToken', refreshToken)
         
         const decodedToken = jwtDecode(token);
         const userId = decodedToken.user_id;
         localStorage.setItem('user_id', userId);
         // Extract permissions from the token claims
         const permissions = decodedToken.permissions || [];
+        console.log(permissions)
         localStorage.setItem('auth', permissions);
         toast.success('Login successful!');
         onLogin(); // Call the onLogin function to proceed to the next page

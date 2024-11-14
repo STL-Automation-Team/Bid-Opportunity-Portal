@@ -24,7 +24,7 @@ const Sidebar = () => {
   };
 
   const hasPermission = (requiredPermission) => {
-    return permissions.includes(requiredPermission) || permissions.includes("Admin");
+    return permissions.includes(requiredPermission) || permissions.includes("ADMIN");
   };
 
     return (
@@ -35,7 +35,7 @@ const Sidebar = () => {
       </div>
       
       <ul className="nav-links">
-        {hasPermission("View") && (
+        {hasPermission("VIEW") && (
           <li>
             <Link to="/analytics">
               <i className="bi bi-grid-1x2-fill"></i>
@@ -49,7 +49,7 @@ const Sidebar = () => {
           </li>
         )}
 
-        {hasPermission("Edit") && (
+        {hasPermission("EDIT") && (
           <li>
             <Link to="/addopportunity">
               <i className="bi bi-file-earmark-text-fill"></i>
@@ -63,7 +63,7 @@ const Sidebar = () => {
           </li>
         )}
 
-        {hasPermission("Edit") && (
+        {hasPermission("EDIT") && (
           <li>
             <Link to="/approvals">
               <i className="bi bi-check-circle-fill"></i>
@@ -77,7 +77,7 @@ const Sidebar = () => {
           </li>
         )}
 
-        {hasPermission("View") && (
+        {hasPermission("VIEW") && (
           <li>
             <Link to="/operationslist">
               <i className="bi bi-ticket-detailed-fill"></i>
@@ -91,7 +91,7 @@ const Sidebar = () => {
           </li>
         )}
 
-        {hasPermission("View") && (
+        {hasPermission("VIEW") && (
           <li>
             <Link to="/sourcedBid">
             <i className="bi bi-info-circle-fill"></i>
@@ -105,7 +105,7 @@ const Sidebar = () => {
           </li>
         )}
 
-        {hasPermission("Edit") && (
+        {hasPermission("EDIT") && (
           <li>
             <Link to="/userslist">
               <i className="bi bi-people-fill"></i>
@@ -119,7 +119,7 @@ const Sidebar = () => {
           </li>
         )}
 
-        {(hasPermission("Edit")) && (
+        {(hasPermission("EDIT")) && (
           <li>
             <div className="iocn-link">
               <Link>

@@ -45,12 +45,23 @@ const PlanActionsForm = ({ show, handleClose, form_id }) => {
       }, 2000); // Close the modal after 2 seconds
     } catch (error) {
       console.error('Error submitting data:', error);
-      setError('Failed to submit data. Please try again.'); // Display error message
+  
+      if (error.response && error.response.status === 400 && typeof error.response.data === 'object') {
+          // Set validation errors in state
+          const validationErrors = Object.values(error.response.data);
+          setError(validationErrors.join('. ')); // Join errors into a single string
+      } else {
+          // Display a general error message if it's not a 400 status or doesn't have specific validation errors
+          setError('Failed to submit data. Please try again.');
+      }
+  
+      // Clear error and close modal after a short delay
       setTimeout(() => {
-        setError(null);
-        handleClose();
-      }, 100); // Close the m
-    }
+          setError(null);
+          handleClose();
+      }, 5000);
+  }
+  
   };
 
   return (

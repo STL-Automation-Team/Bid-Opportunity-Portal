@@ -302,10 +302,31 @@ const AGPManagement = () => {
                   'Content-Type': 'application/json'
                 }
               });
-            } else {
-              console.error('Error checking/saving AGP entry:', error);
-              console.error('Error response:', error.response?.data);
-              throw error;
+            } else if (error.response?.status === 400) {
+              // Validation errors
+              const validationErrors = error.response.data;
+              const errorMessages = Object.values(validationErrors).join('\n');
+              showSnackbar(errorMessages, 'error');
+            } 
+        
+            // Handle unauthorized errors
+            else if (error.response?.status === 401) {
+              showSnackbar('Unauthorized access. Please login again.', 'error');
+              // Optionally redirect to login
+              // navigate('/login');
+            }
+            // Handle server errors
+            else if (error.response?.status === 500) {
+              const errorMessage = error.response.data?.message || 'Internal server error occurred';
+              showSnackbar(errorMessage, 'error');
+            }
+            // Handle network errors
+            else if (error.request) {
+              showSnackbar('Network error. Please check your connection.', 'error');
+            }
+            // Handle other errors
+            else {
+              showSnackbar('Error saving permission. Please try again.', 'error');
             }
           }
         });
@@ -318,13 +339,36 @@ const AGPManagement = () => {
       fetchAGPEntries();
       handleClose();
     } catch (error) {
-      console.error('Error saving AGP entries:', error);
-      console.error('Error response:', error.response?.data);
+      // console.error('Error saving AGP entries:', error);
+      // console.error('Error response:', error.response?.data);
       if (error.response && error.response.status === 422) {
         const errorMessage = error.response.headers['Error-Message'] || 'Operation not allowed at this time.';
         showSnackbar(errorMessage, 'error');
-      } else {
-        showSnackbar('Error saving AGP entries', 'error');
+      } else if (error.response?.status === 400) {
+        // Validation errors
+        const validationErrors = error.response.data;
+        const errorMessages = Object.values(validationErrors).join('\n');
+        showSnackbar(errorMessages, 'error');
+      } 
+  
+      // Handle unauthorized errors
+      else if (error.response?.status === 401) {
+        showSnackbar('Unauthorized access. Please login again.', 'error');
+        // Optionally redirect to login
+        // navigate('/login');
+      }
+      // Handle server errors
+      else if (error.response?.status === 500) {
+        const errorMessage = error.response.data?.message || 'Internal server error occurred';
+        showSnackbar(errorMessage, 'error');
+      }
+      // Handle network errors
+      else if (error.request) {
+        showSnackbar('Network error. Please check your connection.', 'error');
+      }
+      // Handle other errors
+      else {
+        showSnackbar('Error saving permission. Please try again.', 'error');
       }
     }
   };

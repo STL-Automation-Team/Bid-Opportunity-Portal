@@ -10,6 +10,7 @@ const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id })
   const [showEditModal, setShowEditModal] = useState(false);
   const [editDetails, setEditDetails] = useState(details);
   const [permissions, setPermissions] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Retrieve permissions from localStorage when the component mounts
@@ -48,6 +49,14 @@ const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id })
       })
       .catch(error => {
         console.error('Error updating data:', error);
+        if (error.response && error.response.status === 400 && typeof error.response.data === 'object') {
+          // Set validation errors in state
+          const validationErrors = Object.values(error.response.data);
+          setError(validationErrors.join('. ')); // Join errors into a single string
+        }
+        setTimeout(() => {
+          setError(null);
+        }, 5000);
       });
   };
 
@@ -75,8 +84,8 @@ const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id })
             {`Week ${week} Plan`} - {title}
           </span>
           <Button variant="link"
-          disabled={!hasPermission}
-          onClick={handleEditClick} style={{ color: 'white' }}>Add Action</Button>
+            disabled={!hasPermission}
+            onClick={handleEditClick} style={{ color: 'white' }}>Add Action</Button>
         </Card.Header>
         <Card.Body style={{ display: expanded ? 'block' : 'none', textAlign: 'left' }}>
           <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
@@ -90,36 +99,36 @@ const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id })
       </Card>
 
       <Modal show={showEditModal} onHide={handleEditClose}>
-  <Modal.Header closeButton>
-    <Modal.Title>Edit Plan & Action</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <Form>
-        {editDetails.map((detail, index) => (
-      detail.label.toLowerCase() !== 'created at' && (  // Skip if the label is "Created At"
-        <Form.Group controlId={`formDetail${index}`} key={index}>
-          <Form.Label>{detail.label}</Form.Label>
-          <Form.Control
-            type="text"
-            value={detail.value}
-            onChange={(e) => handleEditChange(index, 'value', e.target.value)}
-            readOnly={detail.label.toLowerCase() !== 'action'} // Make all fields except "Action" read-only
-          />
-        </Form.Group>
-      )
-    ))}
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Plan & Action</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            {editDetails.map((detail, index) => (
+              detail.label.toLowerCase() !== 'created at' && (  // Skip if the label is "Created At"
+                <Form.Group controlId={`formDetail${index}`} key={index}>
+                  <Form.Label>{detail.label}</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={detail.value}
+                    onChange={(e) => handleEditChange(index, 'value', e.target.value)}
+                    readOnly={detail.label.toLowerCase() !== 'action'} // Make all fields except "Action" read-only
+                  />
+                </Form.Group>
+              )
+            ))}
 
-    </Form>
-  </Modal.Body>
-  <Modal.Footer>
-    <Button variant="secondary" onClick={handleEditClose}>
-      Close
-    </Button>
-    <Button variant="primary" onClick={handleEditSubmit}>
-      Save Changes
-    </Button>
-  </Modal.Footer>
-</Modal>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleEditClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleEditSubmit}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
     </>
   );

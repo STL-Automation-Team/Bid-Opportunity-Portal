@@ -21,6 +21,7 @@ import {
   Typography
 } from '@mui/material';
 import axios from 'axios';
+import DOMPurify from 'dompurify';
 import React, { useEffect, useState } from 'react';
 import { BASE_URL } from '../constants';
 import './AddEditUser.css';
@@ -38,11 +39,43 @@ const ManagePermissions = () => {
     updatedAt: new Date().toISOString(),
     updatedBy: 'Admin'
   });
+  const [formErrors, setFormErrors] = useState({});
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState(''); 
+  const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  
+  // Input validation rules
+  const permissionNameRegex = /^[a-zA-Z0-9_-]{3,50}$/;
+
+  const validateFormData = () => {
+    const errors = {};
+    
+    // Sanitize and validate permission name
+    const sanitizedName = DOMPurify.sanitize(formData.permission_name.trim());
+    
+    if (!sanitizedName) {
+      errors.permission_name = 'Permission name is required';
+    } else if (!permissionNameRegex.test(sanitizedName)) {
+      errors.permission_name = 'Permission name must be 3-50 characters and contain only letters, numbers, underscores, and hyphens';
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    // Sanitize input value
+    const sanitizedValue = DOMPurify.sanitize(value);
+    setFormData({ ...formData, [name]: sanitizedValue });
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors({ ...formErrors, [name]: '' });
+    }
+  };
+
   const token = localStorage.getItem('token'); // Retrieve the token from storage
 
   const handleChangePage = (event, newPage) => {
@@ -110,37 +143,72 @@ const ManagePermissions = () => {
     }
   };
 
-  const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  // const handleInputChange = (e) => {
+  //   setFormData({ ...formData, [e.target.name]: e.target.value });
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const data = {
+      const sanitizedData = {
         ...formData,
+        permission_name: DOMPurify.sanitize(formData.permission_name.trim()),
         updatedAt: new Date().toISOString()
       };
-      if (editingPermission) {
-        await axios.put(`${BASE_URL}/api/permissions/${editingPermission.id}`, data, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        showSnackbar('Permission updated successfully', 'success');
-      } else {
-        await axios.post(`${BASE_URL}/api/permissions`, data, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        showSnackbar('Permission created successfully', 'success');
-      }
+  
+      const url = editingPermission 
+        ? `${BASE_URL}/api/permissions/${editingPermission.id}`
+        : `${BASE_URL}/api/permissions`;
+  
+      const response = await axios({
+        method: editingPermission ? 'put' : 'post',
+        url: url,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        data: sanitizedData
+      });
+        
+      showSnackbar(
+        `Permission ${editingPermission ? 'updated' : 'created'} successfully`,
+        'success'
+      );
       fetchPermissions();
       handleClose();
     } catch (error) {
       console.error('Error saving permission:', error);
-      showSnackbar('Error saving permission', 'error');
+      
+      // Handle validation errors
+      if (error.response?.status === 400) {
+        // Validation errors
+        const validationErrors = error.response.data;
+        const errorMessages = Object.values(validationErrors).join('\n');
+        showSnackbar(errorMessages, 'error');
+      } 
+      // Handle not found errors
+      else if (error.response?.status === 404) {
+        showSnackbar('Permission not found', 'error');
+      }
+      // Handle unauthorized errors
+      else if (error.response?.status === 401) {
+        showSnackbar('Unauthorized access. Please login again.', 'error');
+        // Optionally redirect to login
+        // navigate('/login');
+      }
+      // Handle server errors
+      else if (error.response?.status === 500) {
+        const errorMessage = error.response.data?.message || 'Internal server error occurred';
+        showSnackbar(errorMessage, 'error');
+      }
+      // Handle network errors
+      else if (error.request) {
+        showSnackbar('Network error. Please check your connection.', 'error');
+      }
+      // Handle other errors
+      else {
+        showSnackbar('Error saving permission. Please try again.', 'error');
+      }
     }
   };
 
@@ -254,6 +322,9 @@ const ManagePermissions = () => {
                   onChange={handleInputChange}
                   className="text-field1"
                 />
+                 {formErrors.permission_name && (
+                  <p className="mt-1 text-sm text-red-500">{formErrors.permission_name}</p>
+                )}
               </Grid>
               
             </Grid>
@@ -290,51 +361,3 @@ const ManagePermissions = () => {
 };
 
 export default ManagePermissions;
-
-
-
-
-
-
-{/* <Grid item xs={12} className="grid-item1">
-                <TextField
-                  name="createdAt"
-                  label="Created At"
-                  type="datetime-local"
-                  fullWidth
-                  value={formData.createdAt}
-                  disabled
-                  className="text-field1"
-                />
-              </Grid> */}
-              {/* <Grid item xs={12} className="grid-item1">
-                <TextField
-                  name="createdBy"
-                  label="Created By"
-                  fullWidth
-                  value={formData.createdBy}
-                  disabled
-                  className="text-field1"
-                />
-              </Grid>
-              <Grid item xs={12} className="grid-item1">
-                <TextField
-                  name="updatedAt"
-                  label="Updated At"
-                  type="datetime-local"
-                  fullWidth
-                  value={formData.updatedAt}
-                  disabled
-                  className="text-field1"
-                />
-              </Grid>
-              <Grid item xs={12} className="grid-item1">
-                <TextField
-                  name="updatedBy"
-                  label="Updated By"
-                  fullWidth
-                  value={formData.updatedBy}
-                  disabled
-                  className="text-field1"
-                />
-              </Grid> */}

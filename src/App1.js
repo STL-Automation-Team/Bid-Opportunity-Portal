@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import SessionDialog from './components/SessionDialog';
 import Sidebar from "./components/Sidebar";
 import Uploader from "./components/Uploader";
 import UserManagement from './components/UserManagement';
@@ -35,7 +36,11 @@ import "./styles/basic.css";
 import { BasicTable } from "./table/BasicTable";
 // import ReadOperation from './pages/Operations/ReadOperation'
 import { AccessDeniedProvider } from './components/AccessDeniedProvider';
-function App1({onLogout}) {
+function App1({onLogout, 
+  showSessionDialog, 
+  setShowSessionDialog, 
+  timeLeft, 
+  renewToken}) {
   // const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // if (!isAuthenticated) {
@@ -47,7 +52,13 @@ function App1({onLogout}) {
     <div className="app">
       <Router>
       <AccessDeniedProvider onLogout={onLogout}>
-
+      <SessionDialog
+            isOpen={showSessionDialog}
+            onClose={() => setShowSessionDialog(false)}
+            timeLeft={timeLeft}
+            onLogout={onLogout}
+            onContinue={renewToken}
+          />
         <Sidebar />
         <div className="page-container">
         <Navbar onLogout={onLogout}/>
@@ -96,7 +107,7 @@ function App1({onLogout}) {
             <Route exact path="/adminsettings" element={<AdminSettings />} />
           </Routes>
         </div>
-
+        
         </AccessDeniedProvider>
 
       </Router>
