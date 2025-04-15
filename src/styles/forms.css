@@ -1,0 +1,88 @@
+.d-block {
+    text-align: left;
+    margin-left: 5px;
+}
+
+.form-entry {
+    box-shadow: 1px 1px 5px lightgray;
+}
+
+fieldset {
+    border: 1px solid gainsboro;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    padding-top: 2.5rem;
+    border-radius: 7px;
+    background-color: white;
+  }
+  
+  legend {
+    display: block;
+    width: 30%;
+    font-weight: bold;
+    padding: 0 5px;
+    position: absolute;
+    top: -17px;
+    left: 10px;
+    font-size: 1.3rem;
+    border: 2px solid mediumblue;
+    border-radius: 20px;
+    background-color: mediumblue;
+    color: white;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 45px;
+  }
+
+  .form-top{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 1rem 2rem 0rem 2rem; 
+  }
+
+ label {
+    white-space: nowrap;
+    width: 100%;
+    color: black;
+  }
+
+/* .btn-back {
+    background-color: aquamarine;
+    
+}
+
+.btn-back:hover {
+    background-color: aqua;
+}
+
+.submit-btn {
+  background-color: ;
+}
+
+.submit-btn:hover {
+  background-color: aqua;
+}
+   */
+
+#react-aria757973695-1 {
+  width: 59rem;
+  background-color: white;
+  color: black;
+  box-shadow: 1px 1px 5px lightgray;
+  border: 1px solid lightgrey;
+
+}
+
+.submit-btn {
+  width: 100%;
+}
+
+.form-part {
+  margin: 1rem;
+}
+

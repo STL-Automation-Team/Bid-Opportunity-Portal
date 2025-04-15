@@ -1,0 +1,78 @@
+{
+  "name": "itam",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^5.16.7",
+    "@mui/material": "^5.16.7",
+    "@mui/x-charts": "^7.9.0",
+    "@mui/x-date-pickers": "^7.9.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/dompurify": "^3.0.5",
+    "axios": "^1.7.2",
+    "bootstrap": "^5.3.3",
+    "cdbreact": "^1.5.18",
+    "chart.js": "^4.4.3",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "date-fns": "^3.6.0",
+    "dayjs": "^1.11.11",
+    "dompurify": "^3.1.7",
+    "file-saver": "^2.0.5",
+    "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.446.0",
+    "prop-types": "^15.8.1",
+    "qs": "^6.11.2",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.10.9",
+    "react-breadcrumbs-dynamic": "^1.2.1",
+    "react-chartjs-2": "^5.2.0",
+    "react-data-table-component": "^7.5.3",
+    "react-date-range": "^2.0.1",
+    "react-datepicker": "^7.6.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.43.9",
+    "react-icons": "^4.12.0",
+    "react-router-dom": "^6.24.1",
+    "react-scripts": "5.0.1",
+    "react-select": "^5.8.0",
+    "react-slider": "^2.0.6",
+    "react-table": "^7.8.0",
+    "react-toastify": "^10.0.5",
+    "recharts": "^2.12.7",
+    "styled-components": "^5.3.10",
+    "ui": "github:shadcn/ui",
+    "use-react-router-breadcrumbs": "^4.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "sass": "^1.63.6"
+  }
+}
