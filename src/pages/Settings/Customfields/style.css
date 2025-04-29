@@ -1,0 +1,178 @@
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2c3e50;
+    --background-color: #ecf0f1;
+    --text-color: #34495e;
+    --border-color: #bdc3c7;
+    --error-color: #e74c3c;
+  }
+  
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    /* color: var(--text-color); */
+  }
+  
+  .datatable-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .listheading {
+    color: var(--secondary-color);
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .data-management-layout {
+    display: flex;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .modules-sidebar {
+    width: 200px;
+    padding: 20px;
+    background-color: var(--secondary-color);
+    border-radius: 8px 0 0 8px;
+  }
+  
+  .modules-sidebar button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    background-color: transparent;
+    border: none;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 4px;
+  }
+  
+  .modules-sidebar button:hover,
+  .modules-sidebar button.active {
+    background-color: var(--primary-color);
+  }
+  
+  .module-content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  .data-form {
+    margin-bottom: 30px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .form-group input.error,
+  .form-group select.error {
+    border-color: var(--error-color);
+  }
+  
+  .error-message {
+    color: var(--error-color);
+    font-size: 12px;
+    margin-top: 5px;
+  }
+  
+  .submit-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .submit-btn:hover {
+    background-color: #2980b9;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .data-table th {
+    background-color: var(--primary-color);
+    color: white;
+  }
+  
+  .data-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+  
+  .edit-btn,
+  .delete-btn {
+    padding: 6px 12px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .edit-btn {
+    background-color: #f39c12;
+    color: white;
+  }
+  
+  .delete-btn {
+    background-color: var(--error-color);
+    color: white;
+  }
+  
+  .edit-btn:hover {
+    background-color: #d35400;
+  }
+  
+  .delete-btn:hover {
+    background-color: #c0392b;
+  }
+  
+  .no-data,
+  .select-module {
+    text-align: center;
+    color: #7f8c8d;
+    font-style: italic;
+  }
+
+  tbody{
+    color: black;
+  }
+
+  

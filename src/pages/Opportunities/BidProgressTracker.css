@@ -1,0 +1,246 @@
+.bid-tracker {
+    padding: 1rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+    max-width: auto;
+    margin: 0 auto;
+  }
+  
+  .bid-tracker h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #333;
+  }
+  
+  .tracker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.5rem;
+  }
+  
+  .tracker-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    transition: all 0.2s ease;
+  }
+  
+  .tracker-item.completed {
+    border-color: #4caf50;
+    background: #f0fff0;
+  }
+  
+  .status-indicator {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
+    color: #999;
+    font-size: 1rem;
+  }
+  
+  .completed .status-indicator {
+    color: #4caf50;
+  }
+  
+  .item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .item-label {
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+  }
+  
+  .item-value {
+    font-size: 0.85rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    font-size: 0.9rem;
+    padding: 0;
+  }
+  
+  .edit-btn:hover {
+    color: #000;
+  }
+  
+  .edit-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+  }
+  
+  .edit-controls input[type="checkbox"] {
+    margin: 0;
+  }
+  
+  .edit-controls input[type="date"] {
+    font-size: 0.8rem;
+    padding: 0.2rem;
+  }
+  
+  .save-btn, .cancel-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0.2rem;
+  }
+  
+  .save-btn {
+    color: #4caf50;
+  }
+  
+  .cancel-btn {
+    color: #f44336;
+  }
+  
+  .loading, .no-data {
+    text-align: center;
+    padding: 1rem;
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .bid-tracker {
+    padding: 0.75rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+    width: 100%; /* Ensure it fits the container */
+    box-sizing: border-box;
+  }
+  
+  .bid-tracker h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    color: #333;
+  }
+  
+  .tracker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjusted for narrower columns */
+    gap: 0.5rem;
+  }
+  
+  .tracker-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    background: #fff;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    transition: all 0.2s ease;
+  }
+  
+  .tracker-item.completed {
+    border-color: #4caf50;
+    background: #f0fff0;
+  }
+  
+  .status-indicator {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
+    color: #999;
+    font-size: 0.9rem;
+  }
+  
+  .completed .status-indicator {
+    color: #4caf50;
+  }
+  
+  .item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .item-label {
+    font-size: 0.85rem;
+    color: #666;
+    font-weight: 500;
+  }
+  
+  .item-value {
+    font-size: 0.8rem;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    font-size: 0.8rem;
+    padding: 0;
+  }
+  
+  .edit-btn:hover {
+    color: #000;
+  }
+  
+  .edit-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.25rem;
+  }
+  
+  .edit-controls input[type="checkbox"] {
+    margin: 0;
+    width: 14px;
+    height: 14px;
+  }
+  
+  .edit-controls input[type="date"] {
+    font-size: 0.75rem;
+    padding: 0.15rem;
+    width: 100px;
+  }
+  
+  .save-btn, .cancel-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.2rem;
+  }
+  
+  .save-btn {
+    color: #4caf50;
+  }
+  
+  .cancel-btn {
+    color: #f44336;
+  }
+  
+  .loading, .no-data {
+    text-align: center;
+    padding: 0.75rem;
+    color: #666;
+    font-size: 0.85rem;
+  }

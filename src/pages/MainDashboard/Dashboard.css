@@ -1,0 +1,16 @@
+.dashboard {
+    padding: 20px;
+    background-color: aliceblue;
+  }
+  
+  .chart-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
+  
+  .chart {
+    width: 30%;
+    margin: 20px 0;
+  }
+  

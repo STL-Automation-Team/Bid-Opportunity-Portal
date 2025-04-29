@@ -1,0 +1,27 @@
+fieldset{
+    background-color: transparent !important;
+}
+
+.icon-button {
+    
+    background-color: white !important;
+    color: gray !important;
+    padding: 5px !important;
+    border-radius: 50% !important; /* Optional */
+    transition: background-color 0.3s, color 0.3s !important;
+  }
+  
+.icon-button:hover {
+    background-color: gray !important;
+    color: white !important;
+  }
+  
+.add-button {
+    background-color: #3498db !important;
+    color: #ffffff !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.add-button:hover {
+    background-color: #2980b9 !important;
+}
