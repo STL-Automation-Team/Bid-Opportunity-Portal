@@ -1,47 +1,70 @@
+/* Button styles (unchanged) */
 .add-button {
-    position: fixed;
-    bottom: 20px; /* Adjust as needed */
-    right: 20px; /* Adjust as needed */
-    background-color: #FFDE95;
-    border: none;
-    padding: 10px;
-    border-radius: 50%;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: transform 0.3s ease;
-    z-index: 10; /* Ensure it's above other content */
-  }
-  
-  .add-button img {
-    width: 50px;
-    height: 50px;
-  }
-  
-  .add-button:hover {
-    transform: scale(1.1);
-  }
-  .popup {
-    position: fixed;
-    bottom: 70px;
-    right: 20px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-    z-index: 1000;
-  }
-  
-  .popup-option {
-    padding: 10px;
-    cursor: pointer;
-    color: black;
-  }
-  
-  .popup-option:hover {
-    background-color: #f0f0f0;
-  }
-  
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #FFDE95;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  z-index: 1000; /* High z-index for button */
+}
+
+.add-button img {
+  width: 50px;
+  height: 50px;
+}
+
+.add-button:hover {
+  transform: scale(1.1);
+}
+
+/* Popup styles */
+.popup {
+  position: fixed !important; /* Ensure fixed positioning */
+  bottom: 80px; /* Above the button */
+  right: 20px; /* Aligned with button */
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 200px; /* Fixed width for all options */
+  z-index: 1001; /* Above button */
+}
+
+.popup-option {
+  padding: 10px;
+  cursor: pointer;
+  color: black;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.popup-option:last-child {
+  border-bottom: none; /* No border on last option */
+}
+
+.popup-option:hover {
+  background-color: #f0f0f0;
+}
+
+.popup-option.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Ensure parent containers don’t interfere */
+.right1 {
+  position: relative; /* Avoid transform or other properties */
+  overflow-y: auto; /* Scrollable, but shouldn’t affect fixed popup */
+}
+
+.main1 {
+  position: relative; /* Avoid transform or other properties */
+}
 
   .no-follow-ups {
     text-align: center;

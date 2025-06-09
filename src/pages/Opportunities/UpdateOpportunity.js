@@ -1,12 +1,14 @@
 import axios from 'axios';
+import { format, parse } from 'date-fns';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BASE_URL } from '../../components/constants';
 import './CreateOpportunity.css';
-
 const EditLead = () => {
   const [formData, setFormData] = useState({
     opportunityName: '',
@@ -147,10 +149,11 @@ const EditLead = () => {
   // Form validation
   const validateForm = () => {
     let newErrors = {};
-    const requiredFields = [
-      'opportunityName', 'obFyId', 'obQtr', 'obMmm', 'priorityId',
-      'amount', 'dealStatusId', 'industrySegmentId', 'bidSubmissionDate'
-    ];
+    // const requiredFields = [
+    //   'opportunityName', 'obFyId', 'obQtr', 'obMmm', 'priorityId',
+    //   'amount', 'dealStatusId', 'industrySegmentId', 'bidSubmissionDate'
+    // ];
+    const requiredFields = []
 
     requiredFields.forEach(field => {
       if (!formData[field]) newErrors[field] = 'This field is required';
@@ -184,7 +187,21 @@ const EditLead = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   }, []);
+  
+  const handleDatePickerChange = (date, name) => {
+    // Format date to YYYY-MM-DD in local timezone (IST)
+    const formattedDate = date ? format(date, 'yyyy-MM-dd') : '';
+    
+    // Debugging: Log the selected and formatted date
+    console.log('Selected Date:', date);
+    console.log('Formatted Date (YYYY-MM-DD):', formattedDate);
 
+    const event = {
+      target: { name, value: formattedDate },
+    };
+    handleChange(event);
+  };
+  
   // Handle form submission (update)
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -235,12 +252,17 @@ const EditLead = () => {
       });
 
       if (response.status === 200) {
-        toast.success('Lead updated successfully', { 
-          autoClose: 2000,
-          toastId: 'updateSuccess_normal'
-        });
-        setTimeout(() => navigate(`/lead/${id}`), 1000);
+        // toast.success('Lead updated successfully', { 
+        //   autoClose: 2000,
+        //   toastId: 'updateSuccess_normal'
+        // });
+        // navigate(`/opportunity/${id}`);
+        const confirmed = window.confirm('Lead updated successfully. Click OK to view the opportunity.');
+        if (confirmed) {
+          navigate(`/operationslist`);
+        }
       }
+      
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -298,12 +320,16 @@ const EditLead = () => {
       await axios.put(`${BASE_URL}/api/leads/${id}?force=true`, postData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success('Lead updated successfully', { 
-        autoClose: 2000,
-        toastId: 'addAnyway'
-      });
+      // toast.success('Lead updated successfully', { 
+      //   autoClose: 2000,
+      //   toastId: 'addAnyway'
+      // });
       setShowDuplicateModal(false);
-      setTimeout(() => navigate(`/lead/${id}`), 1000);
+      const confirmed = window.confirm('Lead updated successfully. Click OK to view the opportunity.');
+      if (confirmed) {
+        navigate(`/operationslist`);
+      }
+      // setTimeout(() => navigate(`/opportunity/${id}`), 10);
     } catch (error) {
       handleApiError(error);
     }
@@ -318,7 +344,7 @@ const EditLead = () => {
   };
 
   const handleCancel = () => {
-    navigate(`/lead/${id}`);
+    navigate(`/opportunity/${id}`);
   };
 
   return (
@@ -405,7 +431,7 @@ const EditLead = () => {
                     name="obFyId"
                     value={formData.obFyId}
                     onChange={handleChange}
-                    required
+                    // required
                     isInvalid={!!errors.obFyId}
                   >
                     <option value="">Select FY</option>
@@ -425,7 +451,7 @@ const EditLead = () => {
                     name="obQtr"
                     value={formData.obQtr}
                     onChange={handleChange}
-                    required
+                    // required
                     isInvalid={!!errors.obQtr}
                   >
                     <option value="">Select Quarter</option>
@@ -445,7 +471,7 @@ const EditLead = () => {
                     name="obMmm"
                     value={formData.obMmm}
                     onChange={handleChange}
-                    required
+                    // required
                     isInvalid={!!errors.obMmm}
                   >
                     <option value="">Select Month</option>
@@ -712,16 +738,29 @@ const EditLead = () => {
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="goNoGoDate">
-                  <Form.Label>Go/No-Go Date</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="goNoGoDate"
-                    value={formData.goNoGoDate || ''}
-                    onChange={handleChange}
-                    max={today}
-                    autoComplete="off"
-                  />
-                </Form.Group>
+      <Form.Label>Go/No-Go Date</Form.Label>
+      <DatePicker
+        selected={
+          formData.goNoGoDate
+            ? parse(formData.goNoGoDate, 'yyyy-MM-dd', new Date())
+            : null
+        }
+        onChange={(date) => handleDatePickerChange(date, 'goNoGoDate')}
+        dateFormat="yyyy-MM-dd"
+        className="form-control"
+        name="goNoGoDate"
+        autoComplete="off"
+        showYearDropdown
+        showMonthDropdown
+        yearDropdownItemNumber={10}
+        scrollableYearDropdown
+        scrollableMonthDropdown
+        placeholderText='YYYY-MM-DD'
+      />
+    </Form.Group>
+
+                
+
               </Row>
             </fieldset>
 
@@ -775,38 +814,59 @@ const EditLead = () => {
               </Row>
 
               <Row className="mb-1">
-                <Form.Group as={Col} controlId="rfpReleaseDate">
-                  <Form.Label>RFP Release Date</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="rfpReleaseDate"
-                    value={formData.rfpReleaseDate || ''}
-                    onChange={handleChange}
-                    max={today}
-                    autoComplete="off"
-                  />
-                </Form.Group>
+              <Form.Group as={Col} controlId="rfpReleaseDate">
+        <Form.Label>RFP Release Date</Form.Label>
+        <DatePicker
+          selected={
+            formData.rfpReleaseDate
+              ? parse(formData.rfpReleaseDate, 'yyyy-MM-dd', new Date())
+              : null
+          }
+          onChange={(date) => handleDatePickerChange(date, 'rfpReleaseDate')}
+          dateFormat="yyyy-MM-dd"
+          className="form-control"
+          name="rfpReleaseDate"
+          // maxDate={new Date()} // Uncomment if needed
+          autoComplete="off"
+          showYearDropdown
+          showMonthDropdown
+          yearDropdownItemNumber={10}
+          scrollableYearDropdown
+          scrollableMonthDropdown
+          placeholderText='YYYY-MM-DD'
+        />
+      </Form.Group>
 
-                <Form.Group as={Col} controlId="bidSubmissionDate">
-                  <Form.Label className="text-start">Bid Submission Date *</Form.Label>
-                  <Form.Control
-                    type="date"
-                    name="bidSubmissionDate"
-                    value={formData.bidSubmissionDate}
-                    min={today}
-                    onChange={handleChange}
-                    required
-                    isInvalid={!!errors.bidSubmissionDate}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.bidSubmissionDate}
-                  </Form.Control.Feedback>
-                </Form.Group>
+      <Form.Group as={Col} controlId="bidSubmissionDate">
+        <Form.Label className="text-start">Bid Submission Date </Form.Label>
+        <DatePicker
+          selected={
+            formData.bidSubmissionDate
+              ? parse(formData.bidSubmissionDate, 'yyyy-MM-dd', new Date())
+              : null
+          }
+          onChange={(date) => handleDatePickerChange(date, 'bidSubmissionDate')}
+          dateFormat="yyyy-MM-dd"
+          className={`form-control ${errors.bidSubmissionDate ? 'is-invalid' : ''}`}
+          name="bidSubmissionDate"
+          // minDate={new Date()} // Uncomment if needed
+          autoComplete="off"
+          showYearDropdown
+          showMonthDropdown
+          yearDropdownItemNumber={10}
+          scrollableYearDropdown
+          scrollableMonthDropdown
+          placeholderText='YYYY-MM-DD'
+        />
+        {errors.bidSubmissionDate && (
+          <div className="invalid-feedback">{errors.bidSubmissionDate}</div>
+        )}
+      </Form.Group>
               </Row>
             </fieldset>
 
             <Button variant="success" type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Updating...' : 'Update'}
+              {isSubmitting ? 'Wait! Updating...' : 'Update'}
             </Button>
             <Button variant="secondary" onClick={handleReset} className="ms-2" disabled={isSubmitting}>
               Reset

@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { BASE_URL } from '../../components/constants';
 import CountCard from '../MainDashboard/CountCard';
@@ -14,6 +14,7 @@ const Opportunities = () => {
     
     // Data states
     const [opportunities, setOpportunities] = useState([]);
+    const [allOpportunities, setAllOpportunities] = useState([]); // Store all data for search
     const [totalLeadscnt, setTotalLeadscnt] = useState(0);
     const [leadsSubmitted, setLeadsSubmitted] = useState(0);
     const [wonleads, setWonLeads] = useState(0);
@@ -45,6 +46,9 @@ const Opportunities = () => {
         selectedFlorence: ''
     });
 
+    // Sorting state
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+
     const columns = [
         'obFy', 'obQtr', 'obMmm', 'opportunityName', 'industrySegment', 'primaryOwner', 'amount', 'dealStatus'
     ];
@@ -68,7 +72,7 @@ const Opportunities = () => {
         industrySegment: ['Public Sector', 'Bharatnet/CN', 'Defence', 'Telecom', 'Mining & Energy', 'GCC'],
         dealStatus: ['Identified', 'Qualified', 'No-Go', 'Work in Progress', 'Bid Submitted', 'Won', 'Bid Dropped', 'Lost'],
         primaryOwner: [
-            "Mrityunjay Nautiyal", "Amit Kar", "Vaibhav Misra", "Srinivasulu AN",
+            "Mrityunjay Nautiyal","Arun Goyal", "Amit Kar", "Vaibhav Misra", "Srinivasulu AN",
             "Vivek Nigam", "Sumeet Banerjee", "Puneet Garg", "Ishwar Chandra",
             "Vijayanand Choudhury", "Ronak Soni", "Tarun Soni", "Anupma Gupta", "Ajay Aggarwal", "Aditya Verma"
         ]
@@ -98,6 +102,29 @@ const Opportunities = () => {
         return path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : null), obj);
     };
 
+    // Fetch all opportunities for search functionality
+    const fetchAllOpportunities = useCallback(async () => {
+        try {
+            const response = await axios.post(`${BASE_URL}/api/leads/filter-by-ids`, {}, { 
+                headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } 
+            });
+            const sortedData = response.data.content.sort((a, b) => b.id - a.id);
+            setAllOpportunities(sortedData);
+        } catch (error) {
+            console.error("Error fetching all opportunities:", error);
+        }
+    }, [token]);
+
+    // Sorting handler
+    const handleSort = (key) => {
+        setSortConfig((prev) => {
+            if (prev.key === key && prev.direction === 'asc') {
+                return { key, direction: 'desc' };
+            }
+            return { key, direction: 'asc' };
+        });
+    };
+
     // Data fetching
     const fetchCardData = useCallback(async (fyIds) => {
         setLoading(true);
@@ -124,23 +151,23 @@ const Opportunities = () => {
             
             setTotalLeadscnt(totalLeads1.data.totalElements);
             const totalAmount_tl = totalLeads1.data.content.reduce((sum, item) => sum + (item.amount || 0), 0);
-            setTotalLeadscnt_tl(totalAmount_tl);
+            setTotalLeadscnt_tl(Math.round(totalAmount_tl)); // Convert to integer
 
             setLeadsSubmitted(leadsSubmitted1.data.totalElements);
             const totalAmount_ls = leadsSubmitted1.data.content.reduce((sum, item) => sum + (item.amount || 0), 0);
-            setLeadsSubmitted_ls(totalAmount_ls);
+            setLeadsSubmitted_ls(Math.round(totalAmount_ls)); // Convert to integer
 
             setWonLeads(won1.data.totalElements);
             const totalAmount_wn = won1.data.content.reduce((sum, item) => sum + (item.amount || 0), 0);
-            setWonLeads_wn(totalAmount_wn);
+            setWonLeads_wn(Math.round(totalAmount_wn)); // Convert to integer
 
             setLostLeads(lost1.data.totalElements);
             const totalAmount_lt = lost1.data.content.reduce((sum, item) => sum + (item.amount || 0), 0);
-            setLostLeads_lt(totalAmount_lt);
+            setLostLeads_lt(Math.round(totalAmount_lt)); // Convert to integer
 
             setResAwa(resulAwa.data.totalElements);
             const totalAmount_ra = resulAwa.data.content.reduce((sum, item) => sum + (item.amount || 0), 0);
-            setResAwa_ra(totalAmount_ra);
+            setResAwa_ra(Math.round(totalAmount_ra)); // Convert to integer
 
             setOpportunities(sortedData);
             setLoading(false);
@@ -159,54 +186,92 @@ const Opportunities = () => {
             selectedFY: `FY${financialYearEnd % 100}`
         }));
         fetchCardData([fyId]);
+        fetchAllOpportunities(); // Fetch all opportunities for search
         
         setPermissions(localStorage.getItem('auth') || []);
-    }, [fetchCardData]);
+    }, [fetchCardData, fetchAllOpportunities]);
 
     // Filtered data with memoization
     const filteredOpportunities = useMemo(() => {
         if (loading) return [];
         
+        // If search is active, search on all data and ignore other filters
+        if (filters.search !== '') {
+            const searchTerm = filters.search.toLowerCase();
+            const fieldsToSearch = ['opportunityName', 'obFy.obFy', 'obQtr', 'obMmm', 'industrySegment.name', 'primaryOwner', 'dealStatus.dealStatus', 'priority.priority', 'amount'];
+            
+            return allOpportunities.filter(op => {
+                return fieldsToSearch.some(field => {
+                    const value = getNestedValue(op, field);
+                    return value != null && value.toString().toLowerCase().includes(searchTerm);
+                });
+            });
+        }
+        
+        // If no search, apply regular filters to current opportunities
         return opportunities.filter(op => {
             return Object.keys(filters).every(filterKey => {
-                if (filterKey === 'selectedFY') return true;
+                if (filterKey === 'selectedFY' || filterKey === 'search') return true;
                 
-                if (filterKey === 'search') {
-                    if (filters.search === '') return true;
-                    const searchTerm = filters.search.toLowerCase();
-                    const fieldsToSearch = ['opportunityName', 'obFy.obFy', 'obQtr', 'obMmm', 'industrySegment.name', 'primaryOwner', 'dealStatus.dealStatus', 'priority.priority', 'amount'];
-                    return fieldsToSearch.some(field => {
-                        const value = getNestedValue(op, field);
-                        return value != null && value.toString().toLowerCase().includes(searchTerm);
-                    });
-                } else {
-                    const filterValues = filters[filterKey];
-                    if (filterValues.length === 0) return true; // Allow empty filter (deselected)
-                    const valuePath = keyMap[filterKey] || filterKey;
-                    let value = getNestedValue(op, valuePath);
-                    if (filterKey === 'obFy') value = value?.toString();
-                    return filterValues.includes(value);
-                }
+                const filterValues = filters[filterKey];
+                if (filterValues.length === 0) return true; // Allow empty filter (deselected)
+                const valuePath = keyMap[filterKey] || filterKey;
+                let value = getNestedValue(op, valuePath);
+                if (filterKey === 'obFy') value = value?.toString();
+                return filterValues.includes(value);
             });
         });
-    }, [filters, opportunities, loading]);
+    }, [filters, opportunities, allOpportunities, loading]);
+
+    // Sorted and filtered data
+    const sortedOpportunities = useMemo(() => {
+        if (loading || !sortConfig.key) return filteredOpportunities;
+
+        const sorted = [...filteredOpportunities];
+        const key = sortConfig.key;
+        const path = keyMap[key] || key;
+
+        sorted.sort((a, b) => {
+            let aValue = getNestedValue(a, path) || '';
+            let bValue = getNestedValue(b, path) || '';
+
+            // Handle numeric sorting for 'amount'
+            if (key === 'amount') {
+                aValue = Number(aValue) || 0;
+                bValue = Number(bValue) || 0;
+            } else {
+                // Handle string sorting
+                aValue = aValue.toString().toLowerCase();
+                bValue = bValue.toString().toLowerCase();
+            }
+
+            if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        return sorted;
+    }, [filteredOpportunities, sortConfig, loading]);
 
     // Calculate total amount
     const totalAmount = useMemo(() => {
-        return filteredOpportunities.reduce((sum, op) => sum + (op.amount || 0), 0);
-    }, [filteredOpportunities]);
+        return sortedOpportunities.reduce((sum, op) => sum + (op.amount || 0), 0);
+    }, [sortedOpportunities]);
 
     // Pagination
     const currentItems = useMemo(() => {
         const indexOfLastItem = currentPage * itemsPerPage;
         const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-        return filteredOpportunities.slice(indexOfFirstItem, indexOfLastItem);
-    }, [filteredOpportunities, currentPage, itemsPerPage]);
+        return sortedOpportunities.slice(indexOfFirstItem, indexOfLastItem);
+    }, [sortedOpportunities, currentPage, itemsPerPage]);
 
-    // Check if no filters are applied
+    // Check if no filters are applied (excluding search)
     const noFiltersApplied = useMemo(() => {
+        // If search is active, consider filters as applied
+        if (filters.search !== '') return false;
+        
         return Object.entries(filters).every(([key, value]) => {
-            if (key === 'selectedFY') return true;
+            if (key === 'selectedFY' || key === 'search') return true;
             return Array.isArray(value) ? value.length === 0 : value === '';
         });
     }, [filters]);
@@ -371,19 +436,28 @@ const Opportunities = () => {
                 <div className="no-filter-message">Please select filters to view opportunities.</div>
             }
             
-            {!loading && !noFiltersApplied && filteredOpportunities.length === 0 && 
+            {!loading && !noFiltersApplied && sortedOpportunities.length === 0 && 
                 <div className="no-filter-message">No opportunities found matching your search.</div>
             }
             
-            {!loading && !noFiltersApplied && filteredOpportunities.length > 0 && (
+            {!loading && !noFiltersApplied && sortedOpportunities.length > 0 && (
                 <>
                     <div className="table-container">
                         <table className="opportunities-table">
                             <thead>
                                 <tr>
-                                    {columns.map(column => 
-                                        <th key={column}>{columnNames[column]}</th>
-                                    )}
+                                    {columns.map(column => (
+                                        <th 
+                                            key={column} 
+                                            onClick={() => handleSort(column)} 
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            {columnNames[column]}
+                                            {sortConfig.key === column && (
+                                                <span>{sortConfig.direction === 'asc' ? ' ↑' : ' ↓'}</span>
+                                            )}
+                                        </th>
+                                    ))}
                                 </tr>
                             </thead>
                             <tbody>
@@ -391,13 +465,13 @@ const Opportunities = () => {
                                     <tr key={opportunity.id}>
                                         {columns.map(column => (
                                             <td key={column}>
-                                                <a 
-                                                    href={`/opportunity/${opportunity.id}`} 
-                                                    target="_blank" 
+                                                <Link
+                                                    to={`/opportunity/${opportunity.id}`}
+                                                    target="_blank"
                                                     rel="noopener noreferrer"
-                                                >
+                                                    >
                                                     {getNestedValue(opportunity, keyMap[column] || column) || '-'}
-                                                </a>
+                                                </Link>
                                             </td>
                                         ))}
                                     </tr>
@@ -413,7 +487,7 @@ const Opportunities = () => {
                     </div>
                     
                     <div className="pagination">
-                        {Array.from({ length: Math.ceil(filteredOpportunities.length / itemsPerPage) }, (_, i) => (
+                        {Array.from({ length: Math.ceil(sortedOpportunities.length / itemsPerPage) }, (_, i) => (
                             <button 
                                 key={i} 
                                 onClick={() => paginate(i + 1)} 

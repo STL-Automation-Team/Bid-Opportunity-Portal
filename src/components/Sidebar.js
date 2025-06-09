@@ -1,23 +1,45 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from '../images/itamlogo.png';
 import '../styles/sidebar.css';
 
 const Sidebar = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-
   const [permissions, setPermissions] = useState([]);
+  const sidebarRef = useRef(null);
+
   useEffect(() => {
     const auth = localStorage.getItem('auth');
     if (auth) {
       setPermissions(auth); // Parse JSON string to array
     }
+
+    // Event delegation for dropdown toggles
+    const handleClick = (e) => {
+      const arrow = e.target.closest('.arrow');
+      if (!arrow) return;
+
+      const listItem = arrow.closest("li");
+      if (!listItem?.classList) {
+        console.warn("Toggle: could not find list item for", arrow);
+        return;
+      }
+
+      listItem.classList.toggle("showMenu");
+    };
+
+    const sidebar = sidebarRef.current;
+    if (sidebar) {
+      sidebar.addEventListener('click', handleClick);
+    }
+
+    // Cleanup
+    return () => {
+      if (sidebar) {
+        sidebar.removeEventListener('click', handleClick);
+      }
+    };
   }, []);
-  
-  const handleDropdownToggle = (e) => {
-    const arrowParent = e.target.parentElement.parentElement;
-    arrowParent.classList.toggle("showMenu");
-  };
 
   const handleSidebarToggle = () => {
     setSidebarOpen(!isSidebarOpen);
@@ -28,7 +50,7 @@ const Sidebar = () => {
   };
 
     return (
-    <div className={`sidebar ${isSidebarOpen ? "open" : "close"}`}>
+      <div className={`sidebar ${isSidebarOpen ? "open" : "close"}`} ref={sidebarRef}>
       <div className="toggle-btn">
         <img className="logoimg" src={logo} alt="Logo" />
         <i className="bi bi-list" onClick={handleSidebarToggle}></i>
@@ -57,7 +79,7 @@ const Sidebar = () => {
             </Link>
             <ul className="sub-menu blank">
               <li>
-                <Link className="link_name" to="/addopportunity">Opportunity</Link>
+                <Link className="link_name" to="/addopportunity">Add Opportunity</Link>
               </li>
             </ul>
           </li>
@@ -100,7 +122,7 @@ const Sidebar = () => {
           <ul className="sub-menu blank">
             <li>
               <a className="link_name" href="https://pgp.sterliteapps.com/" target="_blank" rel="noopener noreferrer">
-                Track Status
+                CRM
               </a>
             </li>
           </ul>
@@ -130,20 +152,20 @@ const Sidebar = () => {
             </Link>
             <ul className="sub-menu blank">
               <li>
-                <Link className="link_name" to="/userslist">Users</Link>
+                <Link className="link_name" to="/userslist">Manage Users</Link>
               </li>
             </ul>
           </li>
         )}
 
-        {(hasPermission("ADMIN")) && (
+{hasPermission("ADMIN") && (
           <li>
             <div className="iocn-link">
               <Link>
                 <i className="bi bi-gear-fill"></i>
                 <span className="link_name">Settings</span>
               </Link>
-              <i className="bi bi-chevron-down arrow" onClick={handleDropdownToggle}></i>
+              <i className="bi bi-chevron-down arrow"></i>
             </div>
             <ul className="sub-menu">
               <li>

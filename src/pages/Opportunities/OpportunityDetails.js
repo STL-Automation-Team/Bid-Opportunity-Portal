@@ -229,6 +229,9 @@ const OpportunityDetails = () => {
     return <div>Loading...</div>;
   }
 
+  const formatDate = (dateStr) =>
+    dateStr ? new Date(dateStr).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : 'N/A';
+  
   const basicInfoDetails = [
     { label: 'Opportunity', value: opportunity.opportunityName },
     { label: 'Opportunity ID', value: opportunity.id },
@@ -250,19 +253,20 @@ const OpportunityDetails = () => {
     { label: 'Estimated OPEX INR (Cr)', value: opportunity.estOpexInrCr || 'N/A' },
     { label: 'OPEX Tenure (Months)', value: opportunity.opexTenureMonths || 'N/A' },
     { label: 'Go/No Go Status', value: opportunity.goNoGoMaster?.goNogoStatus || 'N/A' },
-    { label: 'Go/No Go Date', value: opportunity.goNoGoDate || 'N/A' },
+    { label: 'Go/No Go Date', value: formatDate(opportunity.goNoGoDate) },
     { label: 'GM Percentage', value: opportunity.gmPercentage || 'N/A' },
     { label: 'Probability', value: opportunity.probability || 'N/A' },
     { label: 'Primary Owner', value: opportunity.primaryOwner },
     { label: 'Solution SPOC', value: opportunity.solutionSpoc || 'N/A' },
-    { label: 'RFP Release Date', value: opportunity.rfpReleaseDate || 'N/A' },
-    { label: 'Bid Submission Date', value: opportunity.bidSubmissionDate || 'N/A' },
-    { 
-      label: 'Created By', 
-      value: `${opportunity.createdBy?.firstName || ''} ${opportunity.createdBy?.lastName || ''}`.trim() 
+    { label: 'RFP Release Date', value: formatDate(opportunity.rfpReleaseDate) },
+    { label: 'Bid Submission Date', value: formatDate(opportunity.bidSubmissionDate) },
+    {
+      label: 'Created By',
+      value: `${opportunity.createdBy?.firstName || ''} ${opportunity.createdBy?.lastName || ''}`.trim()
     },
-    { label: 'Created Date', value: opportunity.createdDate }
+    { label: 'Created Date', value: formatDate(opportunity.createdDate) }
   ];
+  
   const handleOptionClick = (option) => {
     setActiveForm(option);
     setPopupVisible(false); // Hide the options popup
@@ -324,7 +328,7 @@ const OpportunityDetails = () => {
             <div className="popup-option" onClick={() => handleOptionClick("PlanActions")}>
               Add plan & Actions
             </div>
-            <div
+            {/* <div
               className={`popup-option ${
                 goNoGoStatusflag === "no" || goNoGoStatusflag === "yes" ? "disabled" : ""
               }`}
@@ -342,7 +346,7 @@ const OpportunityDetails = () => {
             </div>
             <div className="popup-option" onClick={() => handleOptionClick("DealStatusUpdate")}>
               Deal Status Update
-            </div>
+            </div> */}
           </div>
         )}
   
@@ -416,18 +420,25 @@ const OpportunityDetails = () => {
               return (
                 <div key={index} className="submitted-card">
                   <CountCard1
-                    title={data.plan}
-                    baseColor="#FFDE95"
-                    box_id={data.id}
-                    handleUpdate={handleFormSubmission}
-                    details={[
-                      { label: "Week", value: data.week },
-                      { label: "Date", value: data.date },
-                      { label: "Action", value: data.action },
-                      { label: "Plan", value: data.plan },
-                      { label: "Created At", value: data.created_at },
-                    ]}
-                  />
+  title={data.plan}
+  baseColor="#FFDE95"
+  box_id={data.id}
+  handleUpdate={handleFormSubmission}
+  details={[
+    { label: "Week", value: data.week },
+    { label: "Date", value: new Date(data.date).toLocaleString('en-IN', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }) },
+    { label: "Action", value: data.action },
+    { label: "Plan", value: data.plan },
+    { label: "Created At", value: new Date(data.created_at).toLocaleString('en-IN', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }) },
+  ]}
+/>
+
                 </div>
               );
             }

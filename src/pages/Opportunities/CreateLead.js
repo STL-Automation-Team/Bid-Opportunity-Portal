@@ -1,6 +1,10 @@
 import axios from 'axios';
+import { format } from 'date-fns';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { BASE_URL } from '../../components/constants';
@@ -55,6 +59,7 @@ const CreateLead = () => {
 
   const token = localStorage.getItem('token');
   const today = new Date().toISOString().split('T')[0];
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDropdownData = async () => {
@@ -92,10 +97,7 @@ const CreateLead = () => {
 
   const validateForm = () => {
     let newErrors = {};
-    const requiredFields = [
-      'opportunityName', 'obFyId', 'obQtr', 'obMmm', 'priorityId',
-      'amount', 'dealStatusId', 'industrySegmentId', 'bidSubmissionDate'
-    ];
+    const requiredFields = [];
 
     // Required field validation
     requiredFields.forEach(field => {
@@ -132,6 +134,26 @@ const CreateLead = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   }, []);
 
+  // const handleDatePickerChange = (date, name) => {
+  //   const event = {
+  //     target: { name, value: date ? date.toISOString().split('T')[0] : '' },
+  //   };
+  //   handleChange(event);
+  // };
+
+  const handleDatePickerChange = (date, name) => {
+      // Format date to YYYY-MM-DD in local timezone (IST)
+      const formattedDate = date ? format(date, 'yyyy-MM-dd') : '';
+      
+      // Debugging: Log the selected and formatted date
+      console.log('Selected Date:', date);
+      console.log('Formatted Date (YYYY-MM-DD):', formattedDate);
+  
+      const event = {
+        target: { name, value: formattedDate },
+      };
+      handleChange(event);
+    };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -166,11 +188,14 @@ const CreateLead = () => {
       });
 
       if (response.status === 201) {
-        toast.success('Lead created successfully', { 
-            autoClose: 2000,
-            toastId: 'createSuccess_normal' // Unique ID
-          });
+       
         handleReset();
+        const confirmed = window.confirm('Lead updated successfully. Click OK to view the opportunity.');
+        if (confirmed) {
+          navigate(`/operationslist`);
+        }
+          
+        
       } else if (response.status === 409) {
         setPotentialDuplicates(response.data.potentialDuplicates);
         setShowDuplicateModal(true);
@@ -275,12 +300,13 @@ const CreateLead = () => {
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="partFyId">
-                  <Form.Label>Part FY</Form.Label>
+                  <Form.Label>Part FY *</Form.Label>
                   <Form.Control
                     as="select"
                     name="partFyId"
                     value={formData.partFyId}
                     onChange={handleChange}
+                    required
                   >
                     <option value="">Select FY</option>
                     {dropdownData.fy.map(fy => (
@@ -290,12 +316,13 @@ const CreateLead = () => {
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="partQuarter">
-                  <Form.Label>Part Quarter</Form.Label>
+                  <Form.Label>Part Quarter *</Form.Label>
                   <Form.Control
                     as="select"
                     name="partQuarter"
                     value={formData.partQuarter}
                     onChange={handleChange}
+                    required
                   >
                     <option value="">Select Quarter</option>
                     {['Q1', 'Q2', 'Q3', 'Q4'].map(qtr => (
@@ -305,12 +332,13 @@ const CreateLead = () => {
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="partMonth">
-                  <Form.Label>Part Month</Form.Label>
+                  <Form.Label>Part Month *</Form.Label>
                   <Form.Control
                     as="select"
                     name="partMonth"
                     value={formData.partMonth}
                     onChange={handleChange}
+                    required
                   >
                     <option value="">Select Month</option>
 {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -328,7 +356,7 @@ const CreateLead = () => {
               {/* <legend>OB FY Details *</legend> */}
               <Row className="mb-1">
                 <Form.Group as={Col} controlId="obFyId">
-                  <Form.Label>OB FY</Form.Label>
+                  <Form.Label>OB FY *</Form.Label>
                   <Form.Control
                     as="select"
                     name="obFyId"
@@ -345,7 +373,7 @@ const CreateLead = () => {
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="obQtr">
-                  <Form.Label>OB Quarter</Form.Label>
+                  <Form.Label>OB Quarter *</Form.Label>
                   <Form.Control
                     as="select"
                     name="obQtr"
@@ -361,7 +389,7 @@ const CreateLead = () => {
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="obMmm">
-                  <Form.Label>OB Month</Form.Label>
+                  <Form.Label>OB Month *</Form.Label>
                   <Form.Control
                     as="select"
                     name="obMmm"
@@ -480,12 +508,13 @@ const CreateLead = () => {
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="publicPrivate">
-                  <Form.Label>Public/Private</Form.Label>
+                  <Form.Label>Public/Private *</Form.Label>
                   <Form.Control
                     as="select"
                     name="publicPrivate"
                     value={formData.publicPrivate}
                     onChange={handleChange}
+                    required
                   >
                     <option value="">Select</option>
                     <option value="Public">Public</option>
@@ -620,15 +649,22 @@ const CreateLead = () => {
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="goNoGoDate">
-                    <Form.Label>Go/No-Go Date</Form.Label>
-                    <Form.Control
-                        type="date"
-                        name="goNoGoDate"
-                        value={formData.goNoGoDate || ''}
-                        onChange={handleChange}
-                        max={today}
-                        autoComplete="off"
-                    />
+                  <Form.Label>Go/No-Go Date</Form.Label>
+                  <DatePicker
+                    selected={formData.goNoGoDate ? new Date(formData.goNoGoDate) : null}
+                    onChange={(date) => handleDatePickerChange(date, 'goNoGoDate')}
+                    // maxDate={new Date(today)}
+                    dateFormat="yyyy-MM-dd"
+                    className="form-control"
+                    name="goNoGoDate"
+                    autoComplete="off"
+                    showYearDropdown
+                    showMonthDropdown
+                    yearDropdownItemNumber={10}
+                    scrollableYearDropdown
+                    scrollableMonthDropdown
+                    placeholderText='YYYY-MM-DD'
+                  />
                 </Form.Group>
               </Row>
               </fieldset>
@@ -663,12 +699,13 @@ const CreateLead = () => {
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="primaryOwner">
-                  <Form.Label>Primary Owner</Form.Label>
+                  <Form.Label>Primary Owner *</Form.Label>
                   <Form.Control
                     type="text"
                     name="primaryOwner"
                     value={formData.primaryOwner}
                     onChange={handleChange}
+                    required
                   />
                 </Form.Group>
 
@@ -685,26 +722,42 @@ const CreateLead = () => {
 
               <Row className="mb-1">
               <Form.Group as={Col} controlId="rfpReleaseDate">
-                <Form.Label>RFP Release Date</Form.Label>
-                <Form.Control
-                    type="date"
-                    name="rfpReleaseDate"
-                    value={formData.rfpReleaseDate || ''}
-                    onChange={handleChange}
-                    max={today}
-                    autoComplete="off"
-                />
-                </Form.Group>
+                    <Form.Label>RFP Release Date</Form.Label>
+                    <DatePicker
+                      selected={formData.rfpReleaseDate ? new Date(formData.rfpReleaseDate) : null}
+                      onChange={(date) => handleDatePickerChange(date, 'rfpReleaseDate')}
+                      // maxDate={new Date(today)}
+                      dateFormat="yyyy-MM-dd"
+                      className="form-control"
+                      name="rfpReleaseDate"
+                      autoComplete="off"
+                      showYearDropdown
+                      showMonthDropdown
+                      yearDropdownItemNumber={10}
+                      scrollableYearDropdown
+                      scrollableMonthDropdown
+                      placeholderText='YYYY-MM-DD'
+                    />
+                  </Form.Group>
 
-                
-
-                 <Form.Group as={Col} controlId="bidSubmissionDate">
-                              <Form.Label className="text-start">Bid Submission Date *</Form.Label>
-                              <Form.Control type="date" name="bidSubmissionDate" 
-                              value={formData.bidSubmissionDate}
-                              min={today}
-                              onChange={handleChange} />
-                            </Form.Group>
+                  <Form.Group as={Col} controlId="bidSubmissionDate">
+                    <Form.Label className="text-start">Bid Submission Date </Form.Label>
+                    <DatePicker
+                      selected={formData.bidSubmissionDate ? new Date(formData.bidSubmissionDate) : null}
+                      onChange={(date) => handleDatePickerChange(date, 'bidSubmissionDate')}
+                      // minDate={new Date(today)}
+                      dateFormat="yyyy-MM-dd"
+                      className="form-control"
+                      name="bidSubmissionDate"
+                      autoComplete="off"
+                      showYearDropdown
+                      showMonthDropdown
+                      yearDropdownItemNumber={10}
+                      scrollableYearDropdown
+                      scrollableMonthDropdown
+                      placeholderText='YYYY-MM-DD'
+                    />
+                  </Form.Group>
               </Row>
             </fieldset>
 

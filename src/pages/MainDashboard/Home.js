@@ -295,9 +295,12 @@ export default class Home extends Component {
     };
 
     const chartWrapperStyle = {
-      width: '650px',
-      height: '350px',
-      margin: '0 auto'
+      width: '100%',
+      maxWidth: '100%', // Ensure chart doesn't exceed parent
+      height: 'auto',
+      aspectRatio: '16 / 9', // Maintain aspect ratio
+      overflow: 'hidden', // Prevent overflow
+      boxSizing: 'border-box', // Include padding/borders in width
     };
     if (index === 0) {
       const data = {

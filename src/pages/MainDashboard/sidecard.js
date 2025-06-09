@@ -37,7 +37,9 @@ const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id })
     const updatedPayload = {
       action: updatedDetails[2].value,
     };
+  
     console.log(updatedPayload);
+  
     axios.put(`${BASE_URL}/api/plans/${box_id}`, updatedPayload, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -45,20 +47,21 @@ const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id })
     })
       .then(response => {
         console.log('Data updated successfully:', response.data);
+        window.alert('Update successful!'); // ✅ Success popup
         handleUpdate();
       })
       .catch(error => {
         console.error('Error updating data:', error);
         if (error.response && error.response.status === 400 && typeof error.response.data === 'object') {
-          // Set validation errors in state
           const validationErrors = Object.values(error.response.data);
-          setError(validationErrors.join('. ')); // Join errors into a single string
+          setError(validationErrors.join('. '));
         }
         setTimeout(() => {
           setError(null);
         }, 5000);
       });
   };
+  
 
   const handleEditChange = (index, field, value) => {
     const newDetails = [...editDetails];
@@ -80,9 +83,9 @@ const CountCard = ({ title, baseColor, box_id, handleUpdate, details, form_id })
             {expanded ? <FaMinus /> : <FaPlus />}
           </button>
           {/* Updated Card Title */}
-          <span className="card-title">
-            {`Week ${week} Plan`} - {title}
-          </span>
+          <span className="card-title block text-left">
+  {`Week ${week} Plan`} - {title}
+</span>
           <Button variant="link"
             disabled={!hasPermission}
             onClick={handleEditClick} style={{ color: 'white' }}>Add Action</Button>

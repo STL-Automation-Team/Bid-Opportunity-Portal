@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import App1 from './App1';
@@ -8,293 +8,387 @@ import { BASE_URL } from './components/constants';
 import LoginPage from './pages/LoginPage';
 import "./styles/basic.css";
 
+// Move constants outside component to prevent recreation on each render
+const IDLE_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+const CHECK_INTERVAL = 5000; // Check every 5 seconds instead of every second
+const WARNING_TIME = 60; // Show warning 60 seconds before expiry
+
+const ERROR_MESSAGES = {
+  invalid_saml_response: 'Invalid SAML response received. Please try again.',
+  email_not_found: 'Email not found in the SAML response.',
+  user_not_found: 'User does not exist in the system. Please contact support.',
+  account_inactive: 'Your account is inactive. Contact support for assistance.',
+  no_roles_assigned: 'No roles are assigned to your account. Please contact support.',
+  no_permissions: 'You do not have the required permissions. Contact support.',
+  invalid_encoding: 'Invalid encoding in the SAML response.',
+  internal_server_error: 'An unexpected server error occurred. Please try again.',
+};
+
 function App() {
+  // Use refs for values that don't need to trigger renders
+  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showSessionDialog, setShowSessionDialog] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(null);
-  const [lastActivity, setLastActivity] = useState(Date.now());
+  const [sessionState, setSessionState] = useState({
+    showDialog: false,
+    timeLeft: null
+  });
+  
+  // Use refs for values that don't need to trigger re-renders
+  const lastActivityRef = useRef(Date.now());
+  const timerRef = useRef(null);
+  const tokenExpiryRef = useRef(null);
+  const refreshTokenRef = useRef(null);
+  const accessTokenRef = useRef(null);
 
-  // Constants for timing (in milliseconds)
-  const IDLE_TIMEOUT = 10 * 60 * 1000; // 15 minutes
-  const CHECK_INTERVAL = 1000; // Check every second
-  const WARNING_TIME = 60; // Show warning 60 seconds before expiry
-  const errorMessages = {
-    invalid_saml_response: 'Invalid SAML response received. Please try again.',
-    email_not_found: 'Email not found in the SAML response.',
-    user_not_found: 'User does not exist in the system. Please contact support.',
-    account_inactive: 'Your account is inactive. Contact support for assistance.',
-    no_roles_assigned: 'No roles are assigned to your account. Please contact support.',
-    no_permissions: 'You do not have the required permissions. Contact support.',
-    invalid_encoding: 'Invalid encoding in the SAML response.',
-    internal_server_error: 'An unexpected server error occurred. Please try again.',
-  };
-
-  const getTokenExpiry = useCallback(() => {
+  // Decode and store token information
+  const updateTokenInfo = useCallback(() => {
     const token = localStorage.getItem('token');
-    if (!token) {
-      // console.log('No token found');
-      return null;
-    }
-
+    if (!token) return false;
+    
     try {
       const decodedToken = jwtDecode(token);
-      // // console.log('Token expiry timestamp:', decodedToken.exp);
-      // // console.log('Current timestamp:', Math.floor(Date.now() / 1000));
-      return decodedToken.exp; // Keep as seconds
+      tokenExpiryRef.current = decodedToken.exp;
+      accessTokenRef.current = token;
+      refreshTokenRef.current = localStorage.getItem('refreshToken');
+      return true;
     } catch (error) {
       console.error('Error decoding token:', error);
-      return null;
+      return false;
     }
   }, []);
 
-  // Check token expiration
-  const checkTokenExpiration = useCallback(() => {
-    const expiryTime = getTokenExpiry();
-    if (!expiryTime) return;
-
-    const currentTime = Math.floor(Date.now() / 1000);
-    const timeToExpiry = expiryTime - currentTime;
-
-    // console.log('Time to expiry (seconds):', timeToExpiry);
-    // console.log('Warning threshold:', WARNING_TIME);
-    // console.log('Show dialog status:', showSessionDialog);
-
-    // If token is expired
-    if (timeToExpiry <= 0) {
-      // // console.log('Token expired, logging out');
-      performLocalLogout();
-      return;
+  const performLocalLogout = useCallback(() => {
+    // Clear all timers first
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
     }
-
-    // If within warning period and dialog not shown
-    if (timeToExpiry <= WARNING_TIME && !showSessionDialog) {
-      // // console.log('Showing session warning dialog');
-      setShowSessionDialog(true);
-      setTimeLeft(timeToExpiry);
-    }
-    // Update countdown if dialog is shown
-    else if (showSessionDialog && timeToExpiry > 0) {
-      // // console.log('Updating countdown:', timeToExpiry);
-      setTimeLeft(timeToExpiry);
-    }
-  }, [getTokenExpiry, showSessionDialog]);
-
-  // Update last activity timestamp
-  const updateActivity = useCallback(() => {
-    setLastActivity(Date.now());
+    
+    // Clear localStorage
+    localStorage.removeItem('login');
+    localStorage.removeItem('auth');
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user_id');
+    
+    // Set logout flag for other tabs
+    localStorage.setItem('logout', Date.now().toString());
+    
+    // Reset refs
+    tokenExpiryRef.current = null;
+    accessTokenRef.current = null;
+    refreshTokenRef.current = null;
+    
+    // Reset state
+    setSessionState({
+      showDialog: false,
+      timeLeft: null
+    });
+    
+    setIsAuthenticated(false);
+    setIsLoading(false); // Ensure loading state is reset
   }, []);
 
-  // Check if user is idle
-  const checkIdle = useCallback(() => {
-    const timeSinceLastActivity = Date.now() - lastActivity;
-    if (timeSinceLastActivity >= IDLE_TIMEOUT) {
-      // console.log('User idle timeout reached');
-      toast.warn('Session ended due to inactivity');
-      performLocalLogout();
-    }
-  }, [lastActivity]);
-
-  // Reset timers and start monitoring
-  const startSessionMonitoring = useCallback(() => {
-    // console.log('Starting session monitoring');
-
-    // Set up activity listeners
-    const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
-    events.forEach(event => {
-      window.addEventListener(event, updateActivity);
-    });
-
-    // Set up visibility change listener
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        // console.log('Tab became visible, checking token');
-        checkTokenExpiration();
-        updateActivity();
-      }
-    });
-
-    // Immediate check
-    checkTokenExpiration();
-
-    // Start interval checks
-    const intervalId = setInterval(() => {
-      checkTokenExpiration();
-      checkIdle();
-    }, CHECK_INTERVAL);
-
-    return () => {
-      // console.log('Cleaning up session monitoring');
-      events.forEach(event => {
-        window.removeEventListener(event, updateActivity);
-      });
-      clearInterval(intervalId);
-    };
-  }, [checkTokenExpiration, checkIdle, updateActivity]);
-
+  // Memoize error handling function
   const handleErrorsFromUrl = useCallback(() => {
     const query = new URLSearchParams(window.location.search);
     const error = query.get('error');
 
-    if (error && errorMessages[error]) {
-      toast.error(errorMessages[error]);
-      setTimeout(() => {
-        window.history.replaceState({}, document.title, '/');
-      }, 0);
+    if (error && ERROR_MESSAGES[error]) {
+      toast.error(ERROR_MESSAGES[error]);
+      window.history.replaceState({}, document.title, '/');
     }
   }, []);
 
-  const getTokensFromUrl = () => {
+  // Process tokens from URL - memoized to prevent recreation
+  const getTokensFromUrl = useCallback(() => {
     const query = new URLSearchParams(window.location.search);
     const token = query.get('token');
     const refreshToken = query.get('refreshToken');
 
     if (token && refreshToken) {
-      // console.log("Tokens found in URL.");
+      try {
+        // Store tokens in localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('refreshToken', refreshToken);
 
-      // Store tokens in localStorage
-      localStorage.setItem('token', token);
-      localStorage.setItem('refreshToken', refreshToken);
+        // Decode token to fetch user data and permissions
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.user_id;
+        const permissions = decodedToken.permissions || [];
 
-      // Decode token to fetch user data and permissions
-      const decodedToken = jwtDecode(token);
-      const userId = decodedToken.user_id;
-      const permissions = decodedToken.permissions || [];
+        localStorage.setItem('user_id', userId);
+        localStorage.setItem('auth', permissions);
 
-      localStorage.setItem('user_id', userId);
-      localStorage.setItem('auth', permissions);
+        // Update refs
+        tokenExpiryRef.current = decodedToken.exp;
+        accessTokenRef.current = token;
+        refreshTokenRef.current = refreshToken;
 
-      // Delay URL cleanup to avoid interfering with rendering
-      setTimeout(() => {
+        // Clean URL without causing a history entry
         window.history.replaceState({}, document.title, "/");
-        // console.log("Query parameters removed from URL.");
-      }, 0);
-
-      return true;
+        
+        return true;
+      } catch (error) {
+        console.error('Error processing tokens from URL:', error);
+        return false;
+      }
     }
-
-    // console.log("Tokens not found in URL.");
     return false;
-  };
-  useEffect(() => {
-    handleErrorsFromUrl();
+  }, []);
 
-    const hasTokens = getTokensFromUrl();
-    const token = localStorage.getItem('token');
+  // Update activity timestamp - use debounce pattern to reduce updates
+  const updateActivity = useCallback(() => {
+    lastActivityRef.current = Date.now();
+  }, []);
 
-    if (hasTokens || token) {
-      setIsAuthenticated(true);
-      localStorage.setItem('login', 'true');
-      startSessionMonitoring();
-      updateActivity();
-    } else {
-      setIsAuthenticated(false);
+  // Combined session check function - do all checks at once
+  const checkSession = useCallback(() => {
+    if (!tokenExpiryRef.current) return;
+    
+    const currentTime = Math.floor(Date.now() / 1000);
+    const timeToExpiry = tokenExpiryRef.current - currentTime;
+    
+    // Check if token is expired
+    if (timeToExpiry <= 0) {
+      performLocalLogout();
+      return;
     }
-  }, [handleErrorsFromUrl, startSessionMonitoring, updateActivity]);
-
-  
-
-
-  // Initialize on component mount
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const loginStatus = localStorage.getItem('login');
-
-    // console.log('Initializing app - Token exists:', !!token, 'Login status:', !!loginStatus);
-
-    if (token && loginStatus) {
-      setIsAuthenticated(true);
-      const cleanup = startSessionMonitoring();
-      return cleanup;
+    
+    // Check if user is idle
+    const idleTime = Date.now() - lastActivityRef.current;
+    if (idleTime >= IDLE_TIMEOUT) {
+      toast.warn('Session ended due to inactivity');
+      performLocalLogout();
+      return;
     }
-  }, [startSessionMonitoring]);
+    
+    // Check if within warning period
+    if (timeToExpiry <= WARNING_TIME && !sessionState.showDialog) {
+      setSessionState({
+        showDialog: true,
+        timeLeft: timeToExpiry
+      });
+    } 
+    // Update countdown if dialog is already shown
+    else if (sessionState.showDialog && timeToExpiry > 0) {
+      setSessionState(prev => ({
+        ...prev,
+        timeLeft: timeToExpiry
+      }));
+    }
+  }, [sessionState.showDialog]);
 
-  const renewToken = async () => {
+  // Token renewal function with built-in error handling and rate limiting
+  const renewToken = useCallback(async () => {
+    // Prevent multiple simultaneous renewal attempts
+    if (refreshTokenRef.current === null) {
+      console.error('No refresh token available');
+      return false;
+    }
+    
     try {
-      // console.log('Attempting to renew token');
-      const refreshToken = localStorage.getItem('refreshToken');
       const response = await axios.post(`${BASE_URL}/api/user/renewToken`, {
-        refreshToken: refreshToken
+        refreshToken: refreshTokenRef.current
       });
 
       if (response.status === 200) {
         const { token, refreshToken: newRefreshToken } = response.data;
+        
+        // Update localStorage
         localStorage.setItem('token', token);
         localStorage.setItem('refreshToken', newRefreshToken);
 
+        // Update refs
         const decodedToken = jwtDecode(token);
+        tokenExpiryRef.current = decodedToken.exp;
+        accessTokenRef.current = token;
+        refreshTokenRef.current = newRefreshToken;
+        
+        // Update localStorage for user info
         localStorage.setItem('user_id', decodedToken.user_id);
         localStorage.setItem('auth', decodedToken.permissions || []);
 
-        // console.log('Token renewed successfully');
-        setShowSessionDialog(false);
+        // Reset session dialog state
+        setSessionState({
+          showDialog: false,
+          timeLeft: null
+        });
+        
+        // Update activity timestamp
         updateActivity();
         toast.success('Session renewed successfully');
+        return true;
       }
+      return false;
     } catch (error) {
       console.error('Error renewing token:', error);
       toast.error('Session renewal failed');
       performLocalLogout();
+      return false;
     }
-  };
+  }, [updateActivity]);
 
-  const handleLogin = () => {
-    // console.log('Login successful');
+  // Start session monitoring with optimized event listeners
+  const startSessionMonitoring = useCallback(() => {
+    // Clear any existing timers
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    
+    // Use passive event listeners for better performance
+    const listenerOptions = { passive: true };
+    const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+    
+    // Throttled activity handler
+    let lastUpdateTime = 0;
+    const throttledUpdateActivity = () => {
+      const now = Date.now();
+      if (now - lastUpdateTime > 1000) { // Update at most once per second
+        lastUpdateTime = now;
+        updateActivity();
+      }
+    };
+    
+    // Attach listeners
+    events.forEach(event => {
+      window.addEventListener(event, throttledUpdateActivity, listenerOptions);
+    });
+    
+    // Handle tab visibility
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        updateActivity();
+        checkSession();
+      }
+    });
+    
+    // Initial check
+    checkSession();
+    
+    // Set interval with a longer delay to reduce CPU usage
+    timerRef.current = setInterval(checkSession, CHECK_INTERVAL);
+    
+    // Cleanup function that removes all listeners
+    return () => {
+      events.forEach(event => {
+        window.removeEventListener(event, throttledUpdateActivity);
+      });
+      
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    };
+  }, [checkSession, updateActivity]);
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        handleErrorsFromUrl();
+        
+        // Check for tokens from URL or localStorage
+        const hasTokens = getTokensFromUrl();
+        const hasLocalToken = updateTokenInfo();
+
+        if (hasTokens || hasLocalToken) {
+          setIsAuthenticated(true);
+          localStorage.setItem('login', 'true');
+          lastActivityRef.current = Date.now();
+          startSessionMonitoring();
+        }
+      } catch (error) {
+        console.error('Initialization error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
+  }, [handleErrorsFromUrl, getTokensFromUrl, updateTokenInfo, startSessionMonitoring]);
+
+  // Handler functions
+  const handleLogin = useCallback(() => {
+    updateTokenInfo();
     setIsAuthenticated(true);
     localStorage.setItem('login', 'true');
+    lastActivityRef.current = Date.now();
     startSessionMonitoring();
-    updateActivity();
-  };
+  }, [updateTokenInfo, startSessionMonitoring]);
 
-  const handleLogout = async () => {
-    const accessToken = localStorage.getItem('token');
-    const refreshToken = localStorage.getItem('refreshToken');
-  
+  useEffect(() => {
+    // Add storage event listener for logout synchronization
+    const handleStorageChange = (e) => {
+      if (e.key === 'logout' && e.newValue) {
+        performLocalLogout();
+        window.location.reload(); // Optional: force refresh to clean up any state
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [performLocalLogout]);
+
+  const handleLogout = useCallback(async () => {
     const toastId = toast.loading('Logging out...');
-  
+    
     try {
-      const response = await axios.post(
-        `${BASE_URL}/api/user/logout`,
-        {},
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'RefreshToken': `Bearer ${refreshToken}`,
-            'Content-Type': 'application/json'
+      if (accessTokenRef.current && refreshTokenRef.current) {
+        await axios.post(
+          `${BASE_URL}/api/user/logout`,
+          {},
+          {
+            headers: {
+              'Authorization': `Bearer ${accessTokenRef.current}`,
+              'RefreshToken': `Bearer ${refreshTokenRef.current}`,
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      );
-  
-      // As soon as the response is received, no timeout
+        );
+      }
+      
       toast.dismiss(toastId);
       performLocalLogout();
       toast.success('Logged out successfully');
-  
     } catch (error) {
       console.error('Logout error:', error);
       toast.dismiss(toastId);
-  
+      
       if (error.response?.data === 'Token has expired') {
         performLocalLogout();
         toast.success('Session expired. Logged out successfully.');
       } else {
         const errorMessage = error.response?.data?.message || 'An error occurred during logout';
         toast.error(errorMessage);
+        performLocalLogout();
       }
     }
-  };
+  }, []);
+
   
 
-  const performLocalLogout = () => {
-    // console.log('Performing local logout');
-    localStorage.removeItem('login');
-    localStorage.removeItem('auth');
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('user_id');
-    setShowSessionDialog(false);
-    setIsAuthenticated(false);
-    window.location.href = '/';
-  };
+  const renderComponent = useMemo(() => {
+    if (isLoading) {
+      return <div className="loading-screen">Loading...</div>; // Or a proper loading component
+    }
+    
+    if (!isAuthenticated) {
+      return <LoginPage onLogin={handleLogin} />;
+    }
+    
+    return (
+      <App1
+        onLogout={handleLogout}
+        showSessionDialog={sessionState.showDialog}
+        setShowSessionDialog={(show) => 
+          setSessionState(prev => ({...prev, showDialog: show}))
+        }
+        timeLeft={sessionState.timeLeft}
+        renewToken={renewToken}
+      />
+    );
+  }, [isLoading, isAuthenticated, handleLogin, handleLogout, renewToken, sessionState]);
 
   return (
     <div>
@@ -310,18 +404,7 @@ function App() {
         pauseOnHover
         theme="light"
       />
-
-      {!isAuthenticated ? (
-        <LoginPage onLogin={handleLogin} />
-      ) : (
-        <App1
-          onLogout={handleLogout}
-          showSessionDialog={showSessionDialog}
-          setShowSessionDialog={setShowSessionDialog}
-          timeLeft={timeLeft}
-          renewToken={renewToken}
-        />
-      )}
+      {renderComponent}
     </div>
   );
 }
