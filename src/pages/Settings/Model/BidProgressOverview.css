@@ -1,0 +1,62 @@
+.bid-progress-overview {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.filter-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-dropdown {
+  min-width: 200px;
+}
+
+.date-range-picker {
+  min-width: 250px;
+}
+
+.btn-blue {
+  transition: background-color 0.2s;
+}
+
+.btn-blue:hover {
+  opacity: 0.9;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.bid-progress-table {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+}
+
+.bid-progress-table th,
+.bid-progress-table td {
+  padding: 8px;
+  text-align: left;
+  border: 1px solid #e5e7eb;
+}
+
+.bid-progress-table th {
+  /* background-color: #f3f4f6; */
+  font-weight: 600;
+}
+
+.bid-progress-table tr:hover {
+  background-color: #f9fafb;
+}
+
+#header123 {
+  color: var(--text-color) !important;
+}
+
+#div123 {
+  color: var(--text-color) !important;
+
+}

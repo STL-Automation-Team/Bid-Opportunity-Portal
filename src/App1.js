@@ -1,4 +1,3 @@
-import React from 'react';
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import SessionDialog from './components/SessionDialog';
@@ -27,7 +26,7 @@ import UpdateOpportunity from "./pages/Opportunities/UpdateOpportunity";
 import CustomFields from "./pages/Settings/Customfields/CustomFields";
 import CustomFieldsList from "./pages/Settings/Customfields/CustomFieldsList";
 import AssetModel from "./pages/Settings/Model/AssetModel";
-import ModelList from "./pages/Settings/Model/ModelList";
+import ModelList from "./pages/Settings/Model/BidProgressOverview";
 import AddUser from "./pages/Users/AddUser";
 import EditUser from "./pages/Users/EditUser";
 import ReadUser from "./pages/Users/ReadUser";
@@ -81,7 +80,7 @@ function App1({onLogout,
             <Route exact path="/editasset/:Id" element={<EditAsset />} />
             <Route exact path="/addasset" element={<AddAsset />} />
             <Route exact path="/assetmodel" element={<AssetModel />} />
-            <Route exact path="/modellist" element={<ModelList />} />
+            <Route exact path="/BidProgressOverview" element={<ModelList />} />
             <Route exact path="/uploader" element={<Uploader />} />
             <Route exact path="/customfields" element={<CustomFields />} />
             <Route

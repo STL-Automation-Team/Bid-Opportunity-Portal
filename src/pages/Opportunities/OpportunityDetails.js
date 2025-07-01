@@ -1,6 +1,6 @@
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BASE_URL } from '../../components/constants';
 import img from '../../images/add.png';
@@ -258,6 +258,10 @@ const OpportunityDetails = () => {
     { label: 'Probability', value: opportunity.probability || 'N/A' },
     { label: 'Primary Owner', value: opportunity.primaryOwner },
     { label: 'Solution SPOC', value: opportunity.solutionSpoc || 'N/A' },
+    { label: 'SCM SPOC', value: opportunity.scmSpoc || 'N/A' },
+    { label: 'Remarks', value: opportunity.remarks || 'N/A' },
+    { label: 'PQ/TQ remarks', value: opportunity.pqTq_remarks || 'N/A' },
+
     { label: 'RFP Release Date', value: formatDate(opportunity.rfpReleaseDate) },
     { label: 'Bid Submission Date', value: formatDate(opportunity.bidSubmissionDate) },
     {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { format } from 'date-fns';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -41,6 +41,9 @@ const CreateLead = () => {
     probability: '',
     primaryOwner: '',
     solutionSpoc: '',
+    scmSpoc: '',
+    remarks: '',
+    pqTq_remarks: '',
     rfpReleaseDate: null,
     bidSubmissionDate: null
   });
@@ -265,6 +268,8 @@ const CreateLead = () => {
       probability: '',
       primaryOwner: '',
       solutionSpoc: '',
+      remarks: '',
+      pqTq_remarks: '',
       rfpReleaseDate: null,
       bidSubmissionDate: null
     });
@@ -597,13 +602,13 @@ const CreateLead = () => {
               {/* <legend>Deal Status</legend> */}
               <Row className="mb-1">
               <Form.Group as={Col} controlId="priorityId">
-                <Form.Label>Priority *</Form.Label>
+                <Form.Label>Priority </Form.Label>
                 <Form.Control
                     as="select"
                     name="priorityId"
                     value={formData.priorityId}
                     onChange={handleChange}
-                    required
+                    // required
                 >
                     <option value="">Select Priority</option>
                     {dropdownData.priorities.map(priority => (
@@ -632,12 +637,13 @@ const CreateLead = () => {
                 </Form.Group>
 
                 <Form.Group as={Col} controlId="goNoGoStatusId">
-                  <Form.Label>Go/No-Go Status</Form.Label>
+                  <Form.Label>Go/No-Go Status *</Form.Label>
                   <Form.Control
                     as="select"
                     name="goNoGoStatusId"
                     value={formData.goNoGoStatusId}
                     onChange={handleChange}
+                    required
                   >
                     <option value="">Select Status</option>
                     {dropdownData.goNoGoStatuses.map(status => (
@@ -718,6 +724,15 @@ const CreateLead = () => {
                     onChange={handleChange}
                   />
                 </Form.Group>
+                <Form.Group as={Col} controlId="scmSpoc">
+                  <Form.Label>SCM SPOC</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="scmSpoc"
+                    value={formData.scmSpoc}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
               </Row>
 
               <Row className="mb-1">
@@ -758,6 +773,24 @@ const CreateLead = () => {
                       placeholderText='YYYY-MM-DD'
                     />
                   </Form.Group>
+                  <Form.Group as={Col} controlId="remarks">
+                  <Form.Label>Remarks</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="remarks"
+                    value={formData.remarks}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
+                <Form.Group as={Col} controlId="pqTq_remarks">
+                  <Form.Label>PQ/TQ remarks</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="pqTq_remarks"
+                    value={formData.pqTq_remarks}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
               </Row>
             </fieldset>
 

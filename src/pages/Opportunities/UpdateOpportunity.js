@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { format, parse } from 'date-fns';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -40,6 +40,9 @@ const EditLead = () => {
     probability: '',
     primaryOwner: '',
     solutionSpoc: '',
+    scmSpoc: '',
+    remarks: '',
+    pqTq_remarks: '',
     rfpReleaseDate: null,
     bidSubmissionDate: null
   });
@@ -101,6 +104,9 @@ const EditLead = () => {
           probability: leadData.probability || '',
           primaryOwner: leadData.primaryOwner || '',
           solutionSpoc: leadData.solutionSpoc || '',
+          scmSpoc: leadData.scmSpoc || '',
+          remarks: leadData.remarks || '',
+          pqTq_remarks: leadData.pqTq_remarks || '',
           rfpReleaseDate: leadData.rfpReleaseDate || null,
           bidSubmissionDate: leadData.bidSubmissionDate || null
         };
@@ -243,6 +249,9 @@ const EditLead = () => {
         probability: formData.probability ? parseInt(formData.probability) : null,
         primaryOwner: formData.primaryOwner || null,
         solutionSpoc: formData.solutionSpoc || null,
+        scmSpoc: formData.scmSpoc || null,
+        remarks: formData.remarks || null,
+        pqTq_remarks: formData.pqTq_remarks || null,
         rfpReleaseDate: formData.rfpReleaseDate || null,
         bidSubmissionDate: formData.bidSubmissionDate || null
       };
@@ -313,6 +322,9 @@ const EditLead = () => {
         probability: formData.probability ? parseInt(formData.probability) : null,
         primaryOwner: formData.primaryOwner || null,
         solutionSpoc: formData.solutionSpoc || null,
+        scmSpoc: formData.scmSpoc || null,
+        remarks: formData.remarks || null,
+        pqTq_remarks: formData.pqTq_remarks || null,
         rfpReleaseDate: formData.rfpReleaseDate || null,
         bidSubmissionDate: formData.bidSubmissionDate || null
       };
@@ -676,13 +688,12 @@ const EditLead = () => {
             <fieldset>
               <Row className="mb-1">
                 <Form.Group as={Col} controlId="priorityId">
-                  <Form.Label>Priority *</Form.Label>
+                  <Form.Label>Priority </Form.Label>
                   <Form.Control
                     as="select"
                     name="priorityId"
                     value={formData.priorityId}
                     onChange={handleChange}
-                    required
                     isInvalid={!!errors.priorityId}
                   >
                     <option value="">Select Priority</option>
@@ -721,12 +732,13 @@ const EditLead = () => {
                
 
                 <Form.Group as={Col} controlId="goNoGoStatusId">
-                    <Form.Label>Go/No-Go Status</Form.Label>
+                    <Form.Label>Go/No-Go Status *</Form.Label>
                     <Form.Control
                       as="select"
                       name="goNoGoStatusId"
                       value={formData.goNoGoStatusId}
                       onChange={handleChange}
+                      required
                     >
                       <option value="">Select Status</option>
                       {dropdownData.goNoGoStatuses.map(status => (
@@ -811,6 +823,15 @@ const EditLead = () => {
                     onChange={handleChange}
                   />
                 </Form.Group>
+                <Form.Group as={Col} controlId="scmSpoc">
+                  <Form.Label>SCM SPOC</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="scmSpoc"
+                    value={formData.scmSpoc}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
               </Row>
 
               <Row className="mb-1">
@@ -862,6 +883,24 @@ const EditLead = () => {
           <div className="invalid-feedback">{errors.bidSubmissionDate}</div>
         )}
       </Form.Group>
+      <Form.Group as={Col} controlId="remarks">
+                  <Form.Label>Remarks</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="remarks"
+                    value={formData.remarks}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
+                <Form.Group as={Col} controlId="pqTq_remarks">
+                  <Form.Label>PQ/TQ remarks</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="pqTq_remarks"
+                    value={formData.pqTq_remarks}
+                    onChange={handleChange}
+                  />
+                </Form.Group>
               </Row>
             </fieldset>
 

@@ -47,7 +47,8 @@
     "styled-components": "^5.3.10",
     "ui": "github:shadcn/ui",
     "use-react-router-breadcrumbs": "^4.0.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",

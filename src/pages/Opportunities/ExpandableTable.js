@@ -1,4 +1,3 @@
-// ExpandableTable.js
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { BASE_URL } from '../../components/constants';
@@ -21,15 +20,15 @@ const ExpandableTable = ({ selectedFY }) => {
 
     const fetchData = async () => {
         try {
-        const token = localStorage.getItem('token'); // Or sessionStorage.getItem('token');
-        const fyMap = {
-            FY25: 2,
-            FY26: 3,
-            FY27: 4,
-        };
-        const selectedFYId = fyMap[selectedFY] || null;
+            const token = localStorage.getItem('token');
+            const fyMap = {
+                FY25: 2,
+                FY26: 3,
+                FY27: 4,
+            };
+            const selectedFYId = fyMap[selectedFY] || null;
 
-        const [agpResponse, leadVis, leadAct, allUsersResponse] = await Promise.all([
+            const [agpResponse, leadVis, leadAct, allUsersResponse] = await Promise.all([
                 axios.get(`${BASE_URL}/api/agp1`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -59,13 +58,10 @@ const ExpandableTable = ({ selectedFY }) => {
                     },
                 })
             ]);
-        
-            
+
             const agpData = agpResponse.data.filter(item => item.obFY === selectedFY);
             setAgpData(agpData);
 
-            // console.log(leadVis);
-            
             const vidData1 = leadVis.data.content.map(lead => ({
                 industry_segment: lead.industrySegment?.name || null,
                 primary_owner: lead.primaryOwner || null,
@@ -85,15 +81,10 @@ const ExpandableTable = ({ selectedFY }) => {
                 id: lead.id
             }));
             setActData(actData1);
-            
-            
-            // const opportunities = opportunitiesResponse.data.filter(item => item.ob_fy === selectedFY);
-            // setVisData(opportunities);
-            // setActData(opportunities.filter(item => item.deal_status === 'Won'));
 
             const allUsers = allUsersResponse.data;
             const uniqueEmployeeIDs = [...new Set(agpData.map(item => item.employeeID))];
-            
+
             const userMap = {};
             uniqueEmployeeIDs.forEach(employeeID => {
                 const user = allUsers.find(user => user.employeeId === employeeID);
@@ -125,8 +116,7 @@ const ExpandableTable = ({ selectedFY }) => {
         return months[quarter][monthIndex - 1];
     };
 
-    const getValueForPeriod = (accountName,owner, period, type) => {
-        console.log(actData);
+    const getValueForPeriod = (accountName, owner, period, type) => {
         const data = type === 'Act' ? actData : visData;
         const filteredData = data.filter(item => {
             if (item.industry_segment !== accountName) return false;
@@ -139,9 +129,7 @@ const ExpandableTable = ({ selectedFY }) => {
             }
             return item.ob_qtr === period;
         });
-        // console.log("getValue: ", filteredData);
-
-        return filteredData.reduce((sum, item) => sum + item.amount_inr_cr_max, 0);
+        return Math.round(filteredData.reduce((sum, item) => sum + item.amount_inr_cr_max, 0));
     };
 
     const getAgpValueForPeriod = (eid, accountName, period) => {
@@ -152,7 +140,7 @@ const ExpandableTable = ({ selectedFY }) => {
              period === 'H2' ? ['Q3', 'Q4'].includes(item.obQT) :
              item.obQT === period)
         );
-        return filteredData.reduce((sum, item) => sum + item.agpValue, 0);
+        return Math.round(filteredData.reduce((sum, item) => sum + item.agpValue, 0));
     };
 
     const accountData = agpData.map(item => ({
@@ -160,7 +148,6 @@ const ExpandableTable = ({ selectedFY }) => {
         leader: users[item.employeeID] || 'Unknown',
         account: item.accountName
     })).filter((item, index, self) => 
-        // Filter unique combinations of leader and account
         index === self.findIndex(t => 
             t.leader === item.leader && 
             t.account === item.account
@@ -241,32 +228,36 @@ const ExpandableTable = ({ selectedFY }) => {
                                 <td>{row.account}</td>
                                 {['Q1', 'Q2', 'Q3', 'Q4'].map(quarter => (
                                     <React.Fragment key={quarter}>
-                                        <td>{getAgpValueForPeriod(row.eid, row.account, quarter)}</td>
-                                        <td>{getValueForPeriod(row.account,row.leader, quarter, columnValues[quarter])}</td>
+                                        <td>{Math.round(getAgpValueForPeriod(row.eid, row.account, quarter))}</td>
+                                        <td>{Math.round(getValueForPeriod(row.account, row.leader, quarter, columnValues[quarter]))}</td>
                                         {expandedQuarters[quarter] && (
                                             <>
-                                                <td>{getValueForPeriod(row.account,row.leader, `${quarter}_1`, columnValues[quarter])}</td>
-                                                <td>{getValueForPeriod(row.account,row.leader, `${quarter}_2`, columnValues[quarter])}</td>
-                                                <td>{getValueForPeriod(row.account,row.leader, `${quarter}_3`, columnValues[quarter])}</td>
+                                                <td>{Math.round(getValueForPeriod(row.account, row.leader, `${quarter}_1`, columnValues[quarter]))}</td>
+                                                <td>{Math.round(getValueForPeriod(row.account, row.leader, `${quarter}_2`, columnValues[quarter]))}</td>
+                                                <td>{Math.round(getValueForPeriod(row.account, row.leader, `${quarter}_3`, columnValues[quarter]))}</td>
                                             </>
                                         )}
                                     </React.Fragment>
                                 ))}
-                                <td>{getAgpValueForPeriod(row.eid, row.account, 'H1')}</td>
-                                <td>{getValueForPeriod(row.account,row.leader, 'H1', columnValues.H1)}</td>
-                                <td>{getAgpValueForPeriod(row.eid, row.account, 'H2')}</td>
-                                <td>{getValueForPeriod(row.account,row.leader, 'H2', columnValues.H2)}</td>
+                                <td>{Math.round(getAgpValueForPeriod(row.eid, row.account, 'H1'))}</td>
+                                <td>{Math.round(getValueForPeriod(row.account, row.leader, 'H1', columnValues.H1))}</td>
+                                <td>{Math.round(getAgpValueForPeriod(row.eid, row.account, 'H2'))}</td>
+                                <td>{Math.round(getValueForPeriod(row.account, row.leader, 'H2', columnValues.H2))}</td>
                                 <td>
-                                    {getAgpValueForPeriod(row.eid, row.account, 'Q1') + 
-                                     getAgpValueForPeriod(row.eid, row.account, 'Q2') + 
-                                     getAgpValueForPeriod(row.eid, row.account, 'Q3') + 
-                                     getAgpValueForPeriod(row.eid, row.account, 'Q4')}
+                                    {Math.round(
+                                        getAgpValueForPeriod(row.eid, row.account, 'Q1') + 
+                                        getAgpValueForPeriod(row.eid, row.account, 'Q2') + 
+                                        getAgpValueForPeriod(row.eid, row.account, 'Q3') + 
+                                        getAgpValueForPeriod(row.eid, row.account, 'Q4')
+                                    )}
                                 </td>
                                 <td>
-                                    {getValueForPeriod(row.account,row.leader, 'Q1', columnValues.Q1) + 
-                                     getValueForPeriod(row.account,row.leader, 'Q2', columnValues.Q2) + 
-                                     getValueForPeriod(row.account,row.leader, 'Q3', columnValues.Q3) + 
-                                     getValueForPeriod(row.account,row.leader, 'Q4', columnValues.Q4)}
+                                    {Math.round(
+                                        getValueForPeriod(row.account, row.leader, 'Q1', columnValues.Q1) + 
+                                        getValueForPeriod(row.account, row.leader, 'Q2', columnValues.Q2) + 
+                                        getValueForPeriod(row.account, row.leader, 'Q3', columnValues.Q3) + 
+                                        getValueForPeriod(row.account, row.leader, 'Q4', columnValues.Q4)
+                                    )}
                                 </td>
                             </tr>
                         ))}
@@ -274,7 +265,7 @@ const ExpandableTable = ({ selectedFY }) => {
                             <td colSpan="2">Total AGP</td>
                             {['Q1', 'Q2', 'Q3', 'Q4'].map(quarter => (
                                 <React.Fragment key={quarter}>
-                                    <td>{accountData.reduce((sum, row) => sum + getAgpValueForPeriod(row.eid, row.account, quarter), 0)}</td>
+                                    <td>{Math.round(accountData.reduce((sum, row) => sum + getAgpValueForPeriod(row.eid, row.account, quarter), 0))}</td>
                                     <td>-</td>
                                     {expandedQuarters[quarter] && (
                                         <>
@@ -285,17 +276,17 @@ const ExpandableTable = ({ selectedFY }) => {
                                     )}
                                 </React.Fragment>
                             ))}
-                            <td>{accountData.reduce((sum, row) => sum + getAgpValueForPeriod(row.eid, row.account, 'H1'), 0)}</td>
+                            <td>{Math.round(accountData.reduce((sum, row) => sum + getAgpValueForPeriod(row.eid, row.account, 'H1'), 0))}</td>
                             <td>-</td>
-                            <td>{accountData.reduce((sum, row) => sum + getAgpValueForPeriod(row.eid, row.account, 'H2'), 0)}</td>
+                            <td>{Math.round(accountData.reduce((sum, row) => sum + getAgpValueForPeriod(row.eid, row.account, 'H2'), 0))}</td>
                             <td>-</td>
-                            <td>{accountData.reduce((sum, row) => 
+                            <td>{Math.round(accountData.reduce((sum, row) => 
                                 sum + 
                                 getAgpValueForPeriod(row.eid, row.account, 'Q1') + 
                                 getAgpValueForPeriod(row.eid, row.account, 'Q2') + 
                                 getAgpValueForPeriod(row.eid, row.account, 'Q3') + 
                                 getAgpValueForPeriod(row.eid, row.account, 'Q4'), 
-                            0)}</td>
+                            0))}</td>
                             <td>-</td>
                         </tr>
                         <tr className="total-row vis-act-total">
@@ -303,29 +294,29 @@ const ExpandableTable = ({ selectedFY }) => {
                             {['Q1', 'Q2', 'Q3', 'Q4'].map(quarter => (
                                 <React.Fragment key={quarter}>
                                     <td>-</td>
-                                    <td>{accountData.reduce((sum, row) => sum + getValueForPeriod(row.account,row.leader, quarter, columnValues[quarter]), 0)}</td>
+                                    <td>{Math.round(accountData.reduce((sum, row) => sum + getValueForPeriod(row.account, row.leader, quarter, columnValues[quarter]), 0))}</td>
                                     {expandedQuarters[quarter] && (
                                         <>
-                                            <td>{Math.round(accountData.reduce((sum, row) => sum + getValueForPeriod(row.account,row.leader, `${quarter}_1`, columnValues[quarter]), 0))}</td>
-                                            <td>{Math.round(accountData.reduce((sum, row) => sum + getValueForPeriod(row.account,row.leader, `${quarter}_2`, columnValues[quarter]), 0))}</td>
-                                            <td>{Math.round(accountData.reduce((sum, row) => sum + getValueForPeriod(row.account,row.leader, `${quarter}_3`, columnValues[quarter]), 0))}</td>
+                                            <td>{Math.round(accountData.reduce((sum, row) => sum + getValueForPeriod(row.account, row.leader, `${quarter}_1`, columnValues[quarter]), 0))}</td>
+                                            <td>{Math.round(accountData.reduce((sum, row) => sum + getValueForPeriod(row.account, row.leader, `${quarter}_2`, columnValues[quarter]), 0))}</td>
+                                            <td>{Math.round(accountData.reduce((sum, row) => sum + getValueForPeriod(row.account, row.leader, `${quarter}_3`, columnValues[quarter]), 0))}</td>
                                         </>
                                     )}
                                 </React.Fragment>
                             ))}
                             <td>-</td>
-                            <td>{accountData.reduce((sum, row) => sum + getValueForPeriod(row.account,row.leader, 'H1', columnValues.H1), 0)}</td>
+                            <td>{Math.round(accountData.reduce((sum, row) => sum + getValueForPeriod(row.account, row.leader, 'H1', columnValues.H1), 0))}</td>
                             <td>-</td>
-                            <td>{accountData.reduce((sum, row) => sum + getValueForPeriod(row.account,row.leader, 'H2', columnValues.H2), 0)}</td>
+                            <td>{Math.round(accountData.reduce((sum, row) => sum + getValueForPeriod(row.account, row.leader, 'H2', columnValues.H2), 0))}</td>
                             <td>-</td>
                             <td>
-                                {accountData.reduce((sum, row) => 
+                                {Math.round(accountData.reduce((sum, row) => 
                                     sum + 
-                                    getValueForPeriod(row.account,row.leader, 'Q1', columnValues.Q1) + 
-                                    getValueForPeriod(row.account,row.leader, 'Q2', columnValues.Q2) + 
-                                    getValueForPeriod(row.account,row.leader, 'Q3', columnValues.Q3) + 
-                                    getValueForPeriod(row.account,row.leader, 'Q4', columnValues.Q4), 
-                                0)}
+                                    getValueForPeriod(row.account, row.leader, 'Q1', columnValues.Q1) + 
+                                    getValueForPeriod(row.account, row.leader, 'Q2', columnValues.Q2) + 
+                                    getValueForPeriod(row.account, row.leader, 'Q3', columnValues.Q3) + 
+                                    getValueForPeriod(row.account, row.leader, 'Q4', columnValues.Q4), 
+                                0))}
                             </td>
                         </tr>
                     </tbody>

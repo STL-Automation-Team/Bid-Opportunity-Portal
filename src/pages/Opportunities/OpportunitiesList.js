@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { BASE_URL } from '../../components/constants';
@@ -14,7 +14,7 @@ const Opportunities = () => {
     
     // Data states
     const [opportunities, setOpportunities] = useState([]);
-    const [allOpportunities, setAllOpportunities] = useState([]); // Store all data for search
+    const [allOpportunities, setAllOpportunities] = useState([]);
     const [totalLeadscnt, setTotalLeadscnt] = useState(0);
     const [leadsSubmitted, setLeadsSubmitted] = useState(0);
     const [wonleads, setWonLeads] = useState(0);
@@ -36,6 +36,8 @@ const Opportunities = () => {
     
     // Filter states
     const [filters, setFilters] = useState({
+        partFy: [],
+        partQuarter: [],  
         obFy: [],
         obQtr: [],
         priority: [],
@@ -50,10 +52,13 @@ const Opportunities = () => {
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
     const columns = [
-        'obFy', 'obQtr', 'obMmm', 'opportunityName', 'industrySegment', 'primaryOwner', 'amount', 'dealStatus'
+       'partFy', 'partMonth', 'partQuarter', 'obFy', 'obQtr', 'obMmm', 'opportunityName', 'industrySegment', 'primaryOwner', 'amount', 'dealStatus'
     ];
     
     const columnNames = {
+        partQuarter: 'Part Quarter',
+        partMonth: 'Part Month',
+        partFy: 'Part FY',
         obFy: 'OB FY',
         obQtr: 'OB Quarter',
         obMmm: 'OB MMM',
@@ -66,20 +71,24 @@ const Opportunities = () => {
     };
     
     const filterOptions = {
+        partFy: ['2024', '2025', '2026', '2027'],
+        partQuarter: ['Q1', 'Q2', 'Q3', 'Q4'],
         obFy: ['2024', '2025', '2026', '2027'],
         obQtr: ['Q1', 'Q2', 'Q3', 'Q4'],
         priority: ['Commit', 'TBD', 'Upside'],
-        industrySegment: ['Public Sector', 'Bharatnet/CN', 'Defence', 'Telecom', 'Mining & Energy', 'GCC'],
-        dealStatus: ['Identified', 'Qualified', 'No-Go', 'Work in Progress', 'Bid Submitted', 'Won', 'Bid Dropped', 'Lost'],
+        industrySegment: ['Public Sector', 'Bharatnet/CN', 'Defence', 'Telecom', 'Mining & Energy', 'Managed Services'],
+        dealStatus: ['Identified', 'Market Scan','BD','Bid Submitted', 'Won','Tender Cancelled','Bid Dropped', 'Lost'],
         primaryOwner: [
-            "Mrityunjay Nautiyal","Arun Goyal", "Amit Kar", "Vaibhav Misra", "Srinivasulu AN",
-            "Vivek Nigam", "Sumeet Banerjee", "Puneet Garg", "Ishwar Chandra",
-            "Vijayanand Choudhury", "Ronak Soni", "Tarun Soni", "Anupma Gupta", "Ajay Aggarwal", "Aditya Verma"
+            "Arun Goyal", "Amit Kar", "Vaibhav Misra", "Srinivasulu AN",
+            "Vivek Nigam", "Ishwar Chandra",
+            "Anupma Gupta", "Aditya Varma"
         ]
     };
 
     const keyMap = {
         obFy: 'obFy.obFy',
+        partFy: 'partFy.obFy',
+        partQuarter: 'partQuarter',
         industrySegment: 'industrySegment.name',
         dealStatus: 'dealStatus.dealStatus',
         priority: 'priority.priority',
@@ -126,23 +135,24 @@ const Opportunities = () => {
     };
 
     // Data fetching
-    const fetchCardData = useCallback(async (fyIds) => {
+    const fetchCardData = useCallback(async (fyIds, partFyIds = []) => {
         setLoading(true);
         try {
+            const payload = { fyIds, partFyIds };
             const [totalLeads1, leadsSubmitted1, won1, lost1, resulAwa] = await Promise.all([
-                axios.post(`${BASE_URL}/api/leads/filter-by-ids`, { fyIds }, { 
+                axios.post(`${BASE_URL}/api/leads/filter-by-ids`, payload, { 
                     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } 
                 }),
-                axios.post(`${BASE_URL}/api/leads/filter-by-ids`, { fyIds, dealStatusIds: [4] }, { 
+                axios.post(`${BASE_URL}/api/leads/filter-by-ids`, { ...payload, dealStatusIds: [4] }, { 
                     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } 
                 }),
-                axios.post(`${BASE_URL}/api/leads/filter-by-ids`, { fyIds, dealStatusIds: [11] }, { 
+                axios.post(`${BASE_URL}/api/leads/filter-by-ids`, { ...payload, dealStatusIds: [11] }, { 
                     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } 
                 }),
-                axios.post(`${BASE_URL}/api/leads/filter-by-ids`, { fyIds, dealStatusIds: [5] }, { 
+                axios.post(`${BASE_URL}/api/leads/filter-by-ids`, { ...payload, dealStatusIds: [5] }, { 
                     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } 
                 }),
-                axios.post(`${BASE_URL}/api/leads/filter-by-ids`, { fyIds, dealStatusIds: [4, 8] }, { 
+                axios.post(`${BASE_URL}/api/leads/filter-by-ids`, { ...payload, dealStatusIds: [4, 8] }, { 
                     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } 
                 })
             ]);
@@ -151,23 +161,23 @@ const Opportunities = () => {
             
             setTotalLeadscnt(totalLeads1.data.totalElements);
             const totalAmount_tl = totalLeads1.data.content.reduce((sum, item) => sum + (item.amount || 0), 0);
-            setTotalLeadscnt_tl(Math.round(totalAmount_tl)); // Convert to integer
+            setTotalLeadscnt_tl(Math.round(totalAmount_tl));
 
             setLeadsSubmitted(leadsSubmitted1.data.totalElements);
             const totalAmount_ls = leadsSubmitted1.data.content.reduce((sum, item) => sum + (item.amount || 0), 0);
-            setLeadsSubmitted_ls(Math.round(totalAmount_ls)); // Convert to integer
+            setLeadsSubmitted_ls(Math.round(totalAmount_ls));
 
             setWonLeads(won1.data.totalElements);
             const totalAmount_wn = won1.data.content.reduce((sum, item) => sum + (item.amount || 0), 0);
-            setWonLeads_wn(Math.round(totalAmount_wn)); // Convert to integer
+            setWonLeads_wn(Math.round(totalAmount_wn));
 
             setLostLeads(lost1.data.totalElements);
             const totalAmount_lt = lost1.data.content.reduce((sum, item) => sum + (item.amount || 0), 0);
-            setLostLeads_lt(Math.round(totalAmount_lt)); // Convert to integer
+            setLostLeads_lt(Math.round(totalAmount_lt));
 
             setResAwa(resulAwa.data.totalElements);
             const totalAmount_ra = resulAwa.data.content.reduce((sum, item) => sum + (item.amount || 0), 0);
-            setResAwa_ra(Math.round(totalAmount_ra)); // Convert to integer
+            setResAwa_ra(Math.round(totalAmount_ra));
 
             setOpportunities(sortedData);
             setLoading(false);
@@ -182,11 +192,11 @@ const Opportunities = () => {
         const { financialYearEnd, fyId } = getCurrentQuarterAndFY();
         setFilters(prev => ({
             ...prev,
-            obFy: [`${financialYearEnd}`], // Default to current FY
+            obFy: [`${financialYearEnd}`],
             selectedFY: `FY${financialYearEnd % 100}`
         }));
-        fetchCardData([fyId]);
-        fetchAllOpportunities(); // Fetch all opportunities for search
+        fetchCardData([fyId], []); // Initial fetch with default FY and empty partFyIds
+        fetchAllOpportunities();
         
         setPermissions(localStorage.getItem('auth') || []);
     }, [fetchCardData, fetchAllOpportunities]);
@@ -195,10 +205,9 @@ const Opportunities = () => {
     const filteredOpportunities = useMemo(() => {
         if (loading) return [];
         
-        // If search is active, search on all data and ignore other filters
         if (filters.search !== '') {
             const searchTerm = filters.search.toLowerCase();
-            const fieldsToSearch = ['opportunityName', 'obFy.obFy', 'obQtr', 'obMmm', 'industrySegment.name', 'primaryOwner', 'dealStatus.dealStatus', 'priority.priority', 'amount'];
+            const fieldsToSearch = ['opportunityName', 'obFy.obFy', 'partFy.obFy', 'partQuarter', 'obQtr', 'obMmm', 'industrySegment.name', 'primaryOwner', 'dealStatus.dealStatus', 'priority.priority', 'amount'];
             
             return allOpportunities.filter(op => {
                 return fieldsToSearch.some(field => {
@@ -208,16 +217,15 @@ const Opportunities = () => {
             });
         }
         
-        // If no search, apply regular filters to current opportunities
         return opportunities.filter(op => {
             return Object.keys(filters).every(filterKey => {
                 if (filterKey === 'selectedFY' || filterKey === 'search') return true;
                 
                 const filterValues = filters[filterKey];
-                if (filterValues.length === 0) return true; // Allow empty filter (deselected)
+                if (filterValues.length === 0) return true;
                 const valuePath = keyMap[filterKey] || filterKey;
                 let value = getNestedValue(op, valuePath);
-                if (filterKey === 'obFy') value = value?.toString();
+                if (filterKey === 'obFy' || filterKey === 'partFy') value = value?.toString();
                 return filterValues.includes(value);
             });
         });
@@ -235,12 +243,10 @@ const Opportunities = () => {
             let aValue = getNestedValue(a, path) || '';
             let bValue = getNestedValue(b, path) || '';
 
-            // Handle numeric sorting for 'amount'
             if (key === 'amount') {
                 aValue = Number(aValue) || 0;
                 bValue = Number(bValue) || 0;
             } else {
-                // Handle string sorting
                 aValue = aValue.toString().toLowerCase();
                 bValue = bValue.toString().toLowerCase();
             }
@@ -267,7 +273,6 @@ const Opportunities = () => {
 
     // Check if no filters are applied (excluding search)
     const noFiltersApplied = useMemo(() => {
-        // If search is active, consider filters as applied
         if (filters.search !== '') return false;
         
         return Object.entries(filters).every(([key, value]) => {
@@ -279,28 +284,35 @@ const Opportunities = () => {
     // Event handlers
     const handleFilterChange = (selectedOptions, filterName) => {
         const value = selectedOptions ? selectedOptions.map(option => option.value) : [];
-        
+
         setFilters(prev => {
             const newFilters = { ...prev, [filterName]: value };
-            
-            if (filterName === 'obFy') {
-                if (value.length > 0) {
-                    newFilters.selectedFY = `FY${parseInt(value[0]) % 100}`;
-                } else {
-                    newFilters.selectedFY = ''; // Clear selectedFY when deselected
-                }
-                
-                // Update data when FY changes
-                const fyIdMap = { 2024: 1, 2025: 2, 2026: 3, 2027: 4 };
-                const fyIds = value.length > 0 ? value.map(fy => fyIdMap[parseInt(fy)]) : [];
-                fetchCardData(fyIds.length > 0 ? fyIds : [getCurrentQuarterAndFY().fyId]); // Default to current FY if empty
+
+            const fyIdMap = { 2024: 1, 2025: 2, 2026: 3, 2027: 4 };
+
+            const obFyIds = newFilters.obFy.map(fy => fyIdMap[parseInt(fy)]).filter(Boolean);
+            const partFyIds = newFilters.partFy.map(fy => fyIdMap[parseInt(fy)]).filter(Boolean);
+
+            // Update selectedFY
+            if (filterName === 'obFy' && value.length > 0) {
+                newFilters.selectedFY = `FY${parseInt(value[0]) % 100}`;
+            } else if (filterName === 'partFy' && value.length > 0 && newFilters.obFy.length === 0) {
+                newFilters.selectedFY = `FY${parseInt(value[0]) % 100}`;
             }
-            
+
+            // NEW: If obFyIds empty, use partFyIds to drive the fetch
+            if (obFyIds.length > 0) {
+                fetchCardData(obFyIds, partFyIds);
+            } else if (partFyIds.length > 0) {
+                fetchCardData(partFyIds, partFyIds); // Use partFyIds in both params
+            }
+
             return newFilters;
         });
-        
+
         setCurrentPage(1);
     };
+
 
     const handleSearchChange = (e) => {
         if (loading) return;
@@ -318,7 +330,7 @@ const Opportunities = () => {
         const fyIdMap = { 2023: 0, 2024: 1, 2025: 2, 2026: 3, 2027: 4 };
         const fyId = fyIdMap[parseInt(year)];
         if (fyId !== undefined) {
-            fetchCardData([fyId]);
+            fetchCardData([fyId], filters.partFy.map(fy => fyIdMap[parseInt(fy)]));
         }
     };
 
@@ -331,7 +343,9 @@ const Opportunities = () => {
             
             if (status === 'Total Opportunities') {
                 newFilters.obFy = [`${financialYearEnd}`];
+                newFilters.partFy = [];
                 newFilters.obQtr = [];
+                newFilters.partQuarter = [];
                 newFilters.priority = [];
                 newFilters.industrySegment = [];
                 newFilters.dealStatus = [];
@@ -340,20 +354,29 @@ const Opportunities = () => {
                 newFilters.selectedFY = `FY${financialYearEnd % 100}`;
                 
                 const fyIdMap = { 2024: 1, 2025: 2, 2026: 3, 2027: 4 };
-                fetchCardData([fyIdMap[financialYearEnd]]);
-            } else if(status === 'Result Awaited'){
+                fetchCardData([fyIdMap[financialYearEnd]], []);
+            } else if(status === 'Result Awaited') {
                 newFilters.dealStatus = ['Bid Submitted', 'Proposal Submitted'];
                 newFilters.obFy = prev.obFy.length > 0 ? prev.obFy : [`${financialYearEnd}`];
                 if (prev.obFy.length === 0) {
                     newFilters.selectedFY = `FY${financialYearEnd % 100}`;
                 }
                 
-            }else{
+                const fyIdMap = { 2024: 1, 2025: 2, 2026: 3, 2027: 4 };
+                const fyIds = newFilters.obFy.map(fy => fyIdMap[parseInt(fy)]);
+                const partFyIds = newFilters.partFy.map(fy => fyIdMap[parseInt(fy)]);
+                fetchCardData(fyIds, partFyIds);
+            } else {
                 newFilters.dealStatus = [status];
                 newFilters.obFy = prev.obFy.length > 0 ? prev.obFy : [`${financialYearEnd}`];
                 if (prev.obFy.length === 0) {
                     newFilters.selectedFY = `FY${financialYearEnd % 100}`;
                 }
+                
+                const fyIdMap = { 2024: 1, 2025: 2, 2026: 3, 2027: 4 };
+                const fyIds = newFilters.obFy.map(fy => fyIdMap[parseInt(fy)]);
+                const partFyIds = newFilters.partFy.map(fy => fyIdMap[parseInt(fy)]);
+                fetchCardData(fyIds, partFyIds);
             }
             
             return newFilters;
@@ -520,17 +543,6 @@ const Opportunities = () => {
                 
                 {isExpanded && (
                     <div>
-                        <div className="fy-selector">
-                            <select 
-                                value={filters.selectedFY} 
-                                onChange={handleFYChange}
-                                disabled={loading}
-                            >
-                                {['FY23', 'FY24', 'FY25', 'FY26'].map(fy => 
-                                    <option key={fy} value={fy}>{fy}</option>
-                                )}
-                            </select>
-                        </div>
                         <ExpandableTable 
                             key={filters.selectedFY} 
                             selectedFY={filters.selectedFY} 

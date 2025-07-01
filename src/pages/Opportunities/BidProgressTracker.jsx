@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { format } from 'date-fns';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { BASE_URL } from '../../components/constants';
@@ -30,17 +30,20 @@ const BidProgressTracker = ({ leadId }) => {
   };
 
   const handleEditClick = (step) => {
-    setEditingStep(step);
-    setEditValues({
-      preBidMeeting: bidData.preBidMeeting || '',
-      querySubmission: bidData.querySubmission || false,
-      solutionReady: bidData.solutionReady || false,
-      solutionReadyDate: bidData.solutionReadyDate || '',
-      mouReady: bidData.mouReady || false,
-      pricingDone: bidData.pricingDone || false,
-      pricingDoneDate: bidData.pricingDoneDate || '',
-    });
-  };
+  setEditingStep(step);
+  setEditValues({
+    pdTq: bidData.pdTq ?? false,
+    boqReadiness: bidData.boqReadiness ?? false,
+    preBidMeeting: bidData.preBidMeeting || '',
+    querySubmission: bidData.querySubmission ?? false,
+    solutionReady: bidData.solutionReady ?? false,
+    solutionReadyDate: bidData.solutionReadyDate || '',
+    mouReady: bidData.mouReady ?? false,
+    pricingDone: bidData.pricingDone ?? false,
+    pricingDoneDate: bidData.pricingDoneDate || '',
+  });
+};
+
 
   const handleDatePickerChange = (date, name) => {
     const formattedDate = date ? format(date, 'yyyy-MM-dd') : '';
@@ -73,6 +76,8 @@ const BidProgressTracker = ({ leadId }) => {
         bidOpening: bidData.bidOpening,
         dealStatusId: bidData.dealStatusId,
         dealStatusName: bidData.dealStatusName,
+        pdTq: editValues.pdTq || false,
+        boqReadiness: editValues.boqReadiness || false,
         createdDate: bidData.createdDate,
         createdBy: bidData.createdBy,
         createdByName: bidData.createdByName,
@@ -109,15 +114,17 @@ const BidProgressTracker = ({ leadId }) => {
   const progressSteps = [
     { key: 'opportunityIdentification', label: 'Opportunity', value: bidData.opportunityIdentification },
     { key: 'rfpReleaseDate', label: 'RFP Release', value: bidData.rfpReleaseDate },
+    { key: 'pdTq', label: 'PQ/TQ', value: bidData.pdTq, editable:true },
     { key: 'goNoGoName', label: 'Go/No-Go', value: bidData.goNoGoName },
     { key: 'preBidMeeting', label: 'Pre-Bid', value: bidData.preBidMeeting, editable: true, isDate: true },
     { key: 'querySubmission', label: 'Queries', value: bidData.querySubmission, editable: true },
-    { key: 'solutionReady', label: 'Solution', value: bidData.solutionReady, dateKey: 'solutionReadyDate', editable: true },
-    { key: 'mouReady', label: 'MOU', value: bidData.mouReady, editable: true },
+    { key: 'boqReadiness', label: 'BOQ Readiness', value: bidData.boqReadiness, editable:true },
+    { key: 'solutionReady', label: 'Solution Readiness', value: bidData.solutionReady, dateKey: 'solutionReadyDate', editable: true },
+    // { key: 'mouReady', label: 'MOU', value: bidData.mouReady, editable: true },
     { key: 'pricingDone', label: 'Pricing', value: bidData.pricingDone, dateKey: 'pricingDoneDate', editable: true },
     { key: 'tenderSubmissionDate', label: 'Submission', value: bidData.tenderSubmissionDate },
     { key: 'bidOpening', label: 'Bid-Opening', value: bidData.bidOpening },
-    { key: 'dealStatusName', label: 'Deal Status', value: bidData.dealStatusName },
+    { key: 'dealStatusName', label: 'Final Status', value: bidData.dealStatusName },
   ];
 
   return (

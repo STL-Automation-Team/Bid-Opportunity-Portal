@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from '../images/itamlogo.png';
 import '../styles/sidebar.css';
@@ -71,6 +71,20 @@ const Sidebar = () => {
           </li>
         )}
 
+        {hasPermission("VIEW") && (
+          <li>
+            <Link to="/BidProgressOverview">
+              <i className="bi bi-ticket-detailed-fill"></i>
+              <span className="link_name">Current Bid Status</span>
+            </Link>
+            <ul className="sub-menu blank">
+              <li>
+                <Link className="link_name" to="/BidProgressOverview">Current Bid Status</Link>
+              </li>
+            </ul>
+          </li>
+        )}
+
         {hasPermission("EDIT") && (
           <li>
             <Link to="/addopportunity">
@@ -103,11 +117,11 @@ const Sidebar = () => {
           <li>
             <Link to="/operationslist">
               <i className="bi bi-ticket-detailed-fill"></i>
-              <span className="link_name">Track Status</span>
+              <span className="link_name">Bid Funnel</span>
             </Link>
             <ul className="sub-menu blank">
               <li>
-                <Link className="link_name" to="/operationslist">Track Status</Link>
+                <Link className="link_name" to="/operationslist">Bid Funnel</Link>
               </li>
             </ul>
           </li>
