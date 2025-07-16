@@ -1,9 +1,16 @@
 import axios from 'axios';
 import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
   ArcElement,
-  BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement,
-  PointElement, Title, Tooltip
-} from 'chart.js/auto';
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Download } from 'lucide-react';
 import React, { Component } from 'react';
