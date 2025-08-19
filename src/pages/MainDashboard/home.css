@@ -9,6 +9,7 @@
   box-sizing: border-box;
   margin: 0 auto;
   padding-left: 260px; /* Adjust based on navbar width; increase if navbar is wider */
+  /* color: white */
 }
 
 .box {

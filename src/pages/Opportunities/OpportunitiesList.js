@@ -399,7 +399,7 @@ const Opportunities = () => {
                     onClick={() => handleCardClick('Total Opportunities')} 
                 />
                 <CountCard 
-                    title="Bid Submitted" 
+                    title="Bid Submitted/Result Awaited" 
                     count={leadsSubmitted} 
                     totalVal = {leadsSubmitted_ls}
                     baseColor="#ffc107" 
@@ -419,13 +419,13 @@ const Opportunities = () => {
                     baseColor="#d9534f" 
                     onClick={() => handleCardClick('Lost')} 
                 />
-                <CountCard 
+                {/* <CountCard 
                     title="Result Awaited" 
                     count={resAw} 
                     totalVal={resAw_ra}
                     baseColor="#B6C468" 
                     onClick={() => handleCardClick('Result Awaited')} 
-                />
+                /> */}
             </div>
             
             <div className="filter-container">
