@@ -27,6 +27,10 @@ const Opportunities = () => {
     const [lostleads_lt, setLostLeads_lt] = useState(0);
     const [resAw_ra, setResAwa_ra] = useState(0);
     
+    // NEW: Active Funnel states
+    const [activeFunnel, setActiveFunnel] = useState(0);
+    const [activeFunnel_amt, setActiveFunnel_amt] = useState(0);
+    
     // UI states
     const [isExpanded, setIsExpanded] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -111,6 +115,42 @@ const Opportunities = () => {
         return path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : null), obj);
     };
 
+    // Download Excel function
+    const downloadExcel = () => {
+        // Create CSV content from current filtered data
+        const headers = ['Part FY', 'Part Month', 'Part Quarter', 'OB FY', 'OB Quarter', 'OB MMM', 'Opportunity Name', 'Industry Segment', 'Primary Owner', 'Amount (INR Cr)', 'Deal Status'];
+        
+        let csvContent = headers.join(',') + '\n';
+        
+        sortedOpportunities.forEach(opportunity => {
+            const row = [
+                getNestedValue(opportunity, 'partFy.obFy') || '',
+                getNestedValue(opportunity, 'partMonth') || '',
+                getNestedValue(opportunity, 'partQuarter') || '',
+                getNestedValue(opportunity, 'obFy.obFy') || '',
+                getNestedValue(opportunity, 'obQtr') || '',
+                getNestedValue(opportunity, 'obMmm') || '',
+                getNestedValue(opportunity, 'opportunityName') || '',
+                getNestedValue(opportunity, 'industrySegment.name') || '',
+                getNestedValue(opportunity, 'primaryOwner') || '',
+                getNestedValue(opportunity, 'amount') || '',
+                getNestedValue(opportunity, 'dealStatus.dealStatus') || ''
+            ];
+            csvContent += row.map(field => `"${field}"`).join(',') + '\n';
+        });
+        
+        // Create and download the file
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'opportunities_data.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     // Fetch all opportunities for search functionality
     const fetchAllOpportunities = useCallback(async () => {
         try {
@@ -134,12 +174,12 @@ const Opportunities = () => {
         });
     };
 
-    // Data fetching
+    // Data fetching - UPDATED to include Active Funnel
     const fetchCardData = useCallback(async (fyIds, partFyIds = []) => {
         setLoading(true);
         try {
             const payload = { fyIds, partFyIds };
-            const [totalLeads1, leadsSubmitted1, won1, lost1, resulAwa] = await Promise.all([
+            const [totalLeads1, leadsSubmitted1, won1, lost1, resulAwa, activeFunnelData] = await Promise.all([
                 axios.post(`${BASE_URL}/api/leads/filter-by-ids`, payload, { 
                     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } 
                 }),
@@ -153,6 +193,13 @@ const Opportunities = () => {
                     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } 
                 }),
                 axios.post(`${BASE_URL}/api/leads/filter-by-ids`, { ...payload, dealStatusIds: [4, 8] }, { 
+                    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } 
+                }),
+                // NEW: Active Funnel API call
+                axios.post(`${BASE_URL}/api/leads/filter-by-ids`, { 
+                    ...payload, 
+                    dealStatusIds: [1, 6, 2, 4, 11] // Identified, Market Scan, BD, Bid Submitted, Won
+                }, { 
                     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } 
                 })
             ]);
@@ -178,6 +225,11 @@ const Opportunities = () => {
             setResAwa(resulAwa.data.totalElements);
             const totalAmount_ra = resulAwa.data.content.reduce((sum, item) => sum + (item.amount || 0), 0);
             setResAwa_ra(Math.round(totalAmount_ra));
+
+            // NEW: Active Funnel calculations
+            setActiveFunnel(activeFunnelData.data.totalElements);
+            const totalAmount_active = activeFunnelData.data.content.reduce((sum, item) => sum + (item.amount || 0), 0);
+            setActiveFunnel_amt(Math.round(totalAmount_active));
 
             setOpportunities(sortedData);
             setLoading(false);
@@ -334,6 +386,7 @@ const Opportunities = () => {
         }
     };
 
+    // UPDATED: handleCardClick with Active Funnel case
     const handleCardClick = (status) => {
         setSelectedStatus(status);
         const { financialYearEnd } = getCurrentQuarterAndFY();
@@ -355,6 +408,17 @@ const Opportunities = () => {
                 
                 const fyIdMap = { 2024: 1, 2025: 2, 2026: 3, 2027: 4 };
                 fetchCardData([fyIdMap[financialYearEnd]], []);
+            } else if(status === 'Active Funnel') {
+                newFilters.dealStatus = ['Identified', 'Market Scan', 'BD', 'Bid Submitted', 'Won'];
+                newFilters.obFy = prev.obFy.length > 0 ? prev.obFy : [`${financialYearEnd}`];
+                if (prev.obFy.length === 0) {
+                    newFilters.selectedFY = `FY${financialYearEnd % 100}`;
+                }
+                
+                const fyIdMap = { 2024: 1, 2025: 2, 2026: 3, 2027: 4 };
+                const fyIds = newFilters.obFy.map(fy => fyIdMap[parseInt(fy)]);
+                const partFyIds = newFilters.partFy.map(fy => fyIdMap[parseInt(fy)]);
+                fetchCardData(fyIds, partFyIds);
             } else if(status === 'Result Awaited') {
                 newFilters.dealStatus = ['Bid Submitted', 'Proposal Submitted'];
                 newFilters.obFy = prev.obFy.length > 0 ? prev.obFy : [`${financialYearEnd}`];
@@ -399,7 +463,14 @@ const Opportunities = () => {
                     onClick={() => handleCardClick('Total Opportunities')} 
                 />
                 <CountCard 
-                    title="Bid Submitted/Result Awaited" 
+                    title="Active Funnel" 
+                    count={activeFunnel}
+                    totalVal={activeFunnel_amt}
+                    baseColor="#17a2b8" 
+                    onClick={() => handleCardClick('Active Funnel')} 
+                />
+                <CountCard 
+                    title="Result Awaited" 
                     count={leadsSubmitted} 
                     totalVal = {leadsSubmitted_ls}
                     baseColor="#ffc107" 
@@ -419,13 +490,6 @@ const Opportunities = () => {
                     baseColor="#d9534f" 
                     onClick={() => handleCardClick('Lost')} 
                 />
-                {/* <CountCard 
-                    title="Result Awaited" 
-                    count={resAw} 
-                    totalVal={resAw_ra}
-                    baseColor="#B6C468" 
-                    onClick={() => handleCardClick('Result Awaited')} 
-                /> */}
             </div>
             
             <div className="filter-container">
@@ -503,10 +567,27 @@ const Opportunities = () => {
                         </table>
                     </div>
                     
-                    <div className="total-amount-container">
-                        <span className="total-amount-label">Total Amount:</span>
-                        <span className="total-amount-value">{totalAmount.toFixed(2)} Cr</span>
-                        <span className="total-amount-currency">INR</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
+                        <div className="total-amount-container">
+                            <span className="total-amount-label">Total Amount:</span>
+                            <span className="total-amount-value">{totalAmount.toFixed(2)} Cr</span>
+                            <span className="total-amount-currency">INR</span>
+                        </div>
+                        
+                        <button 
+                            onClick={downloadExcel}
+                            className="btn btn-success"
+                            style={{ 
+                                backgroundColor: '#28a745', 
+                                border: 'none', 
+                                color: 'white', 
+                                padding: '8px 16px',
+                                borderRadius: '4px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Download Excel
+                        </button>
                     </div>
                     
                     <div className="pagination">

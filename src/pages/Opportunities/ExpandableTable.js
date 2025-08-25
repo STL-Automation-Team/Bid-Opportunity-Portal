@@ -170,7 +170,7 @@ const ExpandableTable = ({ selectedFY }) => {
                 <table className="account-table">
                     <thead>
                         <tr>
-                            <th rowSpan="2">Account Segment Leader</th>
+                            <th rowSpan="2">Sales Leader</th>
                             <th rowSpan="2">Account</th>
                             {['Q1', 'Q2', 'Q3', 'Q4'].map(quarter => (
                                 <th key={quarter} colSpan={expandedQuarters[quarter] ? 5 : 2}>
